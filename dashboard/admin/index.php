@@ -1,18 +1,26 @@
 <?php
 session_start();
-
 // Jika session username tidak ada, lempar kembali ke login
 if (!isset($_SESSION['username'])) {
-    header("Location: ../pages/login.php");
+    header("Location: ../../auth/login");
     exit;
 }
 
-require_once '../database/koneksi.php';
+
+require_once '../../config.php';
+
+function getUsersByRole($pdo, $role) {
+    $stmt = $pdo->prepare("SELECT * FROM user WHERE role = :role");
+    $stmt->execute(['role' => $role]);
+    return $stmt->fetchAll();
+}
+
+$countKasir = getUsersByRole($pdo, 1);
 
 // Ambil statistik untuk dashboard
-$countMenu = $kon->query("SELECT COUNT(*) FROM menus")->fetchColumn();
-$countKasir = $kon->query("SELECT COUNT(*) FROM users WHERE username != 'admin'")->fetchColumn();
-$countOrder = $kon->query("SELECT COUNT(*) FROM orders")->fetchColumn();
+// $countMenu = $kon->query("SELECT COUNT(*) FROM menus")->fetchColumn();
+// $countKasir = $kon->query("SELECT COUNT(*) FROM users WHERE username != 'admin'")->fetchColumn();
+// $countOrder = $kon->query("SELECT COUNT(*) FROM orders")->fetchColumn();
 ?>
 
 <!doctype html>
@@ -24,13 +32,13 @@ $countOrder = $kon->query("SELECT COUNT(*) FROM orders")->fetchColumn();
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="../..//assets/css/output.css" rel="stylesheet">
     <!-- [Favicon] icon -->
     <link rel="icon" href="../assets/images/favicon.svg" type="image/x-icon" />
     <!-- [Font] Family -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <!-- [Template CSS Files] -->
-    <link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
+
   </head>
   <body>
     <!-- [ Pre-loader ] start -->
@@ -203,8 +211,6 @@ $countOrder = $kon->query("SELECT COUNT(*) FROM orders")->fetchColumn();
       </div>
     </footer>
  
-    <script src="../assets/js/feather.min.js"></script>
-    <script src="../assets/js/script.js"></script>
     
     <!-- Script untuk Data Filter Dashboard -->
     <script>
