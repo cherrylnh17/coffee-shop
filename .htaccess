@@ -1,0 +1,11 @@
+RewriteEngine On
+
+# Menghilangkan index.php dari URL root folder
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^index/?$ index.php [L,NC]
+
+# Menghilangkan ekstensi .php 
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^([^\.]+)$ $1.php [NC,L]
