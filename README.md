@@ -11,6 +11,7 @@ $host     = "localhost";      // Biasanya 'localhost'
 $db_name  = "nama_database";  // Nama database yang Anda buat
 $username = "root";           // Username SQL (default XAMPP: root)
 $password = "";               // Password SQL (default XAMPP: kosong)
+```
 
 ### Run Website
 Untuk mulai website bisa dengan melakukan command `npm install` terus `npm run dev` didalam terminal:
