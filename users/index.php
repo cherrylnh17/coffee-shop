@@ -8,109 +8,99 @@ error_reporting(E_ALL);
 try {
     // Ambil data menu dari database
     $query = "SELECT * FROM menu ORDER BY created_at ASC";
-    $stmt = $conn->prepare($query);
+    $stmt = $pdo->prepare($query);
     $stmt->execute();
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC); 
 } catch(PDOException $e) {
     die("Error pada query: " . $e->getMessage());
 }
+
+$table_code = $_GET['code'];
+if($table_code == NULL){
+    header("Location: ../");
+}
+
 ?>
 
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Träffa Coffee & Eatery</title>
-    <link href="../assets/css/output.css" rel="stylesheet">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f3f4f6; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        @keyframes slideUp { from { transform: translateX(-50%) translateY(100%); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
-        @keyframes fadeIn  { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .toast-animate { animation: slideUp 0.3s ease-out forwards; }
-        .menu-card { animation: fadeIn 0.25s ease-out forwards; }
-    </style>
-</head>
-<body class="antialiased text-gray-800">
-<main class="w-full max-w-[480px] mx-auto bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-x-hidden">
+<?php 
+  $title = "Beranda"; 
+  include 'layout/header.php'; 
+?>
 
-    <header class="sticky top-0 z-20 bg-white shadow-sm pt-5 pb-3 px-4 rounded-b-2xl">
-        <div class="flex justify-between items-center mb-5">
-            <button onclick="window.location.href='profile.php'" class="text-gray-800 hover:text-sky-500 transition-colors">
-                <i class="ph ph-list text-2xl"></i>
-            </button>
-            <button onclick="window.location.href='search.php'" class="text-gray-800 hover:text-sky-500 transition-colors">
-                <i class="ph ph-magnifying-glass text-2xl"></i>
-            </button>
-        </div>
-        <div class="flex justify-between items-center mb-4">
-            <div>
-                <h1 class="text-xl font-bold text-gray-900">Träffa Coffee & Eatery</h1>
-                <p class="text-xs text-gray-500 mt-0.5">Pesan langsung dari mejamu 🍽️</p>
+    <main class="w-full max-w-md mx-auto bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-x-hidden">
+        <header class="sticky top-0 z-20 bg-white shadow-sm pt-5 pb-3 px-4 rounded-b-2xl">
+            <div class="flex justify-between items-center mb-5">
+                <button onclick="window.location.href='profile.php'" class="text-gray-800 hover:text-sky-500 transition-colors">
+                    <i class="ph ph-list text-2xl"></i>
+                </button>
+                <button onclick="window.location.href='search.php'" class="text-gray-800 hover:text-sky-500 transition-colors">
+                    <i class="ph ph-magnifying-glass text-2xl"></i>
+                </button>
             </div>
-            <div class="bg-sky-500 text-white px-3 py-1.5 rounded-xl flex flex-col items-center justify-center shadow-md border-[3px] border-sky-100 flex-shrink-0 min-w-[60px]">
-                <span class="text-[9px] font-bold uppercase tracking-widest opacity-90 mb-[-3px]">Meja</span>
-                <span class="text-xl font-black tracking-wider">A01</span>
-            </div>
-        </div>
-        <div class="flex overflow-x-auto gap-2.5 no-scrollbar pb-1" id="category-container"></div>
-    </header>
-
-    <div class="flex-1 px-4 py-5 space-y-4 pb-28" id="menu-container"></div>
-
-    <div class="fixed bottom-6 w-full max-w-[480px] left-1/2 -translate-x-1/2 px-5 z-30 flex justify-end pointer-events-none">
-        <button onclick="goToCheckout()" class="pointer-events-auto bg-sky-500 hover:bg-sky-600 text-white w-[60px] h-[60px] rounded-full shadow-xl flex items-center justify-center relative transition-transform active:scale-90 flex-shrink-0 border-4 border-white">
-            <i class="ph ph-shopping-cart text-2xl"></i>
-            <span id="cart-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[11px] font-bold w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-sm hidden">0</span>
-        </button>
-    </div>
-
-    <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg z-50 hidden toast-animate flex items-center gap-2">
-        <i class="ph-fill ph-check-circle text-green-400 text-lg"></i>
-        <span id="toast-msg">Ditambahkan ke keranjang</span>
-    </div>
-
-    <div id="modal-backdrop" class="fixed inset-0 bg-black/50 z-40 hidden opacity-0 transition-opacity duration-300" onclick="closeModal()"></div>
-
-    <div id="product-modal" class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-white rounded-t-3xl z-50 transform translate-y-full transition-transform duration-300 flex flex-col max-h-[90vh]">
-        <div class="flex justify-center pt-4 pb-2 cursor-pointer" onclick="closeModal()">
-            <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
-        </div>
-        <div class="overflow-y-auto no-scrollbar pb-24">
-            <div class="px-4 pb-4">
-                <img id="modal-img" src="" alt="" class="w-full h-56 object-cover rounded-2xl bg-gray-100 shadow-sm">
-            </div>
-            <div class="px-5">
-                <div class="flex justify-between items-start gap-4 mb-2">
-                    <h2 id="modal-title" class="text-xl font-bold text-gray-900 leading-tight">Nama Produk</h2>
-                    <span id="modal-price" class="text-lg font-black text-sky-500 whitespace-nowrap">Rp 0</span>
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900">Träffa Coffee & Eatery</h1>
+                    <p class="text-xs text-gray-500 mt-0.5">Pesan langsung dari mejamu 🍽️</p>
                 </div>
-                <p id="modal-desc" class="text-sm text-gray-500 leading-relaxed">Deskripsi produk...</p>
-                <div class="mt-6">
-                    <label class="block text-sm font-bold text-gray-800 mb-2 items-center gap-1.5">
-                        <i class="ph ph-note-pencil text-lg text-gray-500"></i> Catatan Khusus
-                    </label>
-                    <textarea id="modal-note" rows="2" placeholder="Contoh: Esnya sedikit..." class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 bg-gray-50"></textarea>
+                <div class="bg-sky-500 text-white px-3 py-1.5 rounded-xl flex flex-col items-center justify-center shadow-md border-[3px] border-sky-100 shrink-0 min-w-15">
+                    <span class="text-[9px] font-bold uppercase tracking-widest opacity-90 -mb-0.75">Meja</span>
+                    <span class="text-xl font-black tracking-wider"><?=  $table_code ?></span>
                 </div>
             </div>
-        </div>
-        <div class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-100 p-4 flex gap-4 items-center rounded-t-2xl shadow-lg">
-            <div class="flex items-center gap-3 bg-gray-50 border border-gray-200 p-1.5 rounded-xl">
-                <button onclick="changeModalQty(-1)" class="w-9 h-9 rounded-lg flex items-center justify-center text-gray-600 hover:bg-white"><i class="ph-bold ph-minus"></i></button>
-                <span id="modal-qty" class="font-bold text-gray-800 min-w-[24px] text-center">1</span>
-                <button onclick="changeModalQty(1)" class="w-9 h-9 rounded-lg flex items-center justify-center text-sky-600 hover:bg-white"><i class="ph-bold ph-plus"></i></button>
-            </div>
-            <button onclick="addFromModalToCart()" class="flex-1 bg-sky-500 hover:bg-sky-600 text-white rounded-xl py-3.5 font-bold text-sm flex items-center justify-center gap-2">
-                <span>Tambah</span>
-                <span id="modal-total-btn">Rp 0</span>
+            <div class="flex overflow-x-auto gap-2.5 no-scrollbar pb-1" id="category-container"></div>
+        </header>
+
+        <div class="flex-1 px-4 py-5 space-y-4 pb-28" id="menu-container"></div>
+
+        <div class="fixed bottom-6 w-full max-w-120 left-1/2 -translate-x-1/2 px-5 z-30 flex justify-end pointer-events-none">
+            <button onclick="goToCheckout()" class="pointer-events-auto bg-sky-500 hover:bg-sky-600 text-white w-15 h-15 rounded-full shadow-xl flex items-center justify-center relative transition-transform active:scale-90 shrink-0 border-4 border-white">
+                <i class="ph ph-shopping-cart text-2xl"></i>
+                <span id="cart-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[11px] font-bold w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-sm ">0</span>
             </button>
         </div>
-    </div>
-</main>
+
+        <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg z-50 hidden toast-animate items-center gap-2">
+            <i class="ph-fill ph-check-circle text-green-400 text-lg"></i>
+            <span id="toast-msg">Ditambahkan ke keranjang</span>
+        </div>
+
+        <div id="modal-backdrop" class="fixed inset-0 bg-black/50 z-40 hidden opacity-0 transition-opacity duration-300" onclick="closeModal()"></div>
+
+        <div id="product-modal" class="fixed max-w-md bottom-0 left-1/2 -translate-x-1/2 w-full  bg-white rounded-t-3xl z-50 transform translate-y-full transition-transform duration-300 flex flex-col max-h-[90vh]">
+            <div class="flex justify-center pt-4 pb-2 cursor-pointer" onclick="closeModal()">
+                <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+            </div>
+            <div class="overflow-y-auto no-scrollbar pb-24">
+                <div class="px-4 pb-4">
+                    <img id="modal-img" src="" alt="" class="w-full h-56 object-cover rounded-2xl bg-gray-100 shadow-sm">
+                </div>
+                <div class="px-5">
+                    <div class="flex justify-between items-start gap-4 mb-2">
+                        <h2 id="modal-title" class="text-xl font-bold text-gray-900 leading-tight">Nama Produk</h2>
+                        <span id="modal-price" class="text-lg font-black text-sky-500 whitespace-nowrap">Rp 0</span>
+                    </div>
+                    <p id="modal-desc" class="text-sm text-gray-500 leading-relaxed">Deskripsi produk...</p>
+                    <div class="mt-6">
+                        <label class="block text-sm font-bold text-gray-800 mb-2 items-center gap-1.5">
+                            <i class="ph ph-note-pencil text-lg text-gray-500"></i> Catatan Khusus
+                        </label>
+                        <textarea id="modal-note" rows="2" placeholder="Contoh: Esnya sedikit..." class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 bg-gray-50"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-100 p-4 flex gap-4 items-center rounded-t-2xl shadow-lg">
+                <div class="flex items-center gap-3 bg-gray-50 border border-gray-200 p-1.5 rounded-xl">
+                    <button onclick="changeModalQty(-1)" class="w-9 h-9 rounded-lg flex items-center justify-center text-gray-600 hover:bg-white"><i class="ph-bold ph-minus"></i></button>
+                    <span id="modal-qty" class="font-bold text-gray-800 min-w-6 text-center">1</span>
+                    <button onclick="changeModalQty(1)" class="w-9 h-9 rounded-lg flex items-center justify-center text-sky-600 hover:bg-white"><i class="ph-bold ph-plus"></i></button>
+                </div>
+                <button onclick="addFromModalToCart()" class="flex-1 bg-sky-500 hover:bg-sky-600 text-white rounded-xl py-3.5 font-bold text-sm flex items-center justify-center gap-2">
+                    <span>Tambah</span>
+                    <span id="modal-total-btn">Rp 0</span>
+                </button>
+            </div>
+        </div>
+    </main>
 
 <script>
     // Konversi data PHP ke JSON
@@ -272,5 +262,6 @@ try {
 
     window.onload = () => { renderCategories(); renderMenus(); updateCartBadge(); };
 </script>
-</body>
-</html>
+
+
+<?php include 'layout/footer.php'; ?>
