@@ -9,3 +9,6 @@ RewriteRule ^index/?$ index.php [L,NC]
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}\.php -f
 RewriteRule ^([^\.]+)$ $1.php [NC,L]
+
+php_flag display_errors On
+php_value error_reporting 32767

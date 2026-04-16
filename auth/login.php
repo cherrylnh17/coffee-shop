@@ -1,19 +1,25 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 session_start();
-require_once '../database/koneksi.php'; 
+require_once '../config.php'; 
 
+
+var_dump($_SESSION);
 if (isset($_POST['login'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
     try {
         // Asumsi nama tabel adalah 'users'
-        $stmt = $kon->prepare("SELECT * FROM users WHERE username = :username");
+        $stmt = $pdo->prepare("SELECT * FROM user WHERE username = :username AND password = :password");
         $stmt->bindParam(':username', $username);
+        $stmt->bindParam(':password', $password);
         $stmt->execute();
         
         $user = $stmt->fetch();
-
+        var_dump($user);
         // Pengecekan password
         if ($user && $user['password'] === $password) {
             $_SESSION['user_id'] = $user['id'];
@@ -22,9 +28,9 @@ if (isset($_POST['login'])) {
             // Cek role user untuk diarahkan ke halaman yang sesuai
             // (Asumsi di tabel 'users' ada kolom 'role' atau sejenisnya)
             if ($username === 'admin') {
-                header("Location: ../admin/index.php");
+                header("Location: ../dashboard/admin/index.php");
             } else {
-                header("Location: ../dashboard/index.html");
+                header("Location: ../dashboard/index.php");
             }
             exit;
         } else {
