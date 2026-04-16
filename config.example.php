@@ -1,6 +1,6 @@
 <?php
 $host = "Host SQL";
-$db_name = "Nama Database";
+$db_name = "Nama Database;
 $username = "Username SQL";
 $password = "Password SQL";
 try {
