@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../database/koneksi.php'; 
+require_once '../config.php'; 
 
 if (isset($_POST['login'])) {
     $username = $_POST['username'];
@@ -8,7 +8,7 @@ if (isset($_POST['login'])) {
 
     try {
         // Asumsi nama tabel adalah 'users'
-        $stmt = $kon->prepare("SELECT * FROM users WHERE username = :username");
+        $stmt = $kon->prepare("SELECT * FROM user WHERE username = :username");
         $stmt->bindParam(':username', $username);
         $stmt->execute();
         
@@ -22,7 +22,7 @@ if (isset($_POST['login'])) {
             // Cek role user untuk diarahkan ke halaman yang sesuai
             // (Asumsi di tabel 'users' ada kolom 'role' atau sejenisnya)
             if ($username === 'admin') {
-                header("Location: ../admin/index.php");
+                header("Location: ../dashboard/admin/index.php");
             } else {
                 header("Location: ../dashboard/index.html");
             }

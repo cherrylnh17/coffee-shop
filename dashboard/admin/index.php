@@ -3,16 +3,24 @@ session_start();
 
 // Jika session username tidak ada, lempar kembali ke login
 if (!isset($_SESSION['username'])) {
-    header("Location: ../pages/login.php");
+    header("Location: ../auth/login.php");
     exit;
 }
-
-require_once '../database/koneksi.php';
+require_once '../../config.php'; 
 
 // Ambil statistik untuk dashboard
-$countMenu = $kon->query("SELECT COUNT(*) FROM menus")->fetchColumn();
-$countKasir = $kon->query("SELECT COUNT(*) FROM users WHERE username != 'admin'")->fetchColumn();
-$countOrder = $kon->query("SELECT COUNT(*) FROM orders")->fetchColumn();
+// $countMenu = $kon->query("SELECT COUNT(*) FROM menu")->fetchColumn();
+
+var_dump($pdo);
+// function getUsersByRole($pdo, $role) {
+//     $stmt = $pdo->prepare("SELECT * FROM users WHERE role = :role");
+//     $stmt->execute(['role' => $role]);
+//     return $stmt->fetchAll();
+// }
+
+// $countKasir = getUsersByRole($pdo, 2);
+
+// $countOrder = $kon->query("SELECT COUNT(*) FROM order")->fetchColumn();
 ?>
 
 <!doctype html>
