@@ -5,6 +5,17 @@ include '../config.php';
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
+try {
+    // Ambil data menu dari database
+    $query = "SELECT * FROM menu ORDER BY created_at ASC";
+    $stmt = $pdo->prepare($query);
+    $stmt->execute();
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC); 
+} catch(PDOException $e) {
+    die("Error pada query: " . $e->getMessage());
+}
+
+
 if (!isset($_GET['code']) || empty($_GET['code'])) {
     header("Location: ../");
     exit(); 
