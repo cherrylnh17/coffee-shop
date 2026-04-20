@@ -16,7 +16,7 @@ $offset = ($page - 1) * $limit;
 $total_stmt = $pdo->query("SELECT COUNT(*) FROM menu");
 $total_records = $total_stmt->fetchColumn();
 
-// Hitung total halaman
+// Hitung total halaman ssss
 $total_pages = ceil($total_records / $limit);
 if ($page > $total_pages) {
     $page = $total_pages;
