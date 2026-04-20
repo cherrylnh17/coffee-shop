@@ -9,11 +9,9 @@ if (isset($_POST['update'])) {
     $category = $_POST['category'];
     $description = !empty($_POST['description']) ? trim($_POST['description']) : 'Tidak ada deskripsi.';
     
-    // Ambil path gambar lama dari input hidden sebagai default
     $old_image = $_POST['old_image'];
     $image_db_path = $old_image; 
 
-    // Cek apakah user mengunggah gambar baru
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $file_tmp = $_FILES['image']['tmp_name'];
         $file_name = $_FILES['image']['name'];
@@ -31,12 +29,9 @@ if (isset($_POST['update'])) {
 
             $target_file = $target_dir . $new_file_name;
 
-            // Pindahkan file baru
             if (move_uploaded_file($file_tmp, $target_file)) {
                 $image_db_path = 'asset/image/menu/' . $new_file_name;
                 
-                // Opsional: Hapus gambar lama agar folder tidak menumpuk
-                // Pastikan gambar lama bukan placeholder/dari web luar
                 if (!preg_match('/^http/', $old_image) && file_exists('../../../' . $old_image)) {
                     unlink('../../../' . $old_image);
                 }
