@@ -16,26 +16,61 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // PENGAMAN DESKRIPSI: Jika kosong, isi dengan teks default agar tidak NULL di database
         $description = !empty($_POST['description']) ? trim($_POST['description']) : 'Tidak ada deskripsi.';
         
-        // PENGAMAN GAMBAR: Jika URL gambar kosong, beri gambar default
-        $image = !empty($_POST['image']) ? trim($_POST['image']) : 'https://placehold.co/100x100?text=No+Image';
+        // --- LOGIKA UPLOAD GAMBAR ---
+        $image_db_path = 'https://placehold.co/100x100?text=No+Image'; // Default jika gambar gagal/tidak diupload
+
+        // Pastikan ada file yang diunggah dan tidak ada error
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $file_tmp = $_FILES['image']['tmp_name'];
+            $file_name = $_FILES['image']['name'];
+            
+            // Ambil ekstensi file (jpg, png, dll)
+            $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+            // Tentukan ekstensi yang diperbolehkan demi keamanan
+            $allowed_ext = ['jpg', 'jpeg', 'png', 'webp'];
+
+            if (in_array($file_ext, $allowed_ext)) {
+                // Buat nama file baru yang unik (agar file dengan nama sama tidak saling menimpa)
+                $new_file_name = uniqid('menu_') . '.' . $file_ext;
+                
+                // Tentukan lokasi folder fisik tujuan (Naik 3 tingkat ke root -> lalu ke asset/image/menu)
+                $target_dir = '../../../assets/image/menu/';
+                
+                // Jika foldernya belum ada, PHP akan membuatkannya secara otomatis
+                if (!is_dir($target_dir)) {
+                    mkdir($target_dir, 0777, true);
+                }
+
+                $target_file = $target_dir . $new_file_name;
+
+                // Pindahkan file dari penyimpanan sementara ke folder fisik tujuan
+                if (move_uploaded_file($file_tmp, $target_file)) {
+                    // Jika berhasil dipindah, buat string path yang AKAN DISIMPAN KE DATABASE
+                    // Sesuai permintaan: asset/image/menu/....jpg
+                    $image_db_path = 'assets/image/menu/' . $new_file_name;
+                }
+            } else {
+                // Jika format bukan gambar, kembalikan dengan pesan error
+                header("Location: manajemenmenu.php?status=error&msg=" . urlencode("Gagal! Format gambar harus JPG, JPEG, PNG, WEBP, atau GIF."));
+                exit;
+            }
+        }
 
         // 2. Query SQL
         $sql = "INSERT INTO menu (name, price, category, image, description) 
                 VALUES (?, ?, ?, ?, ?)";
         
-        // Ubah $kon menjadi $pdo
         $stmt = $pdo->prepare($sql);
         
-        // 3. Eksekusi
+        // 3. Eksekusi menggunakan path gambar yang sudah diproses (asset/image/menu/...)
         $stmt->execute([
             $name, 
             $price, 
             $category, 
-            $image, 
+            $image_db_path, 
             $description
         ]);
         
-        // Perbaiki link ke manajemenmenu.php
         header("Location: manajemenmenu.php?status=success");
         exit;
         

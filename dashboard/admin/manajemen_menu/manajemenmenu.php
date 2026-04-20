@@ -51,16 +51,14 @@ $menu = $stmt->fetchAll();
   <body class="bg-gray-50 text-gray-800">
     
     <nav class="fixed inset-y-0 left-0 z-[1026] w-[280px] overflow-hidden border-r border-gray-200 bg-white transition-all duration-200 ease-in-out max-lg:-left-[280px] pc-sidebar">
-      <div class="h-full w-full">
-        <div class="flex h-[74px] items-center px-6 py-4">
-          <a href="../index.php" class="flex items-center gap-3">
-            <img src="../../assets/images/logo-dark.svg" class="h-8 w-8" alt="logo" onerror="this.src='https://placehold.co/32x32?text=Logo'"/>
+      <div class="flex h-[74px] items-center px-6 py-4">
+          <a href="index.php" class="flex items-center gap-3">
+            <img src="../../../assets/image/logo.svg" class="h-8 w-8" alt="logo" />
             <span class="inline-block rounded-md bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">Admin Panel</span>
           </a>
         </div>
 
-        <div class="h-[calc(100vh-74px)] overflow-y-auto py-3">
-          <div class="mx-4 mb-4 rounded-xl border border-gray-100 bg-gray-50 p-4">
+        <div class="mx-4 mb-4 rounded-xl bg-gray-50 border border-gray-100 p-4">
             <div class="flex items-center">
               <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600 shadow-sm">
                 AK
@@ -208,7 +206,15 @@ $menu = $stmt->fetchAll();
                         <tr class="border-b border-gray-100 bg-white hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 text-center"><?php echo $no++; ?></td>
                             <td class="px-6 py-4 text-center">
-                                <img src="<?php echo htmlspecialchars($row['image']); ?>" alt="Menu" class="mx-auto h-14 w-14 rounded-lg object-cover shadow-sm" onerror="this.src='https://placehold.co/100x100?text=No+Image'">
+                                <?php 
+                                // Cek apakah dari folder lokal atau url external (http)
+                                $img_src = htmlspecialchars($row['image']);
+                                if (!preg_match('/^http/', $img_src)) {
+                                    // Naik 3 folder dari manajemenmenu.php ke root
+                                    $img_src = '../../../' . $img_src; 
+                                }
+                                ?>
+                                <img src="<?php echo $img_src; ?>" alt="Menu" class="w-14 h-14 rounded-lg object-cover mx-auto shadow-sm" onerror="this.src='https://placehold.co/100x100?text=No+Image'">
                             </td>
                             <td class="px-6 py-4 font-medium text-gray-900"><?php echo htmlspecialchars($row['name']); ?></td>
                             <td class="px-6 py-4">
@@ -292,7 +298,7 @@ $menu = $stmt->fetchAll();
                     </button>
                 </div>
                 
-                <form action="tambah.php" method="POST" class="p-4 md:p-5">
+                <form action="tambah.php" method="POST" enctype="multipart/form-data" class="p-4 md:p-5">
                     <div class="mb-4 grid grid-cols-2 gap-4">
                         <div class="col-span-2">
                             <label for="name" class="mb-2 block text-sm font-medium text-gray-900">Nama Menu</label>
@@ -315,7 +321,7 @@ $menu = $stmt->fetchAll();
                         
                         <div class="col-span-2">
                             <label for="image" class="mb-2 block text-sm font-medium text-gray-900">Link URL Gambar</label>
-                            <input type="url" name="image" id="image" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="https://image-link.com/photo.jpg" required>
+                            <input type="file" name="image" id="image" accept="image/*" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required>
                         </div>
                         
                         <div class="col-span-2">
