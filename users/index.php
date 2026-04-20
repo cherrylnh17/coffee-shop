@@ -15,10 +15,12 @@ try {
     die("Error pada query: " . $e->getMessage());
 }
 
-$table_code = $_GET['code'];
-if($table_code == NULL){
+if (!isset($_GET['code']) || empty($_GET['code'])) {
     header("Location: ../");
+    exit(); 
 }
+
+$table_code = htmlspecialchars($_GET['code']);
 
 ?>
 
@@ -30,9 +32,9 @@ if($table_code == NULL){
     <main class="w-full max-w-md mx-auto bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-x-hidden">
         <header class="sticky top-0 z-20 bg-white shadow-sm pt-5 pb-3 px-4 rounded-b-2xl">
             <div class="flex justify-between items-center mb-5">
-                <button onclick="window.location.href='profile.php'" class="text-gray-800 hover:text-sky-500 transition-colors">
+                <a href="profile?code=<?=$table_code ?>" class="text-gray-800 hover:text-sky-500 transition-colors">
                     <i class="ph ph-list text-2xl"></i>
-                </button>
+                </a>
                 <button onclick="window.location.href='search.php'" class="text-gray-800 hover:text-sky-500 transition-colors">
                     <i class="ph ph-magnifying-glass text-2xl"></i>
                 </button>
