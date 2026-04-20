@@ -1,20 +1,9 @@
-<!DOCTYPE html>
 <?php 
 include '../config.php';
 
 // Aktifkan error reporting untuk debugging
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-
-try {
-    // Ambil data menu dari database
-    $query = "SELECT * FROM menu ORDER BY created_at ASC";
-    $stmt = $pdo->prepare($query);
-    $stmt->execute();
-    $result = $stmt->fetchAll(PDO::FETCH_ASSOC); 
-} catch(PDOException $e) {
-    die("Error pada query: " . $e->getMessage());
-}
 
 if (!isset($_GET['code']) || empty($_GET['code'])) {
     header("Location: ../");
@@ -26,7 +15,7 @@ $table_code = htmlspecialchars($_GET['code']);
 ?>
 
 <?php 
-  $title = "Beranda"; 
+  $title = "Pesanan"; 
   include 'layout/header.php'; 
 ?>
 
@@ -102,7 +91,7 @@ $table_code = htmlspecialchars($_GET['code']);
 
     <!-- Footer CTA -->
     <div class="fixed bottom-0 w-full max-w-[480px] left-1/2 -translate-x-1/2 p-4 bg-white border-t border-gray-200 z-30">
-        <button id="checkout-btn" onclick="goToIdentitas()" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3.5 font-bold text-base shadow-lg transition-transform active:scale-[0.98] flex items-center justify-center gap-2">
+        <button id="checkout-btn" onclick="goToIdentitas()" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3.5 font-bold text-base shadow-lg transition-transform active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer">
             <span>Lanjut ke Pembayaran</span>
             <i class="ph-bold ph-caret-right"></i>
         </button>
@@ -331,7 +320,7 @@ $table_code = htmlspecialchars($_GET['code']);
     function goToIdentitas() {
         const cart = getCart();
         if (!cart.length) return;
-        window.location.href = 'identitas.html';
+        window.location.href = 'identitas.php?code=<?= $table_code ?>';
     }
 
     document.addEventListener('DOMContentLoaded', () => {
