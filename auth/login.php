@@ -12,8 +12,10 @@ if (isset($_POST['login'])) {
 
     try {
         // Asumsi nama tabel adalah 'users'
+
         $stmt = $pdo->prepare("SELECT * FROM user WHERE username = :username AND password = :password");
        
+
         $stmt->bindParam(':username', $username);
         $stmt->bindParam(':password', $password);
         $stmt->execute();
