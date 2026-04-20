@@ -58,6 +58,8 @@ $menu = $stmt->fetchAll();
           </a>
         </div>
 
+        <div class="h-[calc(100vh-74px)] overflow-y-auto py-3">
+
         <div class="mx-4 mb-4 rounded-xl bg-gray-50 border border-gray-100 p-4">
             <div class="flex items-center">
               <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600 shadow-sm">
@@ -106,7 +108,7 @@ $menu = $stmt->fetchAll();
               </li>
 
               <li>
-                <a href="../../auth/login.php" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-red-50 hover:text-red-600">
+                <a href="../../../auth/login.php" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-red-50 hover:text-red-600">
                   <span class="flex w-6 justify-center text-lg text-gray-400 transition-colors group-hover:text-red-600"><i class="fa-solid fa-right-from-bracket"></i></span>
                   <span class="font-medium">Log Out</span>
                 </a>
@@ -370,7 +372,7 @@ $menu = $stmt->fetchAll();
                         </div>
                         <div class="col-span-2">
                             <label class="mb-2 block text-sm font-medium text-gray-900">Link URL Gambar</label>
-                            <input type="url" name="image" id="edit-image" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required>
+                            <input type="file" name="image" id="edit-image" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required>
                         </div>
                         <div class="col-span-2">
                             <label class="mb-2 block text-sm font-medium text-gray-900">Deskripsi Menu</label>
