@@ -52,7 +52,7 @@ $menu = $stmt->fetchAll();
     
     <nav class="fixed inset-y-0 left-0 z-[1026] w-[280px] overflow-hidden border-r border-gray-200 bg-white transition-all duration-200 ease-in-out max-lg:-left-[280px] pc-sidebar">
       <div class="flex h-[74px] items-center px-6 py-4">
-          <a href="index.php" class="flex items-center gap-3">
+          <a href="../index.php" class="flex items-center gap-3">
             <img src="../../../assets/image/logo.svg" class="h-8 w-8" alt="logo" />
             <span class="inline-block rounded-md bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">Admin Panel</span>
           </a>
@@ -97,7 +97,7 @@ $menu = $stmt->fetchAll();
               </li>
 
               <li>
-                <a href="../managekasir.html" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600">
+                <a href="../manajemen_kasir/manajemenkasir.php" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600">
                   <span class="flex w-6 justify-center text-lg text-gray-400 transition-colors group-hover:text-blue-600"><i class="fa-solid fa-users-gear"></i></span>
                   <span class="font-medium">Manajemen Kasir</span>
                 </a>
@@ -209,10 +209,8 @@ $menu = $stmt->fetchAll();
                             <td class="px-6 py-4 text-center"><?php echo $no++; ?></td>
                             <td class="px-6 py-4 text-center">
                                 <?php 
-                                // Cek apakah dari folder lokal atau url external (http)
                                 $img_src = htmlspecialchars($row['image']);
                                 if (!preg_match('/^http/', $img_src)) {
-                                    // Naik 3 folder dari manajemenmenu.php ke root
                                     $img_src = '../../../' . $img_src; 
                                 }
                                 ?>
@@ -353,7 +351,6 @@ $menu = $stmt->fetchAll();
                 
                 <form id="form-edit-menu" action="edit.php" method="POST" enctype="multipart/form-data" class="p-4 md:p-5">
                     <input type="hidden" name="id" id="edit-id">
-                    <!-- Input tersembunyi untuk menyimpan data path gambar lama -->
                     <input type="hidden" name="old_image" id="edit-old-image">
 
                     <div class="mb-4 grid grid-cols-2 gap-4">
@@ -430,7 +427,6 @@ $menu = $stmt->fetchAll();
           });
         }
 
-        // Toggle Mobile (Layar Kecil)
         const btnMobile = document.getElementById('mobile-collapse');
         if (btnMobile && sidebar) {
           btnMobile.addEventListener('click', function(e) {
@@ -476,7 +472,6 @@ $menu = $stmt->fetchAll();
       document.getElementById('edit-category').value = category;
       document.getElementById('edit-price').value = price;
       
-      // Kirim path gambar lama ke input hidden 'edit-old-image'
       document.getElementById('edit-old-image').value = image; 
       
       document.getElementById('edit-description').value = description; 
