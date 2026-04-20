@@ -5,6 +5,17 @@ include '../config.php';
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
+try {
+    // Ambil data menu dari database
+    $query = "SELECT * FROM menu ORDER BY created_at ASC";
+    $stmt = $pdo->prepare($query);
+    $stmt->execute();
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC); 
+} catch(PDOException $e) {
+    die("Error pada query: " . $e->getMessage());
+}
+
+
 if (!isset($_GET['code']) || empty($_GET['code'])) {
     header("Location: ../");
     exit(); 
@@ -122,8 +133,22 @@ $table_code = htmlspecialchars($_GET['code']);
     </div>
 
 </main>
-<script src="menu-data.js"></script>
 <script> 
+
+    const MENU_DATA = <?php echo json_encode($result); ?>;
+
+     function getCart() {
+        return JSON.parse(localStorage.getItem('cart')) || [];
+    }
+
+    function saveCart(cart) {
+        localStorage.setItem('cart', JSON.stringify(cart));
+    }
+
+    function formatRupiah(angka) {
+        return 'Rp ' + parseInt(angka).toLocaleString('id-ID');
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         const cart = getCart();
         if (!cart.length) { window.location.href = 'index.html'; return; }
