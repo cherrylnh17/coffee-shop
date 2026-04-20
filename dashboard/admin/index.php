@@ -11,8 +11,6 @@ if (!isset($_SESSION['username'])) {
 }
 require_once '../../config.php'; 
 
-require_once '../../config.php';
-
 function getUsersByRole($pdo, $role) {
     $stmt = $pdo->prepare("SELECT * FROM user WHERE role = :role");
     $stmt->execute(['role' => $role]);
@@ -21,22 +19,6 @@ function getUsersByRole($pdo, $role) {
 
 $countKasir = getUsersByRole($pdo, 1);
 
-// Ambil statistik untuk dashboard
-// $countMenu = $kon->query("SELECT COUNT(*) FROM menu")->fetchColumn();
-
-var_dump($pdo);
-// function getUsersByRole($pdo, $role) {
-//     $stmt = $pdo->prepare("SELECT * FROM users WHERE role = :role");
-//     $stmt->execute(['role' => $role]);
-//     return $stmt->fetchAll();
-// }
-
-// $countKasir = getUsersByRole($pdo, 2);
-
-// $countOrder = $kon->query("SELECT COUNT(*) FROM order")->fetchColumn();
-// $countMenu = $kon->query("SELECT COUNT(*) FROM menus")->fetchColumn();
-// $countKasir = $kon->query("SELECT COUNT(*) FROM users WHERE username != 'admin'")->fetchColumn();
-// $countOrder = $kon->query("SELECT COUNT(*) FROM orders")->fetchColumn();
 ?>
 
 <!doctype html>
@@ -129,7 +111,7 @@ var_dump($pdo);
               </li>
 
               <li>
-                <a href="../auth/login.php" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-red-50 hover:text-red-600">
+                <a href="../../auth/login.php" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-red-50 hover:text-red-600">
                   <span class="flex w-6 justify-center text-lg text-gray-400 transition-colors group-hover:text-red-600"><i class="fa-solid fa-right-from-bracket"></i></span>
                   <span class="font-medium">Log Out</span>
                 </a>
