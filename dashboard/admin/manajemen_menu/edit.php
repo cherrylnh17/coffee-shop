@@ -5,17 +5,53 @@ require_once '../../../config.php';
 if (isset($_POST['update'])) {
     $id = $_POST['id'];
     $name = $_POST['name'];
-    $price = max(0, (int)$_POST['price']); // Cegah harga minus
+    $price = max(0, (int)$_POST['price']);
     $category = $_POST['category'];
-    $image = !empty($_POST['image']) ? $_POST['image'] : 'https://placehold.co/100x100?text=No+Image';
     $description = !empty($_POST['description']) ? trim($_POST['description']) : 'Tidak ada deskripsi.';
+    
+    // Ambil path gambar lama dari input hidden sebagai default
+    $old_image = $_POST['old_image'];
+    $image_db_path = $old_image; 
+
+    // Cek apakah user mengunggah gambar baru
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $file_tmp = $_FILES['image']['tmp_name'];
+        $file_name = $_FILES['image']['name'];
+        
+        $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+        $allowed_ext = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+
+        if (in_array($file_ext, $allowed_ext)) {
+            $new_file_name = uniqid('menu_') . '.' . $file_ext;
+            $target_dir = '../../../asset/image/menu/';
+            
+            if (!is_dir($target_dir)) {
+                mkdir($target_dir, 0777, true);
+            }
+
+            $target_file = $target_dir . $new_file_name;
+
+            // Pindahkan file baru
+            if (move_uploaded_file($file_tmp, $target_file)) {
+                $image_db_path = 'asset/image/menu/' . $new_file_name;
+                
+                // Opsional: Hapus gambar lama agar folder tidak menumpuk
+                // Pastikan gambar lama bukan placeholder/dari web luar
+                if (!preg_match('/^http/', $old_image) && file_exists('../../../' . $old_image)) {
+                    unlink('../../../' . $old_image);
+                }
+            }
+        } else {
+            header("Location: manajemenmenu.php?status=error&msg=" . urlencode("Format gambar baru tidak valid."));
+            exit;
+        }
+    }
 
     try {
-        $sql = "UPDATE menu SET name = ?, price = ?, category = ?, image = ?, description = ? WHERE id = ?";
+        $sql = "UPDATE menu SET name = ?, price = ?, category = ?, image = ?, description = ?, updated_at = NOW() WHERE id = ?";
         
-        // Ubah $kon menjadi $pdo
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$name, $price, $category, $image, $description, $id]);
+        $stmt->execute([$name, $price, $category, $image_db_path, $description, $id]);
 
         header("Location: manajemenmenu.php?status=success");
         exit;
@@ -23,5 +59,8 @@ if (isset($_POST['update'])) {
         header("Location: manajemenmenu.php?status=error&msg=" . urlencode($e->getMessage()));
         exit;
     }
+} else {
+    header("Location: manajemenmenu.php");
+    exit;
 }
 ?>
