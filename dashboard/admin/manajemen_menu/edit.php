@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../database/koneksi.php';
+require_once '../../../config.php';
 
 if (isset($_POST['update'])) {
     $id = $_POST['id'];
@@ -11,14 +11,17 @@ if (isset($_POST['update'])) {
     $description = !empty($_POST['description']) ? trim($_POST['description']) : 'Tidak ada deskripsi.';
 
     try {
-        $sql = "UPDATE menus SET name = ?, price = ?, category = ?, image = ?, description = ? WHERE id = ?";
-        $stmt = $kon->prepare($sql);
+        $sql = "UPDATE menu SET name = ?, price = ?, category = ?, image = ?, description = ? WHERE id = ?";
+        
+        // Ubah $kon menjadi $pdo
+        $stmt = $pdo->prepare($sql);
         $stmt->execute([$name, $price, $category, $image, $description, $id]);
 
-        header("Location: managemenu.php?status=success");
+        header("Location: manajemenmenu.php?status=success");
         exit;
     } catch (PDOException $e) {
-        header("Location: managemenu.php?status=error&msg=" . urlencode($e->getMessage()));
+        header("Location: manajemenmenu.php?status=error&msg=" . urlencode($e->getMessage()));
         exit;
     }
 }
+?>

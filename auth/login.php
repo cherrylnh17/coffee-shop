@@ -5,7 +5,6 @@ error_reporting(E_ALL);
 session_start();
 require_once '../config.php'; 
 
-
 var_dump($_SESSION);
 if (isset($_POST['login'])) {
     $username = $_POST['username'];
@@ -13,7 +12,10 @@ if (isset($_POST['login'])) {
 
     try {
         // Asumsi nama tabel adalah 'users'
+
         $stmt = $pdo->prepare("SELECT * FROM user WHERE username = :username AND password = :password");
+       
+
         $stmt->bindParam(':username', $username);
         $stmt->bindParam(':password', $password);
         $stmt->execute();
@@ -26,7 +28,6 @@ if (isset($_POST['login'])) {
             $_SESSION['username'] = $user['username'];
             
             // Cek role user untuk diarahkan ke halaman yang sesuai
-            // (Asumsi di tabel 'users' ada kolom 'role' atau sejenisnya)
             if ($username === 'admin') {
                 header("Location: ../dashboard/admin/index.php");
             } else {
@@ -43,95 +44,88 @@ if (isset($_POST['login'])) {
 ?>
 
 <!doctype html>
-<html lang="en" class="preset-1" data-pc-sidebar-caption="true" data-pc-layout="vertical" data-pc-direction="ltr" dir="ltr" data-pc-theme_contrast="" data-pc-theme="light">
-  <!-- [Head] start -->
-
+<html lang="en" data-pc-sidebar-caption="true" data-pc-layout="vertical" data-pc-direction="ltr" dir="ltr" data-pc-theme_contrast="" data-pc-theme="light">
   <head>
     <title>Login | Träffa Coffee</title>
     <!-- [Meta] -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta
-      name="description"
-      content="Able Pro is trending dashboard template made using Bootstrap 5 design framework. Able Pro is available in Bootstrap, React, CodeIgniter, Angular,  and .net Technologies."
-    />
-    <meta
-      name="keywords"
-      content="Bootstrap admin template, Dashboard UI Kit, Dashboard Template, Backend Panel, react dashboard, angular dashboard"
-    />
-    <meta name="author" content="Phoenixcoded" />
+    <meta name="description" content="Login to Träffa Coffee" />
 
     <!-- [Favicon] icon -->
     <link rel="icon" href="../assets/images/favicon.svg" type="image/x-icon" />
- <!-- [Font] Family -->
-<link rel="stylesheet" href="../assets/fonts/inter/inter.css" id="main-font-link" />
-<!-- [phosphor Icons] https://phosphoricons.com/ -->
-<link rel="stylesheet" href="../assets/fonts/phosphor/duotone/style.css" />
-<!-- [Tabler Icons] https://tablericons.com -->
-<link rel="stylesheet" href="../assets/fonts/tabler-icons.min.css" />
-<!-- [Feather Icons] https://feathericons.com -->
-<link rel="stylesheet" href="../assets/fonts/feather.css" />
-<!-- [Font Awesome Icons] https://fontawesome.com/icons -->
-<link rel="stylesheet" href="../assets/fonts/fontawesome.css" />
-<!-- [Material Icons] https://fonts.google.com/icons -->
-<link rel="stylesheet" href="../assets/fonts/material.css" />
-<!-- [Template CSS Files] -->
-<link rel="stylesheet" href="../assets/css/style.css" id="main-style-link" />
-
+    
+    <!-- [Font] Family -->
+    <link rel="stylesheet" href="../assets/fonts/inter/inter.css" id="main-font-link" />
+    <link rel="stylesheet" href="../assets/fonts/tabler-icons.min.css" />
+    <link rel="stylesheet" href="../assets/fonts/feather.css" />
+    <link rel="stylesheet" href="../assets/fonts/fontawesome.css" />
+    <link rel="stylesheet" href="../assets/fonts/material.css" />
+    
+    <!-- Tailwind CSS (Menggantikan style.css kustom) -->
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
 
-  <body>
+  <body class="bg-gray-50 text-gray-800">
     <!-- [ Pre-loader ] start -->
-    <div class="loader-bg fixed inset-0 bg-white dark:bg-themedark-cardbg z-[1034]">
-      <div class="loader-track h-[5px] w-full inline-block absolute overflow-hidden top-0 bg-primary-500/40">
-        <div class="loader-fill w-[300px] h-[5px] bg-primary-500 absolute top-0 left-0 transition-[transform_0.2s_linear] origin-left animate-[2.1s_cubic-bezier(0.65,0.815,0.735,0.395)_0s_infinite_normal_none_running_loader-animate]"></div>
+    <!-- <div class="fixed inset-0 z-[1034] bg-white dark:bg-gray-900 transition-opacity duration-300 loader-bg">
+      <div class="absolute top-0 inline-block w-full h-[5px] overflow-hidden bg-blue-100 loader-track">
+        <div class="absolute left-0 top-0 h-[5px] w-[300px] bg-blue-500 animate-pulse loader-fill"></div>
       </div>
-    </div>
+    </div> -->
     <!-- [ Pre-loader ] End -->
 
-    <div class="auth-main relative">
-  <div class="auth-wrapper v1 flex items-center w-full h-full min-h-screen">
-    <div class="auth-form flex items-center justify-center grow flex-col min-h-screen bg-cover relative p-6 bg-[url('../images/authentication/img-auth-bg.jpg')] dark:bg-none dark:bg-themedark-bodybg">
-      <div class="card sm:my-12 w-full max-w-[480px] shadow-none">
-        <div class="card-body !p-10">
-          
-          <div class="my-8 text-center">
-              <a href="#" class="w-full block">
-                <img src="../assets/images/logo-dark.svg" alt="Logo Trafa Coffee" class="mx-auto" style="width: 120px; height: auto;" />
+    <div class="relative w-full">
+      <div class="flex min-h-screen w-full items-center justify-center bg-cover bg-center bg-no-repeat p-6 relative bg-[url('../images/authentication/img-auth-bg.jpg')] dark:bg-gray-900 dark:bg-none">
+        
+        <!-- Login Card -->
+        <div class="relative w-full max-w-[480px] rounded-2xl border border-gray-200 bg-white shadow-lg sm:my-12 dark:border-gray-800 dark:bg-gray-800">
+          <div class="p-8 sm:p-10">
+            
+            <div class="my-6 text-center">
+              <a href="#" class="block w-full">
+                <img src="../assets/images/logo-dark.svg" alt="Logo Trafa Coffee" class="mx-auto h-auto w-[120px]" />
               </a>
             </div>
-          <h4 class="text-center font-medium my-4">Login Akun Anda</h4>
-          
-          <?php if(isset($error)): ?>
-            <div class="text-red-500 text-sm text-center mb-3">
-              <?php echo $error; ?>
-            </div>
-          <?php endif; ?>
-
-          <form action="" method="POST">
-            <div class="mb-3">
-              <input type="text" name="username" class="form-control" id="username" placeholder="Username" required />
-            </div>
-            <div class="mb-4">
-              <input type="password" name="password" class="form-control" id="password" placeholder="Password" required />
-            </div>
-            <div class="flex mt-1 justify-between items-center flex-wrap">
-              <div class="form-check">
-                <input class="form-check-input input-primary" type="checkbox" id="customCheckc1" checked="" />
-                <label class="form-check-label text-muted" for="customCheckc1">Remember me?</label>
+            
+            <h4 class="my-4 text-center text-xl font-semibold text-gray-800 dark:text-gray-100">Login Akun Anda</h4>
+            
+            <?php if(isset($error)): ?>
+              <div class="mb-4 rounded-lg bg-red-50 p-3 text-center text-sm text-red-600 border border-red-100">
+                <?php echo $error; ?>
               </div>
-            </div>
-            <div class="mt-4">
-              <button type="submit" name="login" class="btn btn-primary w-full text-center">Login</button>
-            </div>
-          </form>
+            <?php endif; ?>
+
+            <form action="" method="POST">
+              <div class="mb-4">
+                <input type="text" name="username" id="username" placeholder="Username" required 
+                       class="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
+              </div>
+              <div class="mb-5">
+                <input type="password" name="password" id="password" placeholder="Password" required 
+                       class="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200" />
+              </div>
+              <div class="mb-6 flex flex-wrap items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <input type="checkbox" id="customCheckc1" checked 
+                         class="h-4 w-4 cursor-pointer rounded border-gray-300 text-blue-600 transition-all focus:ring-2 focus:ring-blue-500" />
+                  <label for="customCheckc1" class="cursor-pointer text-sm text-gray-500 dark:text-gray-400">Remember me?</label>
+                </div>
+              </div>
+              <div class="mt-4">
+                <button type="submit" name="login" 
+                        class="inline-block w-full rounded-full bg-blue-600 px-5 py-3 text-center text-base font-medium text-white shadow-sm transition-all duration-200 ease-in-out hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-800">
+                  Login
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
+
       </div>
     </div>
-  </div>
-</div>
-    <!-- [ Main Content ] end -->
+
     <!-- Required Js -->
     <script src="../assets/js/plugins/simplebar.min.js"></script>
     <script src="../assets/js/plugins/popper.min.js"></script>
@@ -140,39 +134,5 @@ if (isset($_POST['login'])) {
     <script src="../assets/js/component.js"></script>
     <script src="../assets/js/theme.js"></script>
     <script src="../assets/js/script.js"></script>
-    <!-- Buy Now Script -->
-    <script src="https://fomo.codedthemes.com/pixel/CDkpF1sQ8Tt5wpMZgqRvKpQiUhpWE3bc"></script>
-
-    
-    <script>
-      layout_change('false');
-    </script>
-     
-    <script>
-      layout_theme_contrast_change('false');
-    </script>
-     
-    <script>
-      change_box_container('false');
-    </script>
-     
-    <script>
-      layout_caption_change('true');
-    </script>
-     
-    <script>
-      layout_rtl_change('false');
-    </script>
-     
-    <script>
-      preset_change('preset-1');
-    </script>
-     
-    <script>
-      main_layout_change('vertical');
-    </script>
-
- 
   </body>
-  <!-- [Body] end -->
 </html>
