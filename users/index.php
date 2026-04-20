@@ -97,7 +97,6 @@ $table_code = htmlspecialchars($_GET['code']);
                     <button onclick="changeModalQty(1)" class="w-9 h-9 rounded-lg flex items-center justify-center text-sky-600 hover:bg-white"><i class="ph-bold ph-plus"></i></button>
                 </div>
                 <button onclick="addFromModalToCart()" class="flex-1 bg-sky-500 hover:bg-sky-600 text-white rounded-xl py-3.5 font-bold text-sm flex items-center justify-center gap-2">
-                    <span>Tambah</span>
                     <span id="modal-total-btn">Rp 0</span>
                 </button>
             </div>
@@ -108,7 +107,7 @@ $table_code = htmlspecialchars($_GET['code']);
     // Konversi data PHP ke JSON
     const MENU_DATA = <?php echo json_encode($result); ?>;
 
-    // Fungsi Keranjang (Local Storage) agar data awet
+    // Fungsi Keranjang Local Storage
     function getCart() {
         return JSON.parse(localStorage.getItem('cart')) || [];
     }
@@ -188,12 +187,27 @@ $table_code = htmlspecialchars($_GET['code']);
         const item = MENU_DATA.find(i => i.id == itemId);
         if (!item) return;
         currentModalItem = item;
-        modalQty = 1;
+        
+        // cek keranjang Apakah item ini sudah pernah ditambahkan?
+        const existingItem = cart.find(c => c.id == itemId);
+        
+        if (existingItem) {
+            // Jika sudah ada, gunakan quantity dan catatan dari keranjang
+            modalQty = existingItem.qty;
+            document.getElementById('modal-note').value = existingItem.note || "";
+        } else {
+            // Jika belum ada di keranjang, kembalikan ke default
+            modalQty = 1;
+            document.getElementById('modal-note').value = "";
+        }
+
         document.getElementById('modal-img').src = `${item.image}`;
         document.getElementById('modal-title').innerText = item.name;
         document.getElementById('modal-desc').innerText = item.description;
         document.getElementById('modal-price').innerText = formatRupiah(item.price);
+        
         updateModalUI();
+        
         document.getElementById('modal-backdrop').classList.remove('hidden');
         setTimeout(() => {
             document.getElementById('modal-backdrop').classList.add('opacity-100');
@@ -219,13 +233,29 @@ $table_code = htmlspecialchars($_GET['code']);
 
     function addFromModalToCart() {
         const note = document.getElementById('modal-note').value.trim();
-        const existing = cart.find(i => i.id == currentModalItem.id && i.note === note);
-        if (existing) existing.qty += modalQty;
-        else cart.push({ id: currentModalItem.id, name: currentModalItem.name, price: currentModalItem.price, qty: modalQty, note: note, image: currentModalItem.image });
+        
+        // hanya cek berdasarkan id
+        const existingIndex = cart.findIndex(i => i.id == currentModalItem.id);
+        
+        if (existingIndex !== -1) {
+            // Jika sudah ada, timpa quantity dan catatannya dengan yang baru dari modal
+            cart[existingIndex].qty = modalQty; 
+            cart[existingIndex].note = note;
+        } else {
+            // Jika belum ada, buat sebagai item baru di keranjang
+            cart.push({ 
+                id: currentModalItem.id, 
+                name: currentModalItem.name, 
+                price: currentModalItem.price, 
+                qty: modalQty, 
+                note: note, 
+                image: currentModalItem.image 
+            });
+        }
         
         syncCart();
         closeModal();
-        showToast("Ditambahkan ke keranjang");
+        showToast("Keranjang diperbarui");
     }
 
     function changeQty(id, d) {
@@ -259,7 +289,7 @@ $table_code = htmlspecialchars($_GET['code']);
 
     function goToCheckout() {
         if (cart.length === 0) return showToast("Keranjang kosong!");
-        window.location.href = 'pesanan.php';
+        window.location.href = 'pesanan?code=<?= $table_code ?>';
     }
 
     window.onload = () => { renderCategories(); renderMenus(); updateCartBadge(); };
