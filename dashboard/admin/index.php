@@ -3,7 +3,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 session_start();
-// Jika session username tidak ada, lempar kembali ke login
+
 if (!isset($_SESSION['username'])) {
     header("Location: ../auth/login.php");
     header("Location: ../../auth/login.php");
@@ -40,12 +40,6 @@ $countKasir = getUsersByRole($pdo, 1);
   </head>
   
   <body class="bg-gray-50 text-gray-800">
-    <!-- [ Pre-loader ] start -->
-    <!-- <div class="fixed inset-0 z-[1034] bg-white transition-opacity duration-300 loader-bg">
-      <div class="absolute top-0 inline-block w-full h-[5px] overflow-hidden bg-blue-100 loader-track">
-        <div class="absolute left-0 top-0 h-[5px] w-[300px] bg-blue-500 animate-pulse loader-fill"></div>
-      </div>
-    </div> -->
 
     <!-- [ Sidebar Menu ] start -->
     <nav class="fixed inset-y-0 left-0 z-[1026] w-[280px] overflow-hidden border-r border-gray-200 bg-white transition-all duration-200 ease-in-out max-lg:-left-[280px] pc-sidebar">
@@ -100,7 +94,7 @@ $countKasir = getUsersByRole($pdo, 1);
               </li>
               
               <li>
-                <a href="managekasir.html" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600">
+                <a href="manajemen_kasir/manajemenkasir.php" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600">
                   <span class="flex w-6 justify-center text-lg text-gray-400 transition-colors group-hover:text-blue-600"><i class="fa-solid fa-users-gear"></i></span>
                   <span class="font-medium">Manajemen Kasir</span>
                 </a>
@@ -219,7 +213,6 @@ $countKasir = getUsersByRole($pdo, 1);
  
     <!-- Script untuk Data Filter Dashboard -->
     <script>
-      // Data simulasi (mock data)
       const dataDashboard = {
         hari: { pendapatan: 'Rp 1.250.000', transaksi: '45 Pesanan', terjual: '120 Item' },
         minggu: { pendapatan: 'Rp 8.750.000', transaksi: '315 Pesanan', terjual: '840 Item' },
@@ -227,58 +220,47 @@ $countKasir = getUsersByRole($pdo, 1);
       };
 
       function changeFilter(periode, elementBtn) {
-        // 1. Ubah nilai pada widget
         document.getElementById('val-pendapatan').innerText = dataDashboard[periode].pendapatan;
         document.getElementById('val-transaksi').innerText = dataDashboard[periode].transaksi;
         document.getElementById('val-terjual').innerText = dataDashboard[periode].terjual;
 
-        // 2. Reset tampilan semua tombol filter menjadi tidak aktif
         const semuaTombol = document.querySelectorAll('.filter-btn');
         semuaTombol.forEach(btn => {
           btn.className = 'filter-btn rounded-lg border border-transparent px-4 py-2 text-sm font-medium text-gray-500 transition-all hover:bg-gray-200/50 hover:text-gray-700 focus:outline-none';
         });
 
-        // 3. Ubah tampilan tombol yang diklik menjadi aktif
         elementBtn.className = 'filter-btn rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-blue-600 shadow-sm transition-all focus:outline-none';
       }
     </script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        // 1. Ambil elemen-elemen layout
         const sidebar = document.querySelector('.pc-sidebar');
         const header = document.querySelector('header');
         const mainContent = document.querySelector('header').nextElementSibling; // Mengambil div konten utama
         const footer = document.querySelector('footer');
 
-        // 2. Logika Toggle Desktop (Layar Besar)
         const btnDesktop = document.getElementById('sidebar-hide');
         if (btnDesktop && sidebar && header && mainContent && footer) {
           btnDesktop.addEventListener('click', function(e) {
             e.preventDefault();
-            // Perkecil lebar sidebar jadi 0
             sidebar.classList.toggle('lg:w-0');
             sidebar.classList.toggle('lg:border-r-0');
             
-            // Geser header merapat ke kiri
             header.classList.toggle('lg:left-[280px]');
             header.classList.toggle('lg:left-0');
             
-            // Geser konten utama merapat ke kiri
             mainContent.classList.toggle('lg:ml-[280px]');
             mainContent.classList.toggle('lg:ml-0');
             
-            // Geser footer merapat ke kiri
             footer.classList.toggle('lg:ml-[280px]');
             footer.classList.toggle('lg:ml-0');
           });
         }
 
-        // 3. Logika Toggle Mobile (Layar Kecil)
         const btnMobile = document.getElementById('mobile-collapse');
         if (btnMobile && sidebar) {
           btnMobile.addEventListener('click', function(e) {
             e.preventDefault();
-            // Tarik sidebar masuk ke layar
             sidebar.classList.toggle('max-lg:-left-[280px]');
             sidebar.classList.toggle('max-lg:left-0');
           });

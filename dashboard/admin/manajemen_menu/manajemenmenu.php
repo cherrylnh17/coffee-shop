@@ -52,7 +52,7 @@ $menu = $stmt->fetchAll();
     
     <nav class="fixed inset-y-0 left-0 z-[1026] w-[280px] overflow-hidden border-r border-gray-200 bg-white transition-all duration-200 ease-in-out max-lg:-left-[280px] pc-sidebar">
       <div class="flex h-[74px] items-center px-6 py-4">
-          <a href="index.php" class="flex items-center gap-3">
+          <a href="../index.php" class="flex items-center gap-3">
             <img src="../../../assets/image/logo.svg" class="h-8 w-8" alt="logo" />
             <span class="inline-block rounded-md bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">Admin Panel</span>
           </a>
@@ -97,7 +97,7 @@ $menu = $stmt->fetchAll();
               </li>
 
               <li>
-                <a href="../managekasir.html" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600">
+                <a href="../manajemen_kasir/manajemenkasir.php" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600">
                   <span class="flex w-6 justify-center text-lg text-gray-400 transition-colors group-hover:text-blue-600"><i class="fa-solid fa-users-gear"></i></span>
                   <span class="font-medium">Manajemen Kasir</span>
                 </a>
@@ -209,10 +209,8 @@ $menu = $stmt->fetchAll();
                             <td class="px-6 py-4 text-center"><?php echo $no++; ?></td>
                             <td class="px-6 py-4 text-center">
                                 <?php 
-                                // Cek apakah dari folder lokal atau url external (http)
                                 $img_src = htmlspecialchars($row['image']);
                                 if (!preg_match('/^http/', $img_src)) {
-                                    // Naik 3 folder dari manajemenmenu.php ke root
                                     $img_src = '../../../' . $img_src; 
                                 }
                                 ?>
@@ -351,8 +349,9 @@ $menu = $stmt->fetchAll();
                     </button>
                 </div>
                 
-                <form id="form-edit-menu" action="edit.php" method="POST" class="p-4 md:p-5">
+                <form id="form-edit-menu" action="edit.php" method="POST" enctype="multipart/form-data" class="p-4 md:p-5">
                     <input type="hidden" name="id" id="edit-id">
+                    <input type="hidden" name="old_image" id="edit-old-image">
 
                     <div class="mb-4 grid grid-cols-2 gap-4">
                         <div class="col-span-2">
@@ -371,8 +370,14 @@ $menu = $stmt->fetchAll();
                             </select>
                         </div>
                         <div class="col-span-2">
+
+                            <label class="mb-2 block text-sm font-medium text-gray-900">Ganti Gambar (Opsional)</label>
+                            <input type="file" name="image" accept="image/*" class="block w-full cursor-pointer rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100">
+                            <p class="mt-1 text-xs text-gray-500">Biarkan kosong jika tidak ingin mengubah gambar saat ini.</p>
+
                             <label class="mb-2 block text-sm font-medium text-gray-900">Link URL Gambar</label>
                             <input type="file" name="image" id="edit-image" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required>
+
                         </div>
                         <div class="col-span-2">
                             <label class="mb-2 block text-sm font-medium text-gray-900">Deskripsi Menu</label>
@@ -427,7 +432,6 @@ $menu = $stmt->fetchAll();
           });
         }
 
-        // Toggle Mobile (Layar Kecil)
         const btnMobile = document.getElementById('mobile-collapse');
         if (btnMobile && sidebar) {
           btnMobile.addEventListener('click', function(e) {
@@ -453,6 +457,28 @@ $menu = $stmt->fetchAll();
       document.getElementById('edit-category').value = category;
       document.getElementById('edit-price').value = price;
       document.getElementById('edit-image').value = image;
+      document.getElementById('edit-description').value = description; 
+
+      document.getElementById('trigger-edit-modal').click();
+    }
+    </script>
+
+    <script>
+    function openEditModal(button) {
+      const id = button.getAttribute('data-id');
+      const name = button.getAttribute('data-name');
+      const category = button.getAttribute('data-category');
+      const price = button.getAttribute('data-price');
+      const image = button.getAttribute('data-image');
+      const description = button.getAttribute('data-description'); 
+
+      document.getElementById('edit-id').value = id;
+      document.getElementById('edit-name').value = name;
+      document.getElementById('edit-category').value = category;
+      document.getElementById('edit-price').value = price;
+      
+      document.getElementById('edit-old-image').value = image; 
+      
       document.getElementById('edit-description').value = description; 
 
       document.getElementById('trigger-edit-modal').click();
