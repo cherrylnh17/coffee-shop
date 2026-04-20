@@ -15,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         // PENGAMAN DESKRIPSI: Jika kosong, isi dengan teks default agar tidak NULL di database
         $description = !empty($_POST['description']) ? trim($_POST['description']) : 'Tidak ada deskripsi.';
-        //tessss
+        //tesssss
         // --- LOGIKA UPLOAD GAMBAR ---
         $image_db_path = 'https://placehold.co/100x100?text=No+Image'; // Default jika gambar gagal/tidak diupload
 
