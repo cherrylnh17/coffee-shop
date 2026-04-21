@@ -3,47 +3,35 @@ include '../config.php';
 var_dump($_SERVER['REQUEST_METHOD']);
 var_dump($_POST);
 
-function generateOrderCode($length = 10) {
-    $characters = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-    $code = '';
-    for ($i = 0; $i < $length; $i++) {
-        $code .= $characters[rand(0, strlen($characters) - 1)];
-    }
-    return $code;
-}
-
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
 
-        // --- LOGIC GENERATE CODE UNIK ---
+        // generate kode unik
         $isUnique = false;
         $order_code = '';
-
         while (!$isUnique) {
-            $order_code = "TRX-" . generateOrderCode(8); // Hasilnya TRX-ABC12345 (12 Karakter)
-            
-            // Cek ke database apakah code sudah ada
-            $checkSql = "SELECT COUNT(*) FROM `order` WHERE code = ?";
-            $checkStmt = $pdo->prepare($checkSql);
-            $checkStmt->execute([$order_code]);
-            if ($checkStmt->fetchColumn() == 0) {
-                $isUnique = true;
+            $characters = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+            $randomString = '';
+            for ($i = 0; $i < 8; $i++) {
+                $randomString .= $characters[rand(0, strlen($characters) - 1)];
             }
+            $order_code = "ORD-" . $randomString; 
+            
+            $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM `order` WHERE code = ?");
+            $stmtCheck->execute([$order_code]);
+            if ($stmtCheck->fetchColumn() == 0) $isUnique = true;
         }
-        // --------------------------------
 
-        // 1. Tangkap data POST (Sama seperti sebelumnya)
-        $customer_name  = $_POST['customer_name'] ?? 'Guest';
-        $customer_email = $_POST['customer_email'] ?? '';
+        $customer_name  = $_POST['customer_name'];
+        $customer_email = $_POST['customer_email'];
         $payment_type   = $_POST['payment'];
         $table_code     = $_POST['table_code'];
         $cart_items     = json_decode($_POST['cart_data'], true);
 
         if (empty($cart_items)) throw new Exception("Keranjang kosong");
 
-        // Ambil data meja
+        // cari id meja
         $id_table = null; $name_table = null;
         if ($table_code) {
             $stmt = $pdo->prepare("SELECT id, name FROM `table` WHERE name = ?");
@@ -52,21 +40,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($row) { $id_table = $row['id']; $name_table = $row['name']; }
         }
 
-        // 2. Hitung Total & Detail
-        $subtotal = 0; $total_qty = 0; $detail_list = [];
+        // hitung total dan buat detail
+        $subtotal = 0;
+        $total_qty = 0;
+        $summary_list = [];
         foreach ($cart_items as $item) {
             $subtotal += ($item['price'] * $item['qty']);
             $total_qty += $item['qty'];
-            $detail_list[] = $item['qty'] . " " . $item['name'];
+            $summary_list[] = $item['qty'] . " " . $item['name'];
         }
         
-        $detail = implode(", ", $detail_list);
+        $detail_summary = implode(", ", $summary_list);
         $tax = $subtotal * 0.12; 
         $total_bayar = $subtotal + $tax;
         $created_at = date('Y-m-d H:i:s');
-        $expired_at = date('Y-m-d H:i:s', strtotime('+1 hour'));
+        $expired_at = date('Y-m-d H:i:s', strtotime('+10 minutes'));
 
-        // 3. Simpan ke tabel 'order' (Tambah kolom 'code')
+        // insert tabel order
         $sqlOrder = "INSERT INTO `order` (
             code, table_id, table_name, customer_name, customer_email,
             qty, subtotal, tax, total, payment, detail, status,
@@ -75,31 +65,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $stmtOrder = $pdo->prepare($sqlOrder);
         $stmtOrder->execute([
-            $order_code, // <--- Kode unik masuk sini
-            $id_table,
-            $name_table,
-            $customer_name,
-            $customer_email,
-            $total_qty,
-            $subtotal,
-            $tax,
-            $total_bayar,
-            $payment_type,
-            $detail,
-            2,
-            $created_at,
-            $expired_at
+            $order_code, $id_table, $name_table, $customer_name, $customer_email,
+            $total_qty, $subtotal, $tax, $total_bayar, $payment_type,
+            $detail_summary, 2, $created_at, $expired_at
         ]);
 
+        // ambil id yg baru di insert
+        $order_id = $pdo->lastInsertId();
+
+        // insert tabel order item
+        $sqlItem = "INSERT INTO order_item (
+            order_id, 
+            menu_id, 
+            menu_name, 
+            qty, 
+            subtotal, 
+            notes
+        ) VALUES (?, ?, ?, ?, ?, ?)";
+        
+        $stmtItem = $pdo->prepare($sqlItem);
+
+        foreach ($cart_items as $item) {
+            // Hitung subtotal per item (price * qty)
+            $item_subtotal = $item['price'] * $item['qty'];
+            
+            $stmtItem->execute([
+                $order_id,          // Foreign Key ke tabel order
+                $item['id'],        // menu_id
+                $item['name'],      // menu_name
+                $item['qty'],       // qty
+                $item_subtotal,     // subtotal
+                $item['note'] ?? '' // notes
+            ]);
+        }
+
         $pdo->commit();
-        echo json_encode([
-            'status' => 'success', 
-            'order_code' => $order_code, 
-            'message' => 'Pesanan berhasil disimpan'
-        ]);
+        header("Location: checkout?code=" . $order_code);
+        exit(); 
 
     } catch (Exception $e) {
         $pdo->rollBack();
-        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        header("Location: ../");
+        exit();
     }
 }

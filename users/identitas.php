@@ -40,7 +40,6 @@ $table_code = htmlspecialchars($_GET['code']);
     </header>
 
     <form id="formPesanan" method="POST" action="order.php?code=<?= $table_code ?>">
-        <input type="hidden" name="table_code" value="<?= $table_code ?>">
     <div class="flex-1 px-4 py-6 space-y-5 pb-32 fade-in">
 
         <!-- Informasi Pembeli -->
