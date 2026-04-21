@@ -1,4 +1,7 @@
 <?php
+include_once("../../../path.php");
+
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -14,7 +17,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         $description = !empty($_POST['description']) ? trim($_POST['description']) : 'Tidak ada deskripsi.';
         $image_db_path = 'https://placehold.co/100x100?text=No+Image';
-
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
             $file_tmp = $_FILES['image']['tmp_name'];
             $file_name = $_FILES['image']['name'];
@@ -25,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (in_array($file_ext, $allowed_ext)) {
                 $new_file_name = uniqid('menu_') . '.' . $file_ext;
                 
-                $target_dir = '../../../assets/image/menu/';
+                $target_dir = ROOT_PATH . "/assets/image/menu/";
                 
                 if (!is_dir($target_dir)) {
                     mkdir($target_dir, 0777, true);
@@ -46,7 +48,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 VALUES (?, ?, ?, ?, ?)";
         
         $stmt = $pdo->prepare($sql);
-        
         $stmt->execute([
             $name, 
             $price, 

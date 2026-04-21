@@ -21,7 +21,7 @@ if (isset($_POST['update'])) {
 
         if (in_array($file_ext, $allowed_ext)) {
             $new_file_name = uniqid('menu_') . '.' . $file_ext;
-            $target_dir = '../../../asset/image/menu/';
+            $target_dir = '../../../assets/image/menu/';
             
             if (!is_dir($target_dir)) {
                 mkdir($target_dir, 0777, true);
@@ -30,7 +30,7 @@ if (isset($_POST['update'])) {
             $target_file = $target_dir . $new_file_name;
 
             if (move_uploaded_file($file_tmp, $target_file)) {
-                $image_db_path = 'asset/image/menu/' . $new_file_name;
+                $image_db_path = 'assets/image/menu/' . $new_file_name;
                 
                 if (!preg_match('/^http/', $old_image) && file_exists('../../../' . $old_image)) {
                     unlink('../../../' . $old_image);

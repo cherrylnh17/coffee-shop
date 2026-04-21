@@ -53,7 +53,7 @@ if (isset($_POST['login'])) {
     <meta name="description" content="Login to Träffa Coffee" />
 
     <!-- [Favicon] icon -->
-    <link rel="icon" href="../assets/images/favicon.svg" type="image/x-icon" />
+    <link rel="icon" href="../assets/image/favicon.svg" type="image/x-icon" />
     
     <!-- [Font] Family -->
     <link rel="stylesheet" href="../assets/fonts/inter/inter.css" id="main-font-link" />
