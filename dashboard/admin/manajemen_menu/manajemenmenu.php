@@ -320,8 +320,8 @@ $menu = $stmt->fetchAll();
                         </div>
                         
                         <div class="col-span-2">
-                            <label for="image" class="mb-2 block text-sm font-medium text-gray-900">Link URL Gambar</label>
-                            <input type="file" name="image" id="image" accept="image/*" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required>
+                            <label for="image" class="mb-2 block text-sm font-medium text-gray-900">Gambar</label>
+                            <input type="file" name="image" id="image"  accept="image/*" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required>
                         </div>
                         
                         <div class="col-span-2">
