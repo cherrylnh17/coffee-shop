@@ -7,18 +7,29 @@ if (!isset($_SESSION['username'])) {
 
 require_once '../../../config.php';
 
-try {
-    $stmt = $pdo->prepare("SELECT * FROM user WHERE username != 'admin' ORDER BY id DESC");
-    $stmt->execute();
-    $kasirs = $stmt->fetchAll();
-} catch (PDOException $e) {
-    $error_msg = "Gagal mengambil data: " . $e->getMessage();
+$limit = isset($_GET['limit']) ? max(1, (int)$_GET['limit']) : 5; 
+$page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
+$offset = ($page - 1) * $limit;
+
+$total_stmt = $pdo->query("SELECT COUNT(*) FROM `table`");
+$total_records = $total_stmt->fetchColumn();
+
+$total_pages = ceil($total_records / $limit);
+if ($page > $total_pages && $total_pages > 0) {
+    $page = $total_pages;
 }
+
+$stmt = $pdo->prepare("SELECT * FROM `table` ORDER BY id DESC LIMIT :limit OFFSET :offset");
+$stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->execute();
+
+$mejas = $stmt->fetchAll();
 ?>
 <!doctype html>
 <html lang="en" dir="ltr">
   <head>
-    <title>Manajemen Kasir | Träffa Coffee</title>
+    <title>Manajemen Meja | Träffa Coffee</title>
     <!-- [Meta] -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
@@ -77,7 +88,7 @@ try {
               </li>
 
               <li>
-                <a href="laporan.php" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600">
+                <a href="../laporan.php" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600">
                   <span class="flex w-6 justify-center text-lg text-gray-400 transition-colors group-hover:text-blue-600"><i class="fa-solid fa-file-invoice-dollar"></i></span>
                   <span class="font-medium">Laporan Penjualan</span>
                 </a>
@@ -91,15 +102,15 @@ try {
               </li>
 
               <li>
-                <a href="../manajemen_meja/manajemenmeja.php" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600">
-                  <span class="flex w-6 justify-center text-lg text-gray-400 transition-colors group-hover:text-blue-600"><i class="fa-solid fa-chair"></i></span>
+                <a href="manajemenmeja.php" class="group flex items-center gap-3 rounded-xl bg-blue-600 px-4 py-3 text-white shadow-md shadow-blue-500/20 transition-all duration-200">
+                  <span class="flex w-6 justify-center text-lg"><i class="fa-solid fa-chair"></i></span>
                   <span class="font-medium">Manajemen Meja</span>
                 </a>
               </li>
 
               <li>
-                <a href="manajemenkasir.php" class="group flex items-center gap-3 rounded-xl bg-blue-600 px-4 py-3 text-white shadow-md shadow-blue-500/20 transition-all duration-200">
-                  <span class="flex w-6 justify-center text-lg"><i class="fa-solid fa-users-gear"></i></span>
+                <a href="../manajemen_kasir/manajemenkasir.php" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600">
+                  <span class="flex w-6 justify-center text-lg text-gray-400 transition-colors group-hover:text-blue-600"><i class="fa-solid fa-users-gear"></i></span>
                   <span class="font-medium">Manajemen Kasir</span>
                 </a>
               </li>
@@ -144,10 +155,11 @@ try {
     <div class="relative ml-0 min-h-[calc(100vh-135px)] top-[74px] transition-all duration-200 ease-in-out lg:ml-[280px]">
       <div class="p-4 sm:p-6 lg:p-8">  
           
+          <!-- Alert System -->
           <?php if(isset($_GET['status'])): ?>
               <?php if($_GET['status'] == 'success'): ?>
                   <div id="alert-message" class="mb-4 flex items-center justify-between rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800 transition-opacity duration-500">
-                      <div><span class="font-medium">Berhasil!</span> Aksi berhasil dilakukan.</div>
+                      <div><span class="font-medium">Berhasil!</span> Data meja telah diperbarui.</div>
                       <button type="button" onclick="document.getElementById('alert-message').remove()" class="text-green-800 hover:text-green-900"><i class="fa-solid fa-xmark"></i></button>
                   </div>
               <?php elseif($_GET['status'] == 'error'): ?>
@@ -169,77 +181,82 @@ try {
 
           <div class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
               <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <h3 class="text-xl font-bold text-gray-800">Manajemen Akun Kasir</h3>
-                <button data-modal-target="authentication-modal" data-modal-toggle="authentication-modal" class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700" type="button">
-                    <i class="fa-solid fa-user-plus mr-2"></i>Tambah Kasir
-                </button>
+                <h3 class="text-xl font-bold text-gray-800">Manajemen Meja</h3>
+                <div class="flex items-center gap-4">
+                    <!-- Filter Pagination Limit -->
+                    <form method="GET" class="flex items-center">
+                        <label class="mr-2 text-sm text-gray-600">Tampilkan:</label>
+                        <select name="limit" onchange="this.form.submit()" class="rounded border-gray-300 py-1 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                            <option value="5" <?php echo ($limit == 5) ? 'selected' : ''; ?>>5</option>
+                            <option value="10" <?php echo ($limit == 10) ? 'selected' : ''; ?>>10</option>
+                            <option value="25" <?php echo ($limit == 25) ? 'selected' : ''; ?>>25</option>
+                        </select>
+                        <input type="hidden" name="page" value="1">
+                    </form>
+                    <button data-modal-target="tambah-meja-modal" data-modal-toggle="tambah-meja-modal" class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700" type="button">
+                        <i class="fa-solid fa-plus mr-2"></i>Tambah Meja
+                    </button>
+                </div>
               </div>
 
-              <!-- Modal Tambah Kasir -->
-              <div id="authentication-modal" tabindex="-1" aria-hidden="true" class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-900/50 backdrop-blur-sm">
+              <!-- Modal Tambah Meja -->
+              <div id="tambah-meja-modal" tabindex="-1" aria-hidden="true" class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-900/50 backdrop-blur-sm">
                 <div class="relative max-h-full w-full max-w-md p-4">
                     <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
                         <div class="flex items-center justify-between border-b border-gray-100 p-4 md:p-5">
-                            <h3 class="text-lg font-semibold text-gray-900">Tambahkan Akun Kasir</h3>
-                            <button type="button" class="ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900" data-modal-hide="authentication-modal">
+                            <h3 class="text-lg font-semibold text-gray-900">Tambahkan Meja Baru</h3>
+                            <button type="button" class="ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900" data-modal-hide="tambah-meja-modal">
                                 <i class="fa-solid fa-xmark text-lg"></i>
-                                <span class="sr-only">Close modal</span>
                             </button>
                         </div>
                         
                         <form action="tambah.php" method="POST" class="p-4 md:p-5">
-                            <div class="mb-4">
-                                <label for="name" class="mb-2 block text-sm font-medium text-gray-900">Nama Lengkap</label>
-                                <input type="text" name="name" id="name" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="Masukkan Nama Lengkap" required />
-                            </div>
-                            <div class="mb-4">
-                                <label for="username" class="mb-2 block text-sm font-medium text-gray-900">Username</label>
-                                <input type="text" name="username" id="username" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="Contoh: kasir_budi" required />
-                            </div>
-                            <div class="mb-4">
-                                <label for="password" class="mb-2 block text-sm font-medium text-gray-900">Password</label>
-                                <input type="password" name="password" id="password" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="•••••••••" required />
-                            </div>
                             <div class="mb-6">
-                                <label for="konfirmasi_password" class="mb-2 block text-sm font-medium text-gray-900">Ulangi Password</label>
-                                <input type="password" name="konfirmasi_password" id="konfirmasi_password" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="•••••••••" required />
+                                <label for="name" class="mb-2 block text-sm font-medium text-gray-900">Nama Meja</label>
+                                <input type="text" name="name" id="name" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="Contoh: Meja 01 / Meja VIP" required />
                             </div>
                             <button type="submit" name="submit" class="inline-flex w-full justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300">
-                                Daftarkan Kasir
+                                <i class="fa-solid fa-plus mr-2 mt-1"></i> Simpan ke Database
                             </button>
                         </form>
                     </div>
                 </div>
             </div> 
               
-              <!-- Tabel Kasir -->
+              <!-- Tabel Meja -->
               <div class="overflow-x-auto rounded-lg border border-gray-200">
                 <table class="w-full text-left text-sm text-gray-500">
                   <thead class="bg-gray-50 text-xs uppercase text-gray-700 border-b border-gray-200">
                     <tr>
-                      <th scope="col" class="w-16 px-6 py-4 text-center">No</th>
-                      <th scope="col" class="px-6 py-4">Nama</th>
-                      <th scope="col" class="px-6 py-4">Username</th>
-                      <th scope="col" class="px-6 py-4">Role</th>
-                      <th scope="col" class="px-6 py-4 text-center">Aksi</th>
+                      <th scope="col" class="w-20 px-6 py-4 text-center">No</th>
+                      <th scope="col" class="px-6 py-4">Nama Meja</th>
+                      <th scope="col" class="w-32 px-6 py-4 text-center">Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <?php if (empty($kasirs)): ?>
-                        <tr><td colspan="4" class="py-6 text-center text-gray-500">Data kasir belum tersedia.</td></tr>
+                    <?php if (empty($mejas)): ?>
+                        <tr><td colspan="3" class="py-6 text-center text-gray-500">Data meja belum tersedia.</td></tr>
                     <?php else: ?>
-                        <?php $no = 1; foreach ($kasirs as $row): ?>
+                        <?php 
+                        $no = $offset + 1; 
+                        foreach ($mejas as $row): 
+                        ?>
                         <tr class="border-b border-gray-100 bg-white transition-colors hover:bg-gray-50">
                           <td class="px-6 py-4 text-center"><?php echo $no++; ?></td>
-                          <td class="px-6 py-4 font-medium text-gray-900"><?= htmlspecialchars($row['name'] ?? '-'); ?></td>
-                          <td class="px-6 py-4 font-medium text-gray-900"><?= htmlspecialchars($row['username']); ?></td>
-                          <td class="px-6 py-4">
-                              <span class="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-medium text-blue-700">Kasir</span>
-                          </td>
+                          <td class="px-6 py-4 font-medium text-gray-900"><?php echo htmlspecialchars($row['name']); ?></td>
                           <td class="px-6 py-4 text-center">
                             <div class="flex items-center justify-center gap-2">
-                              <!-- Tombol Hapus (Diarahkan ke hapus_kasir.php) -->
-                              <a href="hapus.php?id=<?php echo $row['id']; ?>" onclick="return confirm('Yakin ingin menghapus akun kasir ini?')" class="inline-flex h-8 w-8 items-center justify-center rounded bg-red-50 text-red-600 transition-colors hover:bg-red-100 hover:text-red-900">
+                              <!-- Tombol Edit -->
+                              <button type="button" 
+                                      data-id="<?php echo $row['id']; ?>"
+                                      data-nama="<?php echo htmlspecialchars($row['name']); ?>"
+                                      onclick="openEditMejaModal(this)"
+                                      class="inline-flex h-8 w-8 items-center justify-center rounded bg-blue-50 text-blue-600 transition-colors hover:bg-blue-100 hover:text-blue-900">
+                                  <i class="fa-solid fa-pen-to-square"></i>
+                              </button>
+                              
+                              <!-- Tombol Hapus -->
+                              <a href="hapus.php?id=<?php echo $row['id']; ?>" onclick="return confirm('Yakin ingin menghapus meja ini?')" class="inline-flex h-8 w-8 items-center justify-center rounded bg-red-50 text-red-600 transition-colors hover:bg-red-100 hover:text-red-900">
                                   <i class="fa-solid fa-trash"></i>
                               </a>
                             </div>
@@ -250,8 +267,69 @@ try {
                   </tbody>
                 </table>
               </div>
+
+              <!-- Pagination Info -->
+              <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <span class="text-sm text-gray-500">
+                    <?php
+                    $start = ($total_records > 0) ? $offset + 1 : 0;
+                    $end = $offset + count($mejas);
+                    ?>
+                    Menampilkan <span class="font-medium text-gray-900"><?php echo $start; ?> - <?php echo $end; ?></span> dari <span class="font-medium text-gray-900"><?php echo $total_records; ?></span> data
+                  </span>
+                  
+                  <div class="flex space-x-1">
+                      <?php if ($page > 1): ?>
+                          <a href="?page=<?php echo $page - 1; ?>&limit=<?php echo $limit; ?>" class="rounded border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors">Prev</a>
+                      <?php endif; ?>
+
+                      <?php for($i = 1; $i <= $total_pages; $i++): ?>
+                          <a href="?page=<?php echo $i; ?>&limit=<?php echo $limit; ?>" class="rounded border px-3 py-1.5 text-sm transition-colors <?php echo ($i == $page) ? 'border-blue-600 bg-blue-600 text-white shadow-sm' : 'border-gray-200 text-gray-600 hover:bg-gray-50'; ?>">
+                            <?php echo $i; ?>
+                          </a>
+                      <?php endfor; ?>
+
+                      <?php if ($page < $total_pages): ?>
+                          <a href="?page=<?php echo $page + 1; ?>&limit=<?php echo $limit; ?>" class="rounded border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors">Next</a>
+                      <?php endif; ?>
+                  </div>
+              </div>
           </div>
       </div>
+    </div>
+
+    <!-- Modal Edit Meja -->
+    <button id="trigger-edit-meja-modal" data-modal-target="edit-meja-modal" data-modal-toggle="edit-meja-modal" class="hidden"></button>
+    <div id="edit-meja-modal" tabindex="-1" aria-hidden="true" class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-900/50 backdrop-blur-sm">
+        <div class="relative max-h-full w-full max-w-md p-4">
+            <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
+                <div class="flex items-center justify-between border-b border-gray-100 p-4 md:p-5">
+                    <h3 class="text-lg font-semibold text-gray-900">Edit Nama Meja</h3>
+                    <button type="button" class="ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900" data-modal-hide="edit-meja-modal">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+                
+                <form action="edit.php" method="POST" class="p-4 md:p-5">
+                    <!-- ID Meja yang diedit disembunyikan -->
+                    <input type="hidden" name="id" id="edit_id">
+
+                    <div class="mb-6">
+                        <label for="edit_name" class="mb-2 block text-sm font-medium text-gray-900">Nama Meja</label>
+                        <input type="text" name="name" id="edit_name" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" required />
+                    </div>
+                    
+                    <div class="flex items-center space-x-3 border-t border-gray-100 pt-4 md:pt-5">
+                        <button type="submit" name="update" class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                            <i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Perubahan
+                        </button>
+                        <button data-modal-hide="edit-meja-modal" type="button" class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900">
+                            Batal
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <!-- [ Footer ] start -->
@@ -263,6 +341,7 @@ try {
       </div>
     </footer>
 
+    <!-- Script Kustom untuk Toggle Sidebar & Modal Edit -->
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         const sidebar = document.querySelector('.pc-sidebar');
@@ -270,7 +349,6 @@ try {
         const mainContent = document.querySelector('header').nextElementSibling;
         const footer = document.querySelector('footer');
 
-        // Toggle Desktop (Layar Besar)
         const btnDesktop = document.getElementById('sidebar-hide');
         if (btnDesktop && sidebar && header && mainContent && footer) {
           btnDesktop.addEventListener('click', function(e) {
@@ -298,6 +376,17 @@ try {
           });
         }
       });
+
+      // Script untuk memasukkan data ke dalam Modal Edit Meja
+      function openEditMejaModal(button) {
+        const id = button.getAttribute('data-id');
+        const nama = button.getAttribute('data-nama');
+
+        document.getElementById('edit_id').value = id;
+        document.getElementById('edit_name').value = nama;
+
+        document.getElementById('trigger-edit-meja-modal').click();
+      }
     </script>
   </body>
 </html>

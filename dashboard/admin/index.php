@@ -5,7 +5,6 @@ error_reporting(E_ALL);
 session_start();
 
 if (!isset($_SESSION['username'])) {
-    header("Location: ../auth/login.php");
     header("Location: ../../auth/login.php");
     exit;
 }
@@ -34,7 +33,7 @@ $countKasir = getUsersByRole($pdo, 1);
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- [Favicon] icon -->
-    <link rel="icon" href="../assets/image/logo.svg" type="image/x-icon" />
+    <link rel="icon" href="../../assets/image/favicon.svg" type="image/x-icon" />
     <!-- [Font] Family -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   </head>
@@ -93,6 +92,13 @@ $countKasir = getUsersByRole($pdo, 1);
                 </a>
               </li>
               
+              <li>
+                <a href="manajemen_meja/manajemenmeja.php" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600">
+                  <span class="flex w-6 justify-center text-lg text-gray-400 transition-colors group-hover:text-blue-600"><i class="fa-solid fa-chair"></i></span>
+                  <span class="font-medium">Manajemen Meja</span>
+                </a>
+              </li>
+
               <li>
                 <a href="manajemen_kasir/manajemenkasir.php" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600">
                   <span class="flex w-6 justify-center text-lg text-gray-400 transition-colors group-hover:text-blue-600"><i class="fa-solid fa-users-gear"></i></span>

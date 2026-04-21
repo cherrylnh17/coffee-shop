@@ -45,7 +45,7 @@ $menu = $stmt->fetchAll();
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     
-    <link rel="icon" href="../../assets/images/favicon.svg" type="image/x-icon" />
+    <link rel="icon" href="../../../assets/image/favicon.svg" type="image/x-icon" />
   </head>
   
   <body class="bg-gray-50 text-gray-800">
@@ -93,6 +93,13 @@ $menu = $stmt->fetchAll();
                 <a href="manajemenmenu.php" class="group flex items-center gap-3 rounded-xl bg-blue-600 px-4 py-3 text-white shadow-md shadow-blue-500/20 transition-all duration-200">
                   <span class="flex w-6 justify-center text-lg"><i class="fa-solid fa-mug-hot"></i></span>
                   <span class="font-medium">Manajemen Menu</span>
+                </a>
+              </li>
+
+              <li>
+                <a href="../manajemen_meja/manajemenmeja.php" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600">
+                  <span class="flex w-6 justify-center text-lg text-gray-400 transition-colors group-hover:text-blue-600"><i class="fa-solid fa-chair"></i></span>
+                  <span class="font-medium">Manajemen Meja</span>
                 </a>
               </li>
 
