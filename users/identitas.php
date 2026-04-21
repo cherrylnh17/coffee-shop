@@ -33,13 +33,14 @@ $table_code = htmlspecialchars($_GET['code']);
 <main class="w-full max-w-[480px] mx-auto bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-x-hidden">
 
     <header class="sticky top-0 z-20 bg-white shadow-sm pt-5 pb-4 px-4 flex items-center gap-3">
-        <button onclick="window.location.href='pesanan.html'" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
+        <a href="pesanan?code=<?= $table_code ?>" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
             <i class="ph-bold ph-arrow-left text-lg"></i>
-        </button>
-        <a href="pesanan?code=<?= $table_code ?>"></a>
+        </a>
         <h1 class="text-xl font-bold text-gray-900">Data Pemesan</h1>
     </header>
 
+    <form id="formPesanan" method="POST" action="order.php?code=<?= $table_code ?>">
+        <input type="hidden" name="table_code" value="<?= $table_code ?>">
     <div class="flex-1 px-4 py-6 space-y-5 pb-32 fade-in">
 
         <!-- Informasi Pembeli -->
@@ -51,12 +52,12 @@ $table_code = htmlspecialchars($_GET['code']);
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama Lengkap <span class="text-red-500">*</span></label>
-                    <input type="text" id="name" placeholder="Masukkan nama Anda"
+                    <input type="text" name="customer_name" id="name" placeholder="Masukkan nama Anda"
                         class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1.5">Email <span class="text-gray-400 font-normal">(Opsional)</span></label>
-                    <input type="email" id="email" placeholder="contoh@email.com"
+                    <input type="email" name="customer_email" id="email" placeholder="contoh@email.com"
                         class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white">
                 </div>
         </div>
@@ -82,7 +83,7 @@ $table_code = htmlspecialchars($_GET['code']);
                 </label>
                 <!-- Bayar di Kasir -->
                 <label class="relative cursor-pointer">
-                    <input type="radio" name="payment" value="Bayar di Kasir" class="peer hidden" checked />
+                    <input type="radio" name="payment" value="1" class="peer hidden" checked />
                     <div class="w-full p-4 text-center border-2 border-gray-100 rounded-2xl bg-gray-50 transition-all duration-200
                                 peer-checked:border-blue-400 peer-checked:bg-blue-50 peer-checked:ring-4 peer-checked:ring-blue-100
                                 hover:border-blue-200">
@@ -124,6 +125,7 @@ $table_code = htmlspecialchars($_GET['code']);
         </div>
 
     </div>
+    </form>
 
     <div class="fixed bottom-0 w-full max-w-[480px] left-1/2 -translate-x-1/2 p-4 bg-white border-t border-gray-200 z-30">
         <button onclick="submitPesanan()" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3.5 font-bold text-base shadow-lg transition-transform active:scale-[0.98] flex items-center justify-center gap-2">
@@ -134,12 +136,13 @@ $table_code = htmlspecialchars($_GET['code']);
 
 </main>
 <script> 
-
+    
     const MENU_DATA = <?php echo json_encode($result); ?>;
 
      function getCart() {
         return JSON.parse(localStorage.getItem('cart')) || [];
     }
+    
 
     function saveCart(cart) {
         localStorage.setItem('cart', JSON.stringify(cart));
@@ -149,9 +152,14 @@ $table_code = htmlspecialchars($_GET['code']);
         return 'Rp ' + parseInt(angka).toLocaleString('id-ID');
     }
 
+    
+
     document.addEventListener('DOMContentLoaded', () => {
         const cart = getCart();
-        if (!cart.length) { window.location.href = 'index.html'; return; }
+
+        console.log(cart);
+
+        if (!cart.length) { window.location.href = 'index?code<?= $table_code ?>'; return; }
 
         // Render ringkasan pesanan
         const listEl = document.getElementById('order-summary');
@@ -188,26 +196,18 @@ $table_code = htmlspecialchars($_GET['code']);
         }
     });
 
+    // Contoh cara memasukkan data cart ke form sebelum submit
     function submitPesanan() {
-        const nameInput = document.getElementById('name');
-        if (!nameInput.value.trim()) {
-            nameInput.classList.add('ring-2','ring-red-400','border-red-400');
-            nameInput.focus();
-            setTimeout(() => nameInput.classList.remove('ring-2','ring-red-400','border-red-400'), 2000);
-            return;
-        }
-
-        // Baca payment dari radio yang di-checked
-        const paymentRadio = document.querySelector('input[name="payment"]:checked');
-        const payment = paymentRadio ? paymentRadio.value : 'Bayar di Kasir';
-
-        const buyerData = {
-            name:    nameInput.value.trim(),
-            email:   document.getElementById('email').value.trim(),
-            payment: payment
-        };
-        localStorage.setItem('buyer_data', JSON.stringify(buyerData));
-        window.location.href = 'checkout.html';
+        const cart = getCart();
+        // Buat input hidden secara dinamis untuk cart
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'cart_data';
+        hiddenInput.value = JSON.stringify(cart);
+        
+        const form = document.getElementById('formPesanan');
+        form.appendChild(hiddenInput);
+        form.submit(); 
     }
 </script>
 
