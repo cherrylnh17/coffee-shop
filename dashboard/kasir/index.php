@@ -40,7 +40,7 @@ require_once '../../config.php';
       <div class="h-full w-full">
         <!-- Sidebar Header -->
         <div class="flex h-[74px] items-center px-6 py-4">
-          <a href="../index.php" class="flex items-center gap-3">
+          <a href="index.php" class="flex items-center gap-3">
             <img src="../../assets/image/logo.svg" class="h-8 w-8" alt="logo" onerror="this.src='https://placehold.co/32x32?text=Logo'" />
             <span class="inline-block rounded-md bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">Kasir Panel</span>
           </a>
