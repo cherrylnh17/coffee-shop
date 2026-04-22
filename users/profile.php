@@ -67,7 +67,6 @@ $table_code = htmlspecialchars($_GET['code']);
 
 
 </main>
-<script src="menu-data.js"></script>
 <script>
   
     function clearCart() {

@@ -18,6 +18,8 @@ require_once __DIR__ . '/../../path.php';
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" 
     referrerpolicy="no-referrer" 
     />
+    <!-- sweetalert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f3f4f6; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
