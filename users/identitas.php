@@ -39,7 +39,8 @@ $table_code = htmlspecialchars($_GET['code']);
         <h1 class="text-xl font-bold text-gray-900">Data Pemesan</h1>
     </header>
 
-    <form id="formPesanan" method="POST" action="order.php?code=<?= $table_code ?>">
+    <form id="formPesanan" method="POST" action="order">
+        <input type="hidden" name="table_name" value="<?= $table_code ?>">
     <div class="flex-1 px-4 py-6 space-y-5 pb-32 fade-in">
 
         <!-- Informasi Pembeli -->
@@ -51,7 +52,7 @@ $table_code = htmlspecialchars($_GET['code']);
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama Lengkap <span class="text-red-500">*</span></label>
-                    <input type="text" name="customer_name" id="name" placeholder="Masukkan nama Anda"
+                    <input type="text" name="customer_name" id="name" placeholder="Masukkan nama Anda" required
                         class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white">
                 </div>
                 <div>
@@ -135,14 +136,12 @@ $table_code = htmlspecialchars($_GET['code']);
 
 </main>
 <script> 
-    
     const MENU_DATA = <?php echo json_encode($result); ?>;
 
      function getCart() {
         return JSON.parse(localStorage.getItem('cart')) || [];
     }
     
-
     function saveCart(cart) {
         localStorage.setItem('cart', JSON.stringify(cart));
     }
@@ -150,8 +149,6 @@ $table_code = htmlspecialchars($_GET['code']);
     function formatRupiah(angka) {
         return 'Rp ' + parseInt(angka).toLocaleString('id-ID');
     }
-
-    
 
     document.addEventListener('DOMContentLoaded', () => {
         const cart = getCart();
@@ -197,16 +194,35 @@ $table_code = htmlspecialchars($_GET['code']);
 
     // Contoh cara memasukkan data cart ke form sebelum submit
     function submitPesanan() {
-        const cart = getCart();
+        const form = document.getElementById('formPesanan');
         // Buat input hidden secara dinamis untuk cart
+        if (!form.reportValidity()) {
+            return; // Berhenti di sini jika input tidak valid
+        }
+        const cart = getCart();
+
         const hiddenInput = document.createElement('input');
         hiddenInput.type = 'hidden';
         hiddenInput.name = 'cart_data';
         hiddenInput.value = JSON.stringify(cart);
         
-        const form = document.getElementById('formPesanan');
         form.appendChild(hiddenInput);
         form.submit(); 
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorMessage = urlParams.get('m');
+
+    if (errorMessage) {
+        Swal.fire({
+            title: "Waduh!",
+            text: errorMessage,
+            icon: "error",
+            confirmButtonText: "Oke",
+            confirmButtonColor: "#3b82f6", 
+        });
+
+        window.history.replaceState({}, document.title, window.location.pathname + "?code=" + urlParams.get('code'));
     }
 </script>
 

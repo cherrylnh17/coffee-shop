@@ -14,11 +14,15 @@ if (!isset($_GET['code']) || empty($_GET['code'])) {
 }
 
 try {
-    // Ambil data menu dari database
-    $query = "SELECT * FROM order WHERE code = ?";
-    $stmt = $pdo->prepare("SELECT * FROM `order` WHERE code = ?");
+    // Ambil data Order utama
+    $stmt = $pdo->prepare("SELECT * FROM `order` WHERE code = ?"); // Sesuaikan nama tabel 'orders' atau 'order'
     $stmt->execute([$order_code]);
     $order = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Ambil rincian menu yang dibeli
+    $stmtItem = $pdo->prepare("SELECT * FROM order_item WHERE order_id = ?");
+    $stmtItem->execute([$order['id']]);
+    $order_items = $stmtItem->fetchAll(PDO::FETCH_ASSOC);
 } catch(PDOException $e) {
     die("Error pada query: " . $e->getMessage());
 }
@@ -26,7 +30,7 @@ try {
 $payment = ($order['payment'] == 1) ? 'Bayar di Kasir' : 'Bayar Online';
 
 
-$table_code = htmlspecialchars($_GET['code']);
+$table_code = htmlspecialchars($order['table_name']);
 
 $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . $order['code'];
 
@@ -40,9 +44,9 @@ $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . $ord
 <main class="w-full max-w-[480px] mx-auto bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-x-hidden">
 
     <header class="sticky top-0 z-20 bg-white shadow-sm pt-5 pb-4 px-4 flex items-center gap-3">
-        <button onclick="window.location.href='identitas.html'" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
+        <a href="identitas?code=<?= $table_code ?>" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
             <i class="ph-bold ph-arrow-left text-lg"></i>
-        </button>
+        </a>
         <h1 class="text-xl font-bold text-gray-900">Checkout</h1>
     </header>
 
@@ -69,7 +73,14 @@ $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . $ord
                     <p class="text-xs text-gray-500 mb-1">Metode Bayar</p>
                     <span class="text-sm font-bold text-blue-600" id="display-payment"><?= $payment ?></span>
                 </div>
-
+                <div>
+                    <p class="text-xs text-gray-500 mb-1">Batas Pembayaran</p>
+                    <span class="text-sm font-bold text-blue-600" 
+                        id="display-countdown" 
+                        data-expire="<?= $order['expired_at'] ?>">
+                        Loading...
+                    </span>
+                </div>
             </div>
         </div>
 
@@ -102,30 +113,20 @@ $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . $ord
             <div class="space-y-2 mb-3">
                 <div class="flex justify-between text-sm">
                     <span class="text-gray-500">Subtotal</span>
-                    <span class="font-medium text-gray-800" id="calc-subtotal">Rp 0</span>
+                    <span class="font-medium text-gray-800">Rp <?= number_format($order['subtotal'], 0, ',', '.') ?></span>
                 </div>
                 <div class="flex justify-between text-sm">
                     <span class="text-gray-500">Pajak (12%)</span>
-                    <span class="font-medium text-gray-800" id="calc-tax">Rp 0</span>
+                    <span class="font-medium text-gray-800">Rp <?= number_format($order['tax'], 0, ',', '.') ?></span>
                 </div>
             </div>
             <div class="dashed-line my-3"></div>
             <div class="flex justify-between items-center">
                 <span class="font-bold text-gray-800">Total Tagihan</span>
-                <span class="font-black text-blue-600 text-xl" id="calc-total">Rp 0</span>
+                <span class="font-black text-blue-600 text-xl">Rp <?= number_format($order['total'], 0, ',', '.') ?></span>
             </div>
         </div>
-
     </div>
-
-    <!-- Confirm Button -->
-    <!-- <div class="fixed bottom-0 w-full max-w-[480px] left-1/2 -translate-x-1/2 p-4 bg-white border-t border-gray-200 z-30">
-        <button onclick="completeOrder()" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3.5 font-bold text-base shadow-lg transition-transform active:scale-[0.98] flex items-center justify-center gap-2">
-            <i class="ph-bold ph-check-circle text-lg"></i>
-            <span>Halaman Success</span>
-        </button>
-    </div> -->
-
 
     <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-white border-t border-gray-100 px-4 py-4 shadow-2xl z-20">
       <button onclick="backToMenu()"
@@ -138,89 +139,105 @@ $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . $ord
     
 
 </main>
-<script src="menu-data.js"></script>
+
 <script>
     function backToMenu() {
         localStorage.removeItem('cart');
-        localStorage.removeItem('item_notes');
-        window.location.href = 'index.html';
+        localStorage.removeItem('buyer_data');
+        window.location.href = 'index?code=<?= $order['table_name'] ?>';
     }
 
     const itemNotes = JSON.parse(localStorage.getItem('item_notes')) || {};
 
     document.addEventListener('DOMContentLoaded', () => {
-        const cart  = getCart();
-        const buyer = JSON.parse(localStorage.getItem('buyer_data')) || {};
-        if (!cart.length) { window.location.href = 'index.html'; return; }
+        // 1. Ambil data dari PHP ke JS (opsional jika ingin dipakai di JS)
+        const orderData = <?php echo json_encode($order); ?>;
+        const itemsData = <?php echo json_encode($order_items); ?>;
 
-        // Isi info pemesan
-        document.getElementById('display-name').innerText    = buyer.name    || 'Pelanggan';
-        document.getElementById('display-payment').innerText = buyer.payment || 'Bayar di Kasir';
+        // 2. Tampilkan Nama dan Metode Pembayaran dari Database
+        document.getElementById('display-name').innerText = orderData.customer_name;
+        
+        // Konversi angka payment (1/2) ke teks
+        const paymentText = orderData.payment == 1 ? 'Bayar di Kasir' : 'Online';
+        document.getElementById('display-payment').innerText = paymentText;
 
-        // Generate order code & QR
-        const orderCode = 'APS7-' + Math.random().toString(36).toUpperCase().slice(2,8);
-        const suffix = orderCode.split('-')[1];
-        document.getElementById('code-suffix').innerText = suffix;
-        document.getElementById('qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=TraffaCoffee-A01-${suffix}&color=111827`;
-
-        // Rincian pesanan
+        // 3. Render Daftar Pesanan dari Database (Bukan dari LocalStorage)
         const orderList = document.getElementById('order-list');
-        let subtotal = 0;
-        cart.forEach(ci => {
-            const menu = MENU_DATA.find(m => m.id === ci.id);
-            if (!menu) return;
-            const sub = menu.price * ci.qty;
-            subtotal += sub;
+        orderList.innerHTML = ''; // Kosongkan dulu
+
+        itemsData.forEach(item => {
             const div = document.createElement('div');
             div.className = 'flex justify-between items-center py-2';
             div.innerHTML = `
                 <div class="flex-1">
-                    <p class="font-semibold text-gray-800 text-sm">${menu.name}</p>
-                    <p class="text-xs text-gray-400">${ci.qty}x @ ${formatRupiah(menu.price)}</p>
-                    ${itemNotes[ci.id] ? `<p class="text-xs text-amber-600 italic mt-0.5">📝 ${itemNotes[ci.id]}</p>` : ''}
+                    <p class="font-semibold text-gray-800 text-sm">${item.menu_name}</p>
+                    <p class="text-xs text-gray-400">${item.qty}x @ Rp ${parseInt(item.subtotal/item.qty).toLocaleString('id-ID')}</p>
+                    ${item.notes ? `<p class="text-xs text-amber-600 italic mt-0.5">📝 ${item.notes}</p>` : ''}
                 </div>
-                <div class="font-semibold text-gray-900 text-sm">${formatRupiah(sub)}</div>`;
+                <div class="font-semibold text-gray-900 text-sm">Rp ${parseInt(item.subtotal).toLocaleString('id-ID')}</div>`;
             orderList.appendChild(div);
         });
 
-        const tax   = subtotal * 0.12;
-        const grand = subtotal + tax;
-        document.getElementById('calc-subtotal').innerText = formatRupiah(subtotal);
-        document.getElementById('calc-tax').innerText      = formatRupiah(tax);
-        document.getElementById('calc-total').innerText    = formatRupiah(grand);
+        
+        // localStorage.removeItem('cart');
+        // localStorage.removeItem('buyer_data');
+
     });
 
-    function completeOrder() {
-        const buyer = JSON.parse(localStorage.getItem('buyer_data')) || {};
-        const cart  = getCart();
-        if (!cart.length) return;
 
-        const subtotal = cart.reduce((s,ci) => {
-            const m = MENU_DATA.find(x => x.id === ci.id);
-            return s + (m ? m.price * ci.qty : 0);
-        }, 0);
-        const tax = subtotal * 0.12;
 
-        // Simpan data untuk success.html
-        const successData = {
-            invoice:  generateInvoice(),
-            name:     buyer.name    || 'Pelanggan',
-            payment:  buyer.payment || 'Bayar di Kasir',
-            notes:    buyer.notes   || '',
-            items:    cart.map(ci => ({...ci, note: itemNotes[ci.id] || ''})),
-            subtotal: subtotal,
-            tax:      tax,
-            total:    subtotal + tax
-        };
-        localStorage.setItem('success_data', JSON.stringify(successData));
+    const orderId = <?= $order['id']; ?>;
+    
+    // Fungsi untuk cek status ke server setiap 3 detik
+    const checkInterval = setInterval(async () => {
+        try {
+            const response = await fetch('cek_status.php?id=' + orderId);
+            const data = await response.json();
 
-        // Bersihkan cart & buyer data
-        localStorage.removeItem('cart');
-        localStorage.removeItem('buyer_data');
-        localStorage.removeItem('item_notes');
+            // Jika status berubah jadi 1 (Success)
+            if (data.status == 1) {
+                clearInterval(checkInterval); // Stop pengecekan
+                window.location.href = 'success_page.php?id=' + orderId; // Pindah halaman
+            }
+        } catch (error) {
+            console.error("Gagal cek status", error);
+        }
+    }, 3000); // 3000ms = 3 detik
 
-        window.location.href = 'success.html';
-    }
+    function startCountdown() {
+    const display = document.getElementById('display-countdown');
+    const expireTime = new Date(display.getAttribute('data-expire')).getTime();
+
+    // Update setiap 1 detik
+    const timer = setInterval(function() {
+        const now = new Date().getTime();
+        const distance = expireTime - now;
+
+        // Jika waktu sudah habis atau lewat
+        if (distance <= 0) {
+            clearInterval(timer);
+            display.innerHTML = "KADALUARSA";
+            display.classList.remove('text-blue-600');
+            display.classList.add('text-red-600'); // Ubah warna jadi merah
+            return;
+        }
+
+        // Kalkulasi jam, menit, detik
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        // Tampilkan format 00:00:00
+        display.innerHTML = 
+            (hours < 10 ? "0" + hours : hours) + ":" + 
+            (minutes < 10 ? "0" + minutes : minutes) + ":" + 
+            (seconds < 10 ? "0" + seconds : seconds);
+            
+    }, 1000);
+}
+
+// Jalankan fungsi saat halaman dimuat
+document.addEventListener('DOMContentLoaded', startCountdown);
 </script>
 
 <?php include 'layout/footer.php'; ?>

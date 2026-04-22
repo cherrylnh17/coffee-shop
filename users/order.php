@@ -1,7 +1,5 @@
 <?php
 include '../config.php';
-var_dump($_SERVER['REQUEST_METHOD']);
-var_dump($_POST);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
@@ -23,14 +21,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($stmtCheck->fetchColumn() == 0) $isUnique = true;
         }
 
-        $customer_name  = $_POST['customer_name'];
+        $customer_name  = trim($_POST['customer_name']);
         $customer_email = $_POST['customer_email'];
         $payment_type   = $_POST['payment'];
-        $table_code     = $_POST['table_code'];
+        $table_code     = $_POST['table_name'];
         $cart_items     = json_decode($_POST['cart_data'], true);
 
         if (empty($cart_items)) throw new Exception("Keranjang kosong");
 
+        if (empty($customer_name)) {
+            throw new Exception("Nama pelanggan wajib diisi!");
+        }
+
+        if (empty($payment_type)) {
+            throw new Exception("Metode pembayaran wajib diisi!");
+        }
         // cari id meja
         $id_table = null; $name_table = null;
         if ($table_code) {
@@ -39,6 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($row) { $id_table = $row['id']; $name_table = $row['name']; }
         }
+        var_dump($id_table);
+        var_dump($name_table);
 
         // hitung total dan buat detail
         $subtotal = 0;
@@ -90,12 +97,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $item_subtotal = $item['price'] * $item['qty'];
             
             $stmtItem->execute([
-                $order_id,          // Foreign Key ke tabel order
-                $item['id'],        // menu_id
-                $item['name'],      // menu_name
-                $item['qty'],       // qty
-                $item_subtotal,     // subtotal
-                $item['note'] ?? '' // notes
+                $order_id,          
+                $item['id'],        
+                $item['name'],     
+                $item['qty'],      
+                $item_subtotal,   
+                $item['note'] ?? '' 
             ]);
         }
 
@@ -105,7 +112,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     } catch (Exception $e) {
         $pdo->rollBack();
-        header("Location: ../");
+        $table_code = $_POST['table_name'];
+        header("Location: identitas?code=" . $table_code . "&m=" . urlencode($e->getMessage()));
         exit();
     }
 }
