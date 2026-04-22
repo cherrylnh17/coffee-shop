@@ -177,10 +177,10 @@ $menu = $stmt->fetchAll();
                 <div class="flex items-center gap-4">
                     <form method="GET" class="flex items-center">
                         <label class="mr-2 text-sm text-gray-600">Tampilkan:</label>
-                        <select name="limit" onchange="this.form.submit()" class="rounded border-gray-300 py-1 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                            <option value="5" <?php echo ($limit == 5) ? 'selected' : ''; ?>>5</option>
-                            <option value="10" <?php echo ($limit == 10) ? 'selected' : ''; ?>>10</option>
-                            <option value="25" <?php echo ($limit == 25) ? 'selected' : ''; ?>>25</option>
+                        <select onchange="setLimit(this.value)" class="appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2.5 pl-4 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm font-medium transition-all cursor-pointer">
+                          <option value="5">5</option>
+                          <option value="10">10</option>
+                          <option value="25">25</option>
                         </select>
                         <input type="hidden" name="page" value="1">
                     </form>
@@ -274,8 +274,10 @@ $menu = $stmt->fetchAll();
                 <div class="flex space-x-1">
                     <?php if ($page > 1): ?>
                         <a href="?page=<?php echo $page - 1; ?>&limit=<?php echo $limit; ?>" 
-                          class="rounded border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors">Prev</a>
-                    <?php endif; ?>
+                          class="rounded border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></a>
+                    <?php else: ?>
+                        <button disabled class="rounded border border-gray-200/50 px-3 py-1.5 text-sm text-gray-600/50 hover:bg-gray-50/50 transition-colors"><i class="fa-solid fa-chevron-left text-xs cursor-not-allowed"></i></button>
+                          <?php endif; ?>
 
                     <?php for($i = 1; $i <= $total_pages; $i++): ?>
                         <a href="?page=<?php echo $i; ?>&limit=<?php echo $limit; ?>" 
@@ -286,7 +288,9 @@ $menu = $stmt->fetchAll();
 
                     <?php if ($page < $total_pages): ?>
                         <a href="?page=<?php echo $page + 1; ?>&limit=<?php echo $limit; ?>" 
-                          class="rounded border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors">Next</a>
+                          class="rounded border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></a>
+                          <?php else: ?>
+                            <button disabled class="rounded border border-gray-200/50 px-3 py-1.5 text-sm text-gray-600/50 hover:bg-gray-50/50 transition-colors"><i class="fa-solid fa-chevron-right text-xs cursor-not-allowed"></i></button>
                     <?php endif; ?>
                 </div>
             </div>
