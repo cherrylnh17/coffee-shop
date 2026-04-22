@@ -30,7 +30,7 @@ if (isset($_POST['login'])) {
             if ($username === 'admin') {
                 header("Location: ../dashboard/admin/index.php");
             } else {
-                header("Location: ../dashboard/index.php");
+                header("Location: ../dashboard/kasir/index.php");
             }
             exit;
         } else {

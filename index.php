@@ -79,7 +79,7 @@
 
             <!-- Action Buttons -->
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-                <a href="users/index" class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-amber-600 text-white font-medium hover:bg-amber-500 transition-all duration-300 shadow-[0_0_20px_rgba(217,119,6,0.4)] hover:shadow-[0_0_30px_rgba(217,119,6,0.6)] flex items-center justify-center gap-2">
+                <a href="users/index.php" class="w-full sm:w-auto px-8 py-3.5 rounded-full bg-amber-600 text-white font-medium hover:bg-amber-500 transition-all duration-300 shadow-[0_0_20px_rgba(217,119,6,0.4)] hover:shadow-[0_0_30px_rgba(217,119,6,0.6)] flex items-center justify-center gap-2">
                     <i class="fa-solid fa-compass text-sm"></i>
                     User Page
                 </a>
