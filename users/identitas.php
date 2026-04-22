@@ -52,7 +52,7 @@ $table_code = htmlspecialchars($_GET['code']);
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama Lengkap <span class="text-red-500">*</span></label>
-                    <input type="text" name="customer_name" id="name" placeholder="Masukkan nama Anda" required
+                    <input type="text" name="customer_name" id="name" placeholder="Masukkan nama Anda" required 
                         class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white">
                 </div>
                 <div>
@@ -153,8 +153,6 @@ $table_code = htmlspecialchars($_GET['code']);
     document.addEventListener('DOMContentLoaded', () => {
         const cart = getCart();
 
-        console.log(cart);
-
         if (!cart.length) { window.location.href = 'index?code<?= $table_code ?>'; return; }
 
         // Render ringkasan pesanan
@@ -207,6 +205,14 @@ $table_code = htmlspecialchars($_GET['code']);
         hiddenInput.value = JSON.stringify(cart);
         
         form.appendChild(hiddenInput);
+
+        const buyerData = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+        };
+
+        localStorage.setItem('buyer_data', JSON.stringify(buyerData));
+
         form.submit(); 
     }
 

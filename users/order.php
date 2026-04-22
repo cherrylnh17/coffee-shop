@@ -44,8 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($row) { $id_table = $row['id']; $name_table = $row['name']; }
         }
-        var_dump($id_table);
-        var_dump($name_table);
+        
 
         // hitung total dan buat detail
         $subtotal = 0;
@@ -107,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $pdo->commit();
-        header("Location: checkout?code=" . $order_code);
+        header("Location: checkout?table=" . $table_code . "&code=" . $order_code);
         exit(); 
 
     } catch (Exception $e) {
