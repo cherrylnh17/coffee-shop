@@ -126,6 +126,7 @@ require_once '../../config.php';
       <div class="p-4 sm:p-6 lg:p-8">  
           <div class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm min-h-[60vh]">
             <!-- sini cuyyy -->
+             <div id="reader" style="width: 500px"></div>
           </div>
       </div>
     </div>
@@ -174,6 +175,49 @@ require_once '../../config.php';
       });
     </script>
 
+
+      <script src="https://unpkg.com/html5-qrcode"></script>
+
+      <script>
+function onScanSuccess(decodedText, decodedResult) {
+    // 1. Hentikan scanner setelah berhasil scan (opsional)
+    html5QrcodeScanner.clear();
+
+    // 2. Kirim data ke PHP menggunakan Method POST
+    fetch('proses_scan.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'qrcode_data=' + encodeURIComponent(decodedText)
+    })
+    .then(response => response.text())
+.then(data => {
+    if (data.includes("SUCCESS:")) {
+        const targetUrl = data.split(":")[1];
+        window.location.href = targetUrl; 
+    } else {
+        alert(data);
+        location.reload(); 
+    }
+})
+}
+
+
+
+let html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
+    fps: 30,              // Tingkatkan dari 10 ke 20 agar lebih smooth
+    qrbox: { width: 250, height: 250 },
+    aspectRatio: 1.0,     // Rasio kotak agar fokus
+    showTorchButtonIfSupported: true, // Tambahkan tombol flash jika di HP
+    videoConstraints: {
+        facingMode: "environment",
+        width: { min: 640, ideal: 1280, max: 1920 }, // Paksa HD jika tersedia
+        height: { min: 480, ideal: 720, max: 1080 }
+    }
+});
+html5QrcodeScanner.render(onScanSuccess);
+</script>
     </body>
 </html>
 

@@ -201,18 +201,21 @@ $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . $ord
 
 
 
-    const order_code = <?= $order['code']; ?>;
+    // Tambahkan tanda petik dua atau satu di sekitar tag PHP
+const order_code = "<?= $order['code']; ?>";
     
     // Fungsi untuk cek status ke server setiap 3 detik
     const checkInterval = setInterval(async () => {
         try {
-            const response = await fetch('cek_status?id=' + orderId);
+            const response = await fetch('cek_status?id=' + <?= $order['id'] ?>);
             const data = await response.json();
 
             // Jika status berubah jadi 1 (Success)
             if (data.status == 1) {
+                localStorage.removeItem('cart');
+                 localStorage.removeItem('buyer_data');
                 clearInterval(checkInterval); // Stop pengecekan
-                window.location.href = 'success?id=' + order_code; // Pindah halaman
+                window.location.href = 'success?code=' + order_code; // Pindah halaman
             }
         } catch (error) {
             console.error("Gagal cek status", error);
@@ -231,7 +234,7 @@ $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . $ord
         // Jika waktu sudah habis atau lewat
         if (distance <= 0) {
             clearInterval(timer);
-            display.innerHTML = "KADALUARSA";
+            display.innerHTML = "Kadaluarsa";
             display.classList.remove('text-blue-600');
             display.classList.add('text-red-600'); // Ubah warna jadi merah
             return;

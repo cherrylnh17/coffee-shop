@@ -20,7 +20,6 @@ if (isset($_POST['login'])) {
         $stmt->execute();
         
         $user = $stmt->fetch();
-        var_dump($user);
         // Pengecekan password
         if ($user && $user['password'] === $password) {
             $_SESSION['user_id'] = $user['id'];

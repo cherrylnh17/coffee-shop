@@ -151,11 +151,11 @@ $payment = ($order['payment'] == 1) ? 'Bayar di Kasir' : 'Bayar Online';
 
     <!-- Bottom CTA -->
     <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-white border-t border-gray-100 px-4 py-4 shadow-2xl z-20">
-      <button onclick="backToMenu()"
+      <a href="index?code=<?= $order['table_name'] ?>"
         class="w-full bg-blue-500 text-white font-black py-4 rounded-2xl text-base shadow-lg shadow-blue-200 active:scale-95 transition-transform flex items-center justify-center gap-2">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
         Kembali ke Menu
-      </button>
+      </a>
     </div>
 
   </div>
