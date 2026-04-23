@@ -8,7 +8,6 @@ if (!isset($_SESSION['username'])) {
 require_once '../../../config.php';
 
 try {
-    // Ingat: 'order' adalah reserved keyword di SQL, selalu gunakan backtick (`)
     $order_stmt = $pdo->query("SELECT * FROM `order` ORDER BY created_at DESC");
     $db_orders = $order_stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -17,12 +16,10 @@ try {
 
 ?>
 
-<!-- sini cuy -->
-
 <!doctype html>
 <html lang="en" dir="ltr">
   <head>
-    <title>Manajemen Kasir | Träffa Coffee</title>
+    <title>Riwayat penjualan | Träffa Coffee</title>
     <!-- [Meta] -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
@@ -363,23 +360,19 @@ try {
     </script>
 
     <script>
-      // 1. Mengambil data dari PHP dan mengubahnya menjadi Javascript Array
       const rawDbOrders = <?php echo json_encode($db_orders); ?>;
       
-      // 2. Mapping format data agar sesuai dengan standar Tabel/Popup
       const orders = rawDbOrders.map((o, index) => {
-          // Status Map
           let statusStr = "pending";
           if (o.status == 1) statusStr = "success";
           if (o.status == 3) statusStr = "expired";
           
-          // Payment Map
           let paymentMethod = "-";
           if (o.payment == 1) paymentMethod = "Kasir";
           if (o.payment == 2) paymentMethod = "Online";
 
           return {
-              _idx: index, // Index digunakan untuk tombol Detail
+              _idx: index, 
               code: o.code || '-',
               user_name: o.user_name || '-',
               meja: o.table_name || '-',
@@ -400,7 +393,6 @@ try {
       let currentPage = 1;
 
       let itemsPerPage = 5; 
-      // Mengubah format string datetime MySQL menjadi waktu (ms) untuk disorting
       function parseDate(dateStr) {
           return new Date(dateStr).getTime();
       }
@@ -440,7 +432,6 @@ try {
           const paginatedItems = filteredAndSorted.slice(startIndex, endIndex);
 
           paginatedItems.forEach((o) => {
-              // Pewarnaan Label Status sesuai standar (1=Success, 2=Pending, 3=Expired)
               let statusBadge = '';
               let isDisabled = false;
               if(o.raw_status === 1) {
@@ -504,7 +495,7 @@ try {
 
       function setLimit(limit) {
           itemsPerPage = parseInt(limit);
-          currentPage = 1; // Paksa kembali ke halaman 1 setiap limit diubah
+          currentPage = 1;
           renderTable();
       }
 
@@ -513,7 +504,6 @@ try {
       function changePage(page) { currentPage = page; renderTable(); }
       function printOrder(code) { alert(`Mencetak struk pesanan dengan kode ${code}...`); }
 
-      // Fungsi untuk mengisi Data Modal Popup
       function showDetail(index) {
           const o = orders[index];
           
@@ -527,7 +517,6 @@ try {
           document.getElementById('det-payment').innerText = o.payment;
           document.getElementById('det-detail').innerText = o.detail;
 
-          // Mengatur badge status untuk Modal
           let modalStatus = '';
           if(o.raw_status === 1) modalStatus = '<span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-bold border border-green-200">Sukses</span>';
           else if(o.raw_status === 2) modalStatus = '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-bold border border-yellow-200">Pending</span>';
@@ -535,11 +524,9 @@ try {
           
           document.getElementById('det-status').innerHTML = modalStatus;
 
-          // Memicu Modal (Flowbite) untuk tampil
           document.getElementById('trigger-detail-modal').click();
       }
-
-      // Render pertama kali saat load (Sekarang menggunakan data asli dari Database)
+      
       renderTable();
     </script>
     </body>
