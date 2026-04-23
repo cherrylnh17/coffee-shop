@@ -16,7 +16,7 @@ try {
 }
 
 if (!isset($_GET['code']) || empty($_GET['code'])) {
-    header("Location: ../");
+    header("Location: table");
     exit(); 
 }
 

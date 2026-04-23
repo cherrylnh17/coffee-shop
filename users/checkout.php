@@ -5,6 +5,7 @@ include '../config.php';
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
+$table_code = $_GET['table'];
 
 if (!isset($_GET['code']) || empty($_GET['code'])) {
     header("Location: ../");
@@ -18,7 +19,10 @@ try {
     $stmt = $pdo->prepare("SELECT * FROM `order` WHERE code = ?"); // Sesuaikan nama tabel 'orders' atau 'order'
     $stmt->execute([$order_code]);
     $order = $stmt->fetch(PDO::FETCH_ASSOC);
-
+    if(empty($order)){
+        header("Location: index?code=" . $table_code);
+        exit(); 
+    }
     // Ambil rincian menu yang dibeli
     $stmtItem = $pdo->prepare("SELECT * FROM order_item WHERE order_id = ?");
     $stmtItem->execute([$order['id']]);
@@ -191,13 +195,13 @@ $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . $ord
     // Fungsi untuk cek status ke server setiap 3 detik
     const checkInterval = setInterval(async () => {
         try {
-            const response = await fetch('cek_status.php?id=' + orderId);
+            const response = await fetch('cek_status?id=' + orderId);
             const data = await response.json();
 
             // Jika status berubah jadi 1 (Success)
             if (data.status == 1) {
                 clearInterval(checkInterval); // Stop pengecekan
-                window.location.href = 'success_page.php?id=' + orderId; // Pindah halaman
+                window.location.href = 'success?id=' + orderId; // Pindah halaman
             }
         } catch (error) {
             console.error("Gagal cek status", error);
