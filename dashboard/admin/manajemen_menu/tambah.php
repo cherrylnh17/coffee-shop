@@ -17,6 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         $description = !empty($_POST['description']) ? trim($_POST['description']) : 'Tidak ada deskripsi.';
         $image_db_path = 'https://placehold.co/100x100?text=No+Image';
+        
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
             $file_tmp = $_FILES['image']['tmp_name'];
             $file_name = $_FILES['image']['name'];
