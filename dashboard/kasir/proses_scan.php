@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else if ($row['status'] == 1) {
             echo "Pesanan ini sudah dibayar/selesai!";
         } else {
-           header("Location: checkout?code=" . $row['code']);
+            echo "SUCCESS:check_order?code=" . $row['code'];
         }
     } else {
         echo "Data kosong!";
