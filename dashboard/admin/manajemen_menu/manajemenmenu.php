@@ -7,22 +7,18 @@ if (!isset($_SESSION['username'])) {
 
 require_once '../../../config.php'; 
 
-// Menangkap nilai filter dan mencegah nilai minus/nol
 $limit = isset($_GET['limit']) ? max(1, (int)$_GET['limit']) : 5; 
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $offset = ($page - 1) * $limit;
 
-// Hitung total data - Menggunakan $pdo (bukan $kon)
 $total_stmt = $pdo->query("SELECT COUNT(*) FROM menu");
 $total_records = $total_stmt->fetchColumn();
 
-// Hitung total halaman ssss
 $total_pages = ceil($total_records / $limit);
 if ($page > $total_pages) {
     $page = $total_pages;
 }
 
-// Mengambil data - Menggunakan $pdo (bukan $kon)
 $stmt = $pdo->prepare("SELECT * FROM menu ORDER BY id DESC LIMIT :limit OFFSET :offset");
 $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
