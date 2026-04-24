@@ -127,6 +127,7 @@ require_once '../../config.php';
           <div class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm min-h-[60vh]">
             <!-- sini cuyyy -->
              <div id="reader" style="width: 500px"></div>
+
           </div>
       </div>
     </div>
