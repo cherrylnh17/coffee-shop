@@ -10,7 +10,6 @@ if (isset($_POST['login'])) {
     $password = $_POST['password'];
 
     try {
-        // Asumsi nama tabel adalah 'users'
 
         $stmt = $pdo->prepare("SELECT * FROM user WHERE username = :username AND password = :password");
        
@@ -20,12 +19,11 @@ if (isset($_POST['login'])) {
         $stmt->execute();
         
         $user = $stmt->fetch();
-        // Pengecekan password
+
         if ($user && $user['password'] === $password) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             
-            // Cek role user untuk diarahkan ke halaman yang sesuai
             if ($username === 'admin') {
                 header("Location: ../dashboard/admin/index.php");
             } else {
@@ -54,25 +52,11 @@ if (isset($_POST['login'])) {
     <!-- [Favicon] icon -->
     <link rel="icon" href="../assets/image/favicon.svg" type="image/x-icon" />
     
-    <!-- [Font] Family -->
-    <link rel="stylesheet" href="../assets/fonts/inter/inter.css" id="main-font-link" />
-    <link rel="stylesheet" href="../assets/fonts/tabler-icons.min.css" />
-    <link rel="stylesheet" href="../assets/fonts/feather.css" />
-    <link rel="stylesheet" href="../assets/fonts/fontawesome.css" />
-    <link rel="stylesheet" href="../assets/fonts/material.css" />
-    
-    <!-- Tailwind CSS (Menggantikan style.css kustom) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
 
   <body class="bg-gray-50 text-gray-800">
-    <!-- [ Pre-loader ] start -->
-    <!-- <div class="fixed inset-0 z-[1034] bg-white dark:bg-gray-900 transition-opacity duration-300 loader-bg">
-      <div class="absolute top-0 inline-block w-full h-[5px] overflow-hidden bg-blue-100 loader-track">
-        <div class="absolute left-0 top-0 h-[5px] w-[300px] bg-blue-500 animate-pulse loader-fill"></div>
-      </div>
-    </div> -->
-    <!-- [ Pre-loader ] End -->
 
     <div class="relative w-full">
       <div class="flex min-h-screen w-full items-center justify-center bg-cover bg-center bg-no-repeat p-6 relative bg-[url('../images/authentication/img-auth-bg.jpg')]">
@@ -124,13 +108,5 @@ if (isset($_POST['login'])) {
       </div>
     </div>
 
-    <!-- Required Js -->
-    <script src="../assets/js/plugins/simplebar.min.js"></script>
-    <script src="../assets/js/plugins/popper.min.js"></script>
-    <script src="../assets/js/icon/custom-font.js"></script>
-    <script src="../assets/js/plugins/feather.min.js"></script>
-    <script src="../assets/js/component.js"></script>
-    <script src="../assets/js/theme.js"></script>
-    <script src="../assets/js/script.js"></script>
   </body>
 </html>

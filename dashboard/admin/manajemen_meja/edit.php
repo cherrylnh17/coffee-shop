@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update'])) {
             exit;
         }
 
-        $sql = "UPDATE `table` SET name = ? WHERE id = ?";
+        $sql = "UPDATE `table` SET name = ?, updated_at = NOW() WHERE id = ?";
         $stmt = $pdo->prepare($sql);
         
         $stmt->execute([$name, $id]);

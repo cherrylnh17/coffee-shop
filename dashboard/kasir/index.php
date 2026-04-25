@@ -10,7 +10,10 @@ require_once '../../config.php';
 <!doctype html>
 <html lang="en" dir="ltr">
   <head>
-    <title>Manajemen Kasir | Träffa Coffee</title>
+
+    <title>Dashboard Kasir | Träffa Coffee</title>
+    <!-- [Meta] -->
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -90,21 +93,8 @@ require_once '../../config.php';
           </ul>
         </div>
       </div>
-<<<<<<< HEAD
     </nav>
-=======
-    </header>
-    
-    <div class="relative ml-0 min-h-[calc(100vh-135px)] top-[74px] transition-all duration-200 ease-in-out lg:ml-[280px]">
-      <div class="p-4 sm:p-6 lg:p-8">  
-          <div class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm min-h-[60vh]">
-            <!-- sini cuyyy -->
-             <div id="reader" style="width: 500px"></div>
 
-          </div>
-      </div>
-    </div>
->>>>>>> 9361d8f7997126a530098dd9ca4e42babee666e0
 
     <header class="fixed inset-x-0 top-0 z-[1024] flex h-[74px] items-center bg-white/80 px-4 shadow-sm backdrop-blur-md transition-all duration-300 lg:left-[280px] pc-header">
       <div class="flex grow items-center sm:px-2">
