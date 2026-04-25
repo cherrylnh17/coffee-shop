@@ -19,6 +19,7 @@ if (isset($_POST['login'])) {
         $stmt->execute();
         
         $user = $stmt->fetch();
+
         if ($user && $user['password'] === $password) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];

@@ -8,7 +8,7 @@ error_reporting(E_ALL);
 $table_code = $_GET['table'];
 
 if (!isset($_GET['code']) || empty($_GET['code'])) {
-    header("Location: ../");
+    header("Location: table");
     exit(); 
 } else {
     $order_code = $_GET['code'];
@@ -35,6 +35,17 @@ $payment = ($order['payment'] == 1) ? 'Bayar di Kasir' : 'Bayar Online';
 
 
 $table_code = htmlspecialchars($order['table_name']);
+
+$query = "SELECT 1 FROM `table` WHERE name = ? LIMIT 1";
+$stmt = $pdo->prepare($query);
+$stmt->execute([$table_code]);
+
+$exists = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$exists) {
+    header("Location: table.php");
+    exit();
+} 
 
 $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . $order['code'];
 
@@ -190,18 +201,21 @@ $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . $ord
 
 
 
-    const orderId = <?= $order['id']; ?>;
+    // Tambahkan tanda petik dua atau satu di sekitar tag PHP
+const order_code = "<?= $order['code']; ?>";
     
     // Fungsi untuk cek status ke server setiap 3 detik
     const checkInterval = setInterval(async () => {
         try {
-            const response = await fetch('cek_status?id=' + orderId);
+            const response = await fetch('cek_status?id=' + <?= $order['id'] ?>);
             const data = await response.json();
 
             // Jika status berubah jadi 1 (Success)
             if (data.status == 1) {
+                localStorage.removeItem('cart');
+                 localStorage.removeItem('buyer_data');
                 clearInterval(checkInterval); // Stop pengecekan
-                window.location.href = 'success?id=' + orderId; // Pindah halaman
+                window.location.href = 'success?code=' + order_code; // Pindah halaman
             }
         } catch (error) {
             console.error("Gagal cek status", error);
@@ -220,7 +234,7 @@ $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . $ord
         // Jika waktu sudah habis atau lewat
         if (distance <= 0) {
             clearInterval(timer);
-            display.innerHTML = "KADALUARSA";
+            display.innerHTML = "Kadaluarsa";
             display.classList.remove('text-blue-600');
             display.classList.add('text-red-600'); // Ubah warna jadi merah
             return;

@@ -9,6 +9,14 @@ session_start();
 require_once '../../../config.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    echo "<pre>";
+    echo "--- DATA POST ---\n";
+    var_dump($_POST);
+    echo "\n--- DATA FILES ---\n";
+    var_dump($_FILES);
+    echo "\n--- ROOT_PATH VALUE ---\n";
+    var_dump(ROOT_PATH);
+    echo "</pre>";
     try {
         $name = $_POST['name'];
         $category = $_POST['category'];
@@ -30,14 +38,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 
                 $target_dir = ROOT_PATH . "/assets/image/menu/";
                 
+                // Cek apakah folder ada, jika tidak, coba buat
                 if (!is_dir($target_dir)) {
-                    mkdir($target_dir, 0777, true);
+                    if (!mkdir($target_dir, 0777, true)) {
+                        // Jika gagal membuat folder, tampilkan pesan yang jelas
+                        die("Gagal membuat folder: " . $target_dir . ". Pastikan izin folder induk benar.");
+                    }
+                }
+
+                // Pastikan folder bisa ditulis (writable)
+                if (!is_writable($target_dir)) {
+                    die("Folder " . $target_dir . " tidak memiliki izin tulis (not writable).");
                 }
 
                 $target_file = $target_dir . $new_file_name;
 
                 if (move_uploaded_file($file_tmp, $target_file)) {
                     $image_db_path = 'assets/image/menu/' . $new_file_name;
+                } else {
+                    // Jika gagal, tampilkan pesan spesifik
+                    echo "Gagal memindahkan file ke: " . $target_file;
+                    echo "<br>Cek apakah folder tersebut ada dan bisa ditulis (writable).";
+                    die();
                 }
             } else {
                 header("Location: manajemenmenu.php?status=error&msg=" . urlencode("Gagal! Format gambar harus JPG, JPEG, PNG, WEBP, atau GIF."));

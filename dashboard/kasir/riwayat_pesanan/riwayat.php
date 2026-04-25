@@ -39,7 +39,7 @@ try {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   </head>
   <body class="bg-gray-50 text-gray-800">
-
+    <div id="sidebar-overlay" class="fixed inset-0 z-[1025] bg-gray-900/50 backdrop-blur-sm hidden lg:hidden"></div>
     <!-- [ Sidebar Menu ] start -->
     <nav class="fixed inset-y-0 left-0 z-[1026] w-[280px] overflow-hidden border-r border-gray-200 bg-white transition-all duration-200 ease-in-out max-lg:-left-[280px] pc-sidebar">
       <div class="h-full w-full">
@@ -325,38 +325,61 @@ try {
 
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        const sidebar = document.querySelector('.pc-sidebar');
-        const header = document.querySelector('header');
-        const mainContent = document.querySelector('header').nextElementSibling;
-        const footer = document.querySelector('footer');
+    const sidebar = document.querySelector('.pc-sidebar');
+    const header = document.querySelector('header');
+    const mainContent = header.nextElementSibling;
+    const footer = document.querySelector('footer');
+    const overlay = document.getElementById('sidebar-overlay');
 
-        const btnDesktop = document.getElementById('sidebar-hide');
-        if (btnDesktop && sidebar && header && mainContent && footer) {
-          btnDesktop.addEventListener('click', function(e) {
+    const btnDesktop = document.getElementById('sidebar-hide');
+    const btnMobile = document.getElementById('mobile-collapse');
+
+    // Fungsi untuk Toggle Sidebar Mobile
+    function toggleMobileSidebar() {
+        sidebar.classList.toggle('max-lg:-left-[280px]');
+        sidebar.classList.toggle('max-lg:left-0');
+        overlay.classList.toggle('hidden');
+    }
+
+    // Event Klik Tombol Desktop (Collapse)
+    if (btnDesktop) {
+        btnDesktop.addEventListener('click', function(e) {
             e.preventDefault();
             sidebar.classList.toggle('lg:w-0');
             sidebar.classList.toggle('lg:border-r-0');
-            
             header.classList.toggle('lg:left-[280px]');
             header.classList.toggle('lg:left-0');
-            
             mainContent.classList.toggle('lg:ml-[280px]');
             mainContent.classList.toggle('lg:ml-0');
-            
             footer.classList.toggle('lg:ml-[280px]');
             footer.classList.toggle('lg:ml-0');
-          });
-        }
+        });
+    }
 
-        const btnMobile = document.getElementById('mobile-collapse');
-        if (btnMobile && sidebar) {
-          btnMobile.addEventListener('click', function(e) {
+    // Event Klik Tombol Mobile (Hamburger)
+    if (btnMobile) {
+        btnMobile.addEventListener('click', function(e) {
             e.preventDefault();
-            sidebar.classList.toggle('max-lg:-left-[280px]');
-            sidebar.classList.toggle('max-lg:left-0');
-          });
+            toggleMobileSidebar();
+        });
+    }
+
+    // Event Klik pada Overlay (Menutup sidebar saat klik di luar)
+    if (overlay) {
+        overlay.addEventListener('click', function() {
+            toggleMobileSidebar();
+        });
+    }
+
+    // Tambahan: Menutup sidebar jika layar di-resize ke ukuran desktop
+    window.addEventListener('resize', function() {
+        if (window.innerWidth >= 1024) {
+            sidebar.classList.add('max-lg:-left-[280px]');
+            sidebar.classList.remove('max-lg:left-0');
+            overlay.classList.add('hidden');
         }
-      });
+    });
+});
     </script>
 
     <script>

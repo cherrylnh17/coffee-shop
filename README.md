@@ -15,3 +15,15 @@ $password = "";               // Password SQL (default XAMPP: kosong)
 
 ### Run Website
 Untuk mulai website bisa dengan melakukan command `npm install` terus `npm run dev` didalam terminal:
+
+### Penggunaan Upload Gambar
+Untuk konfigurasi di linux perlu memberikan izin untuk pengubahan folder, berikut adalah comand untuk di terminal.
+
+# Masuk ke direktori project
+```cd /var/www/html/coffee-shop```
+
+# Berikan hak akses kepemilikan ke user web server (umumnya www-data)
+```sudo chown -R www-data:www-data assets```
+
+# Berikan izin tulis
+```sudo chmod -R 775 assets```

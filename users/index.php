@@ -22,6 +22,17 @@ if (!isset($_GET['code']) || empty($_GET['code'])) {
 
 $table_code = htmlspecialchars($_GET['code']);
 
+$query = "SELECT 1 FROM `table` WHERE name = ? LIMIT 1";
+$stmt = $pdo->prepare($query);
+$stmt->execute([$table_code]);
+
+$exists = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$exists) {
+    header("Location: table");
+    exit();
+} 
+
 ?>
 
 <?php 
@@ -35,9 +46,9 @@ $table_code = htmlspecialchars($_GET['code']);
                 <a href="profile?code=<?=$table_code ?>" class="text-gray-800 hover:text-sky-500 transition-colors">
                     <i class="ph ph-list text-2xl"></i>
                 </a>
-                <button onclick="window.location.href='search.php'" class="text-gray-800 hover:text-sky-500 transition-colors">
+                <a href="search?code=<?= $table_code ?>" class="text-gray-800 hover:text-sky-500 transition-colors">
                     <i class="ph ph-magnifying-glass text-2xl"></i>
-                </button>
+                </a>
             </div>
             <div class="flex justify-between items-center mb-4">
                 <div>

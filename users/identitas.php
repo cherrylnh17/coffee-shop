@@ -17,12 +17,22 @@ try {
 
 
 if (!isset($_GET['code']) || empty($_GET['code'])) {
-    header("Location: ../");
+    header("Location: table");
     exit(); 
 }
 
 $table_code = htmlspecialchars($_GET['code']);
 
+$query = "SELECT 1 FROM `table` WHERE name = ? LIMIT 1";
+$stmt = $pdo->prepare($query);
+$stmt->execute([$table_code]);
+
+$exists = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$exists) {
+    header("Location: table.php");
+    exit();
+} 
 ?>
 
 <?php 
