@@ -9,9 +9,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("UPDATE `order` SET status = 1 WHERE id = ?");
         $stmt->execute([$order_id]);
 
-        // Kembali ke halaman sebelumnya atau riwayat
-        echo "<script>alert('Status Berhasil Diperbarui!'); window.location.href='riwayat_pesanan/riwayat.php';</script>";
+        // Simpan pesan ke dalam session
+        $_SESSION['swal_msg'] = [
+            'icon' => 'success',
+            'title' => 'Berhasil!',
+            'text' => 'Status Pesanan Berhasil Diperbarui!'
+        ];
+
+        // Redirect ke index.php
+        header("Location: index");
+        exit;
     } catch(PDOException $e) {
-        die("Gagal memperbarui status: " . $e->getMessage());
+        // Simpan pesan error ke dalam session
+        $_SESSION['swal_msg'] = [
+            'icon' => 'error',
+            'title' => 'Gagal!',
+            'text' => 'Gagal memperbarui status: ' . $e->getMessage()
+        ];
+        
+        header("Location: index.php");
+        exit;
     }
 }
+?>

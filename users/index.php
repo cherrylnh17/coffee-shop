@@ -29,7 +29,7 @@ $stmt->execute([$table_code]);
 $exists = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$exists) {
-    header("Location: table.php");
+    header("Location: table");
     exit();
 } 
 

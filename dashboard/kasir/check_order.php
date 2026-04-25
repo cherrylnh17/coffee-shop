@@ -69,7 +69,7 @@ $payment_status = ($order['status'] == 1) ? 'Lunas' : 'Belum Bayar';
                 <small class="text-xs text-gray-500">Kasir</small>
               </div>
             </div>
-          </div>
+          </div> 
 
           <div class="w-full">
             <ul class="flex flex-col gap-1.5 px-4 py-2">
