@@ -381,9 +381,16 @@ $menu = $stmt->fetchAll();
                             </select>
                         </div>
                         <div class="col-span-2">
+
+
                             <label class="mb-2 block text-sm font-medium text-gray-900">Ganti Gambar (Opsional)</label>
                             <input type="file" name="image" accept="image/*" class="block w-full cursor-pointer rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100">
                             <p class="mt-1 text-xs text-gray-500">Biarkan kosong jika tidak ingin mengubah gambar saat ini.</p>
+
+                            <label class="mb-2 block text-sm font-medium text-gray-900">Link URL Gambar</label>
+                            <input type="file" name="image" id="edit-image" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required>
+
+
                         </div>
                         <div class="col-span-2">
                             <label class="mb-2 block text-sm font-medium text-gray-900">Deskripsi Menu</label>
