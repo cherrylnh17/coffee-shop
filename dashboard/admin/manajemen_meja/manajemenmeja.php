@@ -329,44 +329,72 @@ $mejas = $stmt->fetchAll();
         const header = document.querySelector('header');
         const mainContent = document.querySelector('header').nextElementSibling;
         const footer = document.querySelector('footer');
-
         const btnDesktop = document.getElementById('sidebar-hide');
-        if (btnDesktop && sidebar && header && mainContent && footer) {
+        const btnMobile = document.getElementById('mobile-collapse');
+
+        const overlay = document.createElement('div');
+        overlay.id = 'sidebar-overlay';
+        overlay.className = 'fixed inset-0 z-[1024] bg-gray-900/40 backdrop-blur-sm hidden transition-opacity duration-200';
+        document.body.appendChild(overlay);
+
+        const closeSidebarMobile = () => {
+          sidebar.classList.add('max-lg:-left-[280px]');
+          sidebar.classList.remove('max-lg:left-0');
+          overlay.classList.add('hidden');
+          document.body.style.overflow = '';
+        };
+
+        const openSidebarMobile = () => {
+          sidebar.classList.remove('max-lg:-left-[280px]');
+          sidebar.classList.add('max-lg:left-0');
+          overlay.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+        };
+
+        if (btnDesktop) {
           btnDesktop.addEventListener('click', function(e) {
             e.preventDefault();
             sidebar.classList.toggle('lg:w-0');
             sidebar.classList.toggle('lg:border-r-0');
-            
             header.classList.toggle('lg:left-[280px]');
             header.classList.toggle('lg:left-0');
-            
             mainContent.classList.toggle('lg:ml-[280px]');
             mainContent.classList.toggle('lg:ml-0');
-            
             footer.classList.toggle('lg:ml-[280px]');
             footer.classList.toggle('lg:ml-0');
           });
         }
 
-        const btnMobile = document.getElementById('mobile-collapse');
-        if (btnMobile && sidebar) {
+        if (btnMobile) {
           btnMobile.addEventListener('click', function(e) {
             e.preventDefault();
-            sidebar.classList.toggle('max-lg:-left-[280px]');
-            sidebar.classList.toggle('max-lg:left-0');
+            const isOpen = sidebar.classList.contains('max-lg:left-0');
+            if (isOpen) {
+              closeSidebarMobile();
+            } else {
+              openSidebarMobile();
+            }
           });
         }
+
+        overlay.addEventListener('click', closeSidebarMobile);
+
+        const navLinks = sidebar.querySelectorAll('ul li a');
+        navLinks.forEach(link => {
+          link.addEventListener('click', function() {
+            if (window.innerWidth < 1024) {
+              closeSidebarMobile();
+            }
+          });
+        });
+
+        window.addEventListener('resize', function() {
+          if (window.innerWidth >= 1024) {
+            overlay.classList.add('hidden');
+            document.body.style.overflow = '';
+          }
+        });
       });
-
-      function openEditMejaModal(button) {
-        const id = button.getAttribute('data-id');
-        const nama = button.getAttribute('data-nama');
-
-        document.getElementById('edit_id').value = id;
-        document.getElementById('edit_name').value = nama;
-
-        document.getElementById('trigger-edit-meja-modal').click();
-      }
     </script>
   </body>
 </html>

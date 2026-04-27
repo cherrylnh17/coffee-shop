@@ -328,7 +328,7 @@ try {
     </footer>
 
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {
     const sidebar = document.querySelector('.pc-sidebar');
     const header = document.querySelector('header');
     const mainContent = header.nextElementSibling;

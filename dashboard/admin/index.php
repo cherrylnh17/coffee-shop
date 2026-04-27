@@ -53,6 +53,8 @@ $countKasir = getUsersByRole($pdo, 1);
   </head>
   
   <body class="bg-gray-50 text-gray-800">
+    
+    <div id="sidebar-overlay" class="fixed inset-0 z-[1025] bg-gray-900/50 backdrop-blur-sm hidden lg:hidden"></div>
 
     <nav class="fixed inset-y-0 left-0 z-[1026] w-[280px] overflow-hidden border-r border-gray-200 bg-white transition-all duration-200 ease-in-out max-lg:-left-[280px] pc-sidebar">
       <div class="h-full w-full">
@@ -258,33 +260,71 @@ $countKasir = getUsersByRole($pdo, 1);
         const header = document.querySelector('header');
         const mainContent = document.querySelector('header').nextElementSibling;
         const footer = document.querySelector('footer');
-
         const btnDesktop = document.getElementById('sidebar-hide');
-        if (btnDesktop && sidebar && header && mainContent && footer) {
+        const btnMobile = document.getElementById('mobile-collapse');
+
+        const overlay = document.createElement('div');
+        overlay.id = 'sidebar-overlay';
+        overlay.className = 'fixed inset-0 z-[1024] bg-gray-900/40 backdrop-blur-sm hidden transition-opacity duration-200';
+        document.body.appendChild(overlay);
+
+        const closeSidebarMobile = () => {
+          sidebar.classList.add('max-lg:-left-[280px]');
+          sidebar.classList.remove('max-lg:left-0');
+          overlay.classList.add('hidden');
+          document.body.style.overflow = '';
+        };
+
+        const openSidebarMobile = () => {
+          sidebar.classList.remove('max-lg:-left-[280px]');
+          sidebar.classList.add('max-lg:left-0');
+          overlay.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+        };
+
+        if (btnDesktop) {
           btnDesktop.addEventListener('click', function(e) {
             e.preventDefault();
             sidebar.classList.toggle('lg:w-0');
             sidebar.classList.toggle('lg:border-r-0');
-            
             header.classList.toggle('lg:left-[280px]');
             header.classList.toggle('lg:left-0');
-            
             mainContent.classList.toggle('lg:ml-[280px]');
             mainContent.classList.toggle('lg:ml-0');
-            
             footer.classList.toggle('lg:ml-[280px]');
             footer.classList.toggle('lg:ml-0');
           });
         }
 
-        const btnMobile = document.getElementById('mobile-collapse');
-        if (btnMobile && sidebar) {
+        if (btnMobile) {
           btnMobile.addEventListener('click', function(e) {
             e.preventDefault();
-            sidebar.classList.toggle('max-lg:-left-[280px]');
-            sidebar.classList.toggle('max-lg:left-0');
+            const isOpen = sidebar.classList.contains('max-lg:left-0');
+            if (isOpen) {
+              closeSidebarMobile();
+            } else {
+              openSidebarMobile();
+            }
           });
         }
+
+        overlay.addEventListener('click', closeSidebarMobile);
+
+        const navLinks = sidebar.querySelectorAll('ul li a');
+        navLinks.forEach(link => {
+          link.addEventListener('click', function() {
+            if (window.innerWidth < 1024) {
+              closeSidebarMobile();
+            }
+          });
+        });
+
+        window.addEventListener('resize', function() {
+          if (window.innerWidth >= 1024) {
+            overlay.classList.add('hidden');
+            document.body.style.overflow = '';
+          }
+        });
       });
     </script>
   </body>

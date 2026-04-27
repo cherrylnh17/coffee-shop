@@ -162,7 +162,6 @@ if (!isset($_SESSION['name']) || $_SESSION['role'] != 1) {
         btnToggle.addEventListener('click', (e) => { e.preventDefault(); toggleSidebar(); });
         overlay.addEventListener('click', toggleSidebar);
 
-        // Resize handler agar UI tidak glitch saat ganti orientasi layar
         window.addEventListener('resize', () => {
           if (window.innerWidth >= 1024) {
             overlay.classList.add('hidden');
