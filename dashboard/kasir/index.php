@@ -174,7 +174,6 @@ if (!isset($_SESSION['name']) || $_SESSION['role'] != 1) {
     <script>
       function onScanSuccess(decodedText, decodedResult) {
           html5QrcodeScanner.clear();
-          // Logika fetch Anda tetap sama...
           fetch('proses_scan.php', {
               method: 'POST',
               headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
