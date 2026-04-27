@@ -1,11 +1,15 @@
 <?php
 session_start();
-if (!isset($_SESSION['username'])) {
-    header("Location: ../../../auth/login.php");
+
+
+require_once '../../../config.php';
+require_once '../../../path.php';
+
+if (!isset($_SESSION['name']) || $_SESSION['role'] != 1) {
+    header("Location: " . BASE_URL . "auth/login.php");
     exit;
 }
 
-require_once '../../../config.php';
 
 try {
     $order_stmt = $pdo->query("SELECT * FROM `order` ORDER BY created_at DESC");
