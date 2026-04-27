@@ -334,14 +334,12 @@ try {
     const btnDesktop = document.getElementById('sidebar-hide');
     const btnMobile = document.getElementById('mobile-collapse');
 
-    // Fungsi untuk Toggle Sidebar Mobile
     function toggleMobileSidebar() {
         sidebar.classList.toggle('max-lg:-left-[280px]');
         sidebar.classList.toggle('max-lg:left-0');
         overlay.classList.toggle('hidden');
     }
 
-    // Event Klik Tombol Desktop (Collapse)
     if (btnDesktop) {
         btnDesktop.addEventListener('click', function(e) {
             e.preventDefault();
@@ -355,8 +353,6 @@ try {
             footer.classList.toggle('lg:ml-0');
         });
     }
-
-    // Event Klik Tombol Mobile (Hamburger)
     if (btnMobile) {
         btnMobile.addEventListener('click', function(e) {
             e.preventDefault();
@@ -364,14 +360,12 @@ try {
         });
     }
 
-    // Event Klik pada Overlay (Menutup sidebar saat klik di luar)
     if (overlay) {
         overlay.addEventListener('click', function() {
             toggleMobileSidebar();
         });
     }
 
-    // Tambahan: Menutup sidebar jika layar di-resize ke ukuran desktop
     window.addEventListener('resize', function() {
         if (window.innerWidth >= 1024) {
             sidebar.classList.add('max-lg:-left-[280px]');
@@ -459,11 +453,12 @@ try {
               let isDisabled = false;
               if(o.raw_status === 1) {
                   statusBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border bg-green-50 text-green-600 border-green-200"><i class="fa-solid fa-check-double"></i> Sukses</span>`;
-              } else if (o.raw_status === 2 || o.raw_status===3) {
+              } else if (o.raw_status === 2) {
                   statusBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border bg-yellow-50 text-yellow-600 border-yellow-200"><i class="fa-solid fa-hourglass-half"></i> Pending</span>`;
                   isDisabled = true;
               } else {
                   statusBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border bg-red-50 text-red-600 border-red-200"><i class="fa-solid fa-xmark"></i> Expired</span>`;
+                  isDisabled = true;
               }
 
               table.innerHTML += `
@@ -481,7 +476,6 @@ try {
                       </td>
                       <td class="px-5 py-4">
                           <div class="flex items-center justify-center gap-2">
-                              <!-- Memanggil fungsi showDetail dengan index dari array master (orders) -->
                               <button onclick="showDetail(${o._idx})" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white border border-transparent hover:border-blue-600">
                                   <i class="fa-solid fa-eye"></i> Detail
                               </button>
