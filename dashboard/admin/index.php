@@ -10,22 +10,34 @@ if (!isset($_SESSION['username'])) {
 }
 require_once '../../config.php'; 
 
+//pakai left join, ambil order yang status nya sudah succes,lalu menjumlahkan yang ada di order items
+// tabel kiri order dan yg kanan order item
 try {
-    $today_stmt = $pdo->query("SELECT SUM(total) as revenue, COUNT(*) as transactions FROM `order` WHERE status = 1 AND DATE(created_at) = CURDATE()");
+    $today_stmt = $pdo->query("SELECT SUM(o.total) as revenue, COUNT(DISTINCT o.id) as transactions, SUM(oi.qty) as items_sold 
+                               FROM `order` o 
+                               LEFT JOIN order_item oi ON o.id = oi.order_id 
+                               WHERE o.status = 1 AND DATE(o.created_at) = CURDATE()");
     $today_data = $today_stmt->fetch(PDO::FETCH_ASSOC);
 
-    $week_stmt = $pdo->query("SELECT SUM(total) as revenue, COUNT(*) as transactions FROM `order` WHERE status = 1 AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)");
+    $week_stmt = $pdo->query("SELECT SUM(o.total) as revenue, COUNT(DISTINCT o.id) as transactions, SUM(oi.qty) as items_sold 
+                              FROM `order` o 
+                              LEFT JOIN order_item oi ON o.id = oi.order_id 
+                              WHERE o.status = 1 AND o.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)");
     $week_data = $week_stmt->fetch(PDO::FETCH_ASSOC);
 
-    $month_stmt = $pdo->query("SELECT SUM(total) as revenue, COUNT(*) as transactions FROM `order` WHERE status = 1 AND MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())");
+    $month_stmt = $pdo->query("SELECT SUM(o.total) as revenue, COUNT(DISTINCT o.id) as transactions, SUM(oi.qty) as items_sold 
+                               FROM `order` o 
+                               LEFT JOIN order_item oi ON o.id = oi.order_id 
+                               WHERE o.status = 1 AND MONTH(o.created_at) = MONTH(CURRENT_DATE()) AND YEAR(o.created_at) = YEAR(CURRENT_DATE())");
     $month_data = $month_stmt->fetch(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    $today_data = $week_data = $month_data = ['revenue' => 0, 'transactions' => 0];
+    $today_data = $week_data = $month_data = ['revenue' => 0, 'transactions' => 0, 'items_sold' => 0];
 }
 
-
+// Format data awal untuk tampilan
 $initial_revenue = "Rp " . number_format((int)$today_data['revenue'], 0, ',', '.');
 $initial_transactions = (int)$today_data['transactions'] . " Pesanan";
+$initial_items_sold = (int)$today_data['items_sold'] . " Produk"; // Tambahkan ini
 
 function getUsersByRole($pdo, $role) {
     $stmt = $pdo->prepare("SELECT * FROM user WHERE role = :role");
@@ -200,7 +212,7 @@ $countKasir = getUsersByRole($pdo, 1);
               </div>
               <div>
                 <p class="text-sm font-medium text-gray-500">Menu Terjual</p>
-                <h4 id="val-terjual" class="text-2xl font-bold text-gray-800">-</h4>
+                <h4 id="val-terjual" class="text-2xl font-bold text-gray-800"><?php echo $initial_items_sold; ?></h4>
               </div>
             </div>
           </div>
@@ -222,22 +234,24 @@ $countKasir = getUsersByRole($pdo, 1);
 
     <script>
       const dataDashboard = {
-        hari: { 
-          pendapatan: '<?php echo $initial_revenue; ?>', 
-          transaksi: '<?php echo $initial_transactions; ?>', 
-          terjual: '-' 
-        },
-        minggu: { 
-          pendapatan: 'Rp ' + (<?= (int)$week_data['revenue'] ?>).toLocaleString('id-ID'), 
-          transaksi: '<?= (int)$week_data['transactions'] ?> Pesanan', 
-          terjual: '-' 
-        },
-        bulan: { 
-          pendapatan: 'Rp ' + (<?= (int)$month_data['revenue'] ?>).toLocaleString('id-ID'), 
-          transaksi: '<?= (int)$month_data['transactions'] ?> Pesanan', 
-          terjual: '-' 
-        }
-      };
+          hari: { 
+            pendapatan: '<?php echo $initial_revenue; ?>', 
+            transaksi: '<?php echo $initial_transactions; ?>', 
+            terjual: '<?php echo $initial_items_sold; ?>' 
+          },
+          minggu: { 
+            pendapatan: 'Rp ' + (<?= (int)$week_data['revenue'] ?>).toLocaleString('id-ID'), 
+            transaksi: '<?= (int)$week_data['transactions'] ?> Pesanan', 
+            terjual: '<?= (int)$week_data['items_sold'] ?> Produk' 
+          },
+          bulan: { 
+            pendapatan: 'Rp ' + (<?= (int)$month_data['revenue'] ?>).toLocaleString('id-ID'), 
+            transaksi: '<?= (int)$month_data['transactions'] ?> Pesanan', 
+            terjual: '<?= (int)$month_data['items_sold'] ?> Produk' 
+          }
+        };
+
+
 
       function changeFilter(periode, elementBtn) {
         document.getElementById('val-pendapatan').innerText = dataDashboard[periode].pendapatan;
