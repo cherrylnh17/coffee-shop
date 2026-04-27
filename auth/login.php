@@ -22,9 +22,9 @@ if (isset($_POST['login'])) {
 
         if ($user && $user['password'] === $password) {
             $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
+            $_SESSION['name'] = $user['name'];
             
-            if ($username === 'admin') {
+            if ($user['role'] === 2) {
                 header("Location: ../dashboard/admin/index.php");
             } else {
                 header("Location: ../dashboard/kasir/index.php");
