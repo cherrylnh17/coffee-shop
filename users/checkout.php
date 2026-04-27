@@ -236,7 +236,7 @@ const order_code = "<?= $order['code']; ?>";
             clearInterval(timer);
             display.innerHTML = "Kadaluarsa";
             display.classList.remove('text-blue-600');
-            display.classList.add('text-red-600'); // Ubah warna jadi merah
+            display.classList.add('text-red-600'); // Ubah warna jadi merahss
             return;
         }
 
@@ -246,7 +246,7 @@ const order_code = "<?= $order['code']; ?>";
         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
         // Tampilkan format 00:00:00
-        display.innerHTML = 
+        display.innerHTML =  
             (hours < 10 ? "0" + hours : hours) + ":" + 
             (minutes < 10 ? "0" + minutes : minutes) + ":" + 
             (seconds < 10 ? "0" + seconds : seconds);
