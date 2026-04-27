@@ -30,30 +30,23 @@ $mejas = $stmt->fetchAll();
 <html lang="en" dir="ltr">
   <head>
     <title>Manajemen Meja | Träffa Coffee</title>
-    <!-- [Meta] -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     
-    <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Flowbite CSS & JS untuk Modal -->
     <link href="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
     
-    <!-- [Favicon] icon -->
     <link rel="icon" href="../../../assets/image/favicon.svg" type="image/x-icon" />
     
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   </head>
   <body class="bg-gray-50 text-gray-800">
 
-    <!-- [ Sidebar Menu ] start -->
     <nav class="fixed inset-y-0 left-0 z-[1026] w-[280px] overflow-hidden border-r border-gray-200 bg-white transition-all duration-200 ease-in-out max-lg:-left-[280px] pc-sidebar">
       <div class="h-full w-full">
-        <!-- Sidebar Header -->
         <div class="flex h-[74px] items-center px-6 py-4">
           <a href="../index.php" class="flex items-center gap-3">
             <img src="../../../assets/image/logo.svg" class="h-8 w-8" alt="logo" onerror="this.src='https://placehold.co/32x32?text=Logo'" />
@@ -61,9 +54,7 @@ $mejas = $stmt->fetchAll();
           </a>
         </div>
 
-        <!-- Sidebar Content -->
         <div class="h-[calc(100vh-74px)] overflow-y-auto py-3">
-          <!-- User Profile Card -->
           <div class="mx-4 mb-4 rounded-xl border border-gray-100 bg-gray-50 p-4">
             <div class="flex items-center">
               <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600 shadow-sm">
@@ -76,7 +67,6 @@ $mejas = $stmt->fetchAll();
             </div>
           </div>
 
-          <!-- Menu Links -->
           <div class="w-full">
             <ul class="flex flex-col gap-1.5 px-4 py-2">
               
@@ -131,7 +121,6 @@ $mejas = $stmt->fetchAll();
       </div>
     </nav>
 
-    <!-- [ Header Topbar ] start -->
     <header class="fixed inset-x-0 top-0 z-[1025] flex h-[74px] items-center bg-white/80 px-4 shadow-sm backdrop-blur-md transition-all duration-200 ease-in-out lg:left-[280px]">
       <div class="flex grow items-center sm:px-2">
         <div class="mr-auto">
@@ -151,11 +140,9 @@ $mejas = $stmt->fetchAll();
       </div>
     </header>
 
-    <!-- [ Main Content ] start -->
     <div class="relative ml-0 min-h-[calc(100vh-135px)] top-[74px] transition-all duration-200 ease-in-out lg:ml-[280px]">
       <div class="p-4 sm:p-6 lg:p-8">  
           
-          <!-- Alert System -->
           <?php if(isset($_GET['status'])): ?>
               <?php if($_GET['status'] == 'success'): ?>
                   <div id="alert-message" class="mb-4 flex items-center justify-between rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800 transition-opacity duration-500">
@@ -183,7 +170,6 @@ $mejas = $stmt->fetchAll();
               <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <h3 class="text-xl font-bold text-gray-800">Manajemen Meja</h3>
                 <div class="flex items-center gap-4">
-                    <!-- Filter Pagination Limit -->
                     <form method="GET" class="flex items-center">
                         <label class="mr-2 text-sm text-gray-600">Tampilkan:</label>
                         <select onchange="setLimit(this.value)" class="appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2.5 pl-4 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm font-medium transition-all cursor-pointer">
@@ -199,7 +185,6 @@ $mejas = $stmt->fetchAll();
                 </div>
               </div>
 
-              <!-- Modal Tambah Meja -->
               <div id="tambah-meja-modal" tabindex="-1" aria-hidden="true" class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-900/50 backdrop-blur-sm">
                 <div class="relative max-h-full w-full max-w-md p-4">
                     <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
@@ -223,7 +208,6 @@ $mejas = $stmt->fetchAll();
                 </div>
             </div> 
               
-              <!-- Tabel Meja -->
               <div class="overflow-x-auto rounded-lg border border-gray-200">
                 <table class="w-full text-left text-sm text-gray-500">
                   <thead class="bg-gray-50 text-xs uppercase text-gray-700 border-b border-gray-200">
@@ -246,7 +230,6 @@ $mejas = $stmt->fetchAll();
                           <td class="px-6 py-4 font-medium text-gray-900"><?php echo htmlspecialchars($row['name']); ?></td>
                           <td class="px-6 py-4 text-center">
                             <div class="flex items-center justify-center gap-2">
-                              <!-- Tombol Edit -->
                               <button type="button" 
                                       data-id="<?php echo $row['id']; ?>"
                                       data-nama="<?php echo htmlspecialchars($row['name']); ?>"
@@ -255,7 +238,6 @@ $mejas = $stmt->fetchAll();
                                   <i class="fa-solid fa-pen-to-square"></i>
                               </button>
                               
-                              <!-- Tombol Hapus -->
                               <a href="hapus.php?id=<?php echo $row['id']; ?>" onclick="return confirm('Yakin ingin menghapus meja ini?')" class="inline-flex h-8 w-8 items-center justify-center rounded bg-red-50 text-red-600 transition-colors hover:bg-red-100 hover:text-red-900">
                                   <i class="fa-solid fa-trash"></i>
                               </a>
@@ -268,7 +250,6 @@ $mejas = $stmt->fetchAll();
                 </table>
               </div>
 
-              <!-- Pagination Info -->
               <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                   <span class="text-sm text-gray-500">
                     <?php
@@ -302,7 +283,6 @@ $mejas = $stmt->fetchAll();
       </div>
     </div>
 
-    <!-- Modal Edit Meja -->
     <button id="trigger-edit-meja-modal" data-modal-target="edit-meja-modal" data-modal-toggle="edit-meja-modal" class="hidden"></button>
     <div id="edit-meja-modal" tabindex="-1" aria-hidden="true" class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-900/50 backdrop-blur-sm">
         <div class="relative max-h-full w-full max-w-md p-4">
@@ -315,7 +295,6 @@ $mejas = $stmt->fetchAll();
                 </div>
                 
                 <form action="edit.php" method="POST" class="p-4 md:p-5">
-                    <!-- ID Meja yang diedit disembunyikan -->
                     <input type="hidden" name="id" id="edit_id">
 
                     <div class="mb-6">
@@ -336,7 +315,6 @@ $mejas = $stmt->fetchAll();
         </div>
     </div>
 
-    <!-- [ Footer ] start -->
     <footer class="relative ml-0 mt-[74px] z-[995] py-[20px] border-t border-gray-200 bg-white transition-all duration-200 ease-in-out lg:ml-[280px]">
       <div class="mx-auto px-6">
         <div class="flex items-center justify-center gap-1.5 text-sm text-gray-500">
@@ -345,7 +323,6 @@ $mejas = $stmt->fetchAll();
       </div>
     </footer>
 
-    <!-- Script Kustom untuk Toggle Sidebar & Modal Edit -->
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         const sidebar = document.querySelector('.pc-sidebar');
@@ -381,7 +358,6 @@ $mejas = $stmt->fetchAll();
         }
       });
 
-      // Script untuk memasukkan data ke dalam Modal Edit Meja
       function openEditMejaModal(button) {
         const id = button.getAttribute('data-id');
         const nama = button.getAttribute('data-nama');

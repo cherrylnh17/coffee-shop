@@ -19,30 +19,23 @@ try {
 <html lang="en" dir="ltr">
   <head>
     <title>Manajemen Kasir | Träffa Coffee</title>
-    <!-- [Meta] -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     
-    <!-- Tailwind CSS (CDN) -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Flowbite CSS & JS untuk Modal -->
     <link href="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
     
-    <!-- [Favicon] icon -->
     <link rel="icon" href="../../../assets/image/favicon.svg" type="image/x-icon" />
     
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   </head>
   <body class="bg-gray-50 text-gray-800">
 
-    <!-- [ Sidebar Menu ] start -->
     <nav class="fixed inset-y-0 left-0 z-[1026] w-[280px] overflow-hidden border-r border-gray-200 bg-white transition-all duration-200 ease-in-out max-lg:-left-[280px] pc-sidebar">
       <div class="h-full w-full">
-        <!-- Sidebar Header -->
         <div class="flex h-[74px] items-center px-6 py-4">
           <a href="../index.php" class="flex items-center gap-3">
             <img src="../../../assets/image/logo.svg" class="h-8 w-8" alt="logo" onerror="this.src='https://placehold.co/32x32?text=Logo'" />
@@ -50,9 +43,7 @@ try {
           </a>
         </div>
 
-        <!-- Sidebar Content -->
         <div class="h-[calc(100vh-74px)] overflow-y-auto py-3">
-          <!-- User Profile Card -->
           <div class="mx-4 mb-4 rounded-xl border border-gray-100 bg-gray-50 p-4">
             <div class="flex items-center">
               <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600 shadow-sm">
@@ -65,7 +56,6 @@ try {
             </div>
           </div>
 
-          <!-- Menu Links -->
           <div class="w-full">
             <ul class="flex flex-col gap-1.5 px-4 py-2">
               
@@ -120,7 +110,6 @@ try {
       </div>
     </nav>
 
-    <!-- [ Header Topbar ] start -->
     <header class="fixed inset-x-0 top-0 z-[1025] flex h-[74px] items-center bg-white/80 px-4 shadow-sm backdrop-blur-md transition-all duration-200 ease-in-out lg:left-[280px]">
       <div class="flex grow items-center sm:px-2">
         <div class="mr-auto">
@@ -140,7 +129,6 @@ try {
       </div>
     </header>
 
-    <!-- [ Main Content ] start -->
     <div class="relative ml-0 min-h-[calc(100vh-135px)] top-[74px] transition-all duration-200 ease-in-out lg:ml-[280px]">
       <div class="p-4 sm:p-6 lg:p-8">  
           
@@ -175,7 +163,6 @@ try {
                 </button>
               </div>
 
-              <!-- Modal Tambah Kasir -->
               <div id="authentication-modal" tabindex="-1" aria-hidden="true" class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-900/50 backdrop-blur-sm">
                 <div class="relative max-h-full w-full max-w-md p-4">
                     <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
@@ -212,7 +199,6 @@ try {
                 </div>
             </div> 
               
-              <!-- Tabel Kasir -->
               <div class="overflow-x-auto rounded-lg border border-gray-200">
                 <table class="w-full text-left text-sm text-gray-500">
                   <thead class="bg-gray-50 text-xs uppercase text-gray-700 border-b border-gray-200">
@@ -238,7 +224,6 @@ try {
                           </td>
                           <td class="px-6 py-4 text-center">
                             <div class="flex items-center justify-center gap-2">
-                              <!-- Tombol Hapus (Diarahkan ke hapus_kasir.php) -->
                               <a href="hapus.php?id=<?php echo $row['id']; ?>" onclick="return confirm('Yakin ingin menghapus akun kasir ini?')" class="inline-flex h-8 w-8 items-center justify-center rounded bg-red-50 text-red-600 transition-colors hover:bg-red-100 hover:text-red-900">
                                   <i class="fa-solid fa-trash"></i>
                               </a>
@@ -254,7 +239,6 @@ try {
       </div>
     </div>
 
-    <!-- [ Footer ] start -->
     <footer class="relative ml-0 mt-[74px] z-[995] py-[20px] border-t border-gray-200 bg-white transition-all duration-200 ease-in-out lg:ml-[280px]">
       <div class="mx-auto px-6">
         <div class="flex items-center justify-center gap-1.5 text-sm text-gray-500">
@@ -270,7 +254,6 @@ try {
         const mainContent = document.querySelector('header').nextElementSibling;
         const footer = document.querySelector('footer');
 
-        // Toggle Desktop (Layar Besar)
         const btnDesktop = document.getElementById('sidebar-hide');
         if (btnDesktop && sidebar && header && mainContent && footer) {
           btnDesktop.addEventListener('click', function(e) {

@@ -10,6 +10,23 @@ if (!isset($_SESSION['username'])) {
 }
 require_once '../../config.php'; 
 
+try {
+    $today_stmt = $pdo->query("SELECT SUM(total) as revenue, COUNT(*) as transactions FROM `order` WHERE status = 1 AND DATE(created_at) = CURDATE()");
+    $today_data = $today_stmt->fetch(PDO::FETCH_ASSOC);
+
+    $week_stmt = $pdo->query("SELECT SUM(total) as revenue, COUNT(*) as transactions FROM `order` WHERE status = 1 AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)");
+    $week_data = $week_stmt->fetch(PDO::FETCH_ASSOC);
+
+    $month_stmt = $pdo->query("SELECT SUM(total) as revenue, COUNT(*) as transactions FROM `order` WHERE status = 1 AND MONTH(created_at) = MONTH(CURRENT_DATE()) AND YEAR(created_at) = YEAR(CURRENT_DATE())");
+    $month_data = $month_stmt->fetch(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $today_data = $week_data = $month_data = ['revenue' => 0, 'transactions' => 0];
+}
+
+
+$initial_revenue = "Rp " . number_format((int)$today_data['revenue'], 0, ',', '.');
+$initial_transactions = (int)$today_data['transactions'] . " Pesanan";
+
 function getUsersByRole($pdo, $role) {
     $stmt = $pdo->prepare("SELECT * FROM user WHERE role = :role");
     $stmt->execute(['role' => $role]);
@@ -24,26 +41,21 @@ $countKasir = getUsersByRole($pdo, 1);
 <html lang="en" data-pc-sidebar-caption="true" data-pc-layout="vertical" data-pc-direction="ltr" dir="ltr" data-pc-theme_contrast="" data-pc-theme="light">
   <head>
     <title>Admin Dashboard | Träffa Coffee</title>
-    <!-- [Meta] -->
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- [Favicon] icon -->
     <link rel="icon" href="../../assets/image/favicon.svg" type="image/x-icon" />
-    <!-- [Font] Family -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   </head>
   
   <body class="bg-gray-50 text-gray-800">
 
-    <!-- [ Sidebar Menu ] start -->
     <nav class="fixed inset-y-0 left-0 z-[1026] w-[280px] overflow-hidden border-r border-gray-200 bg-white transition-all duration-200 ease-in-out max-lg:-left-[280px] pc-sidebar">
       <div class="h-full w-full">
-        <!-- Sidebar Header -->
         <div class="flex h-[74px] items-center px-6 py-4">
           <a href="index.php" class="flex items-center gap-3">
             <img src="../../assets/image/logo.svg" class="h-8 w-8" alt="logo" />
@@ -54,7 +66,6 @@ $countKasir = getUsersByRole($pdo, 1);
         <!-- Sidebar Content -->
         <div class="h-[calc(100vh-74px)] overflow-y-auto py-3">
           
-          <!-- User Profile Card -->
           <div class="mx-4 mb-4 rounded-xl bg-gray-50 border border-gray-100 p-4">
             <div class="flex items-center">
               <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600 shadow-sm">
@@ -67,7 +78,6 @@ $countKasir = getUsersByRole($pdo, 1);
             </div>
           </div>
 
-          <!-- Menu Links -->
           <div class="w-full">
             <ul class="flex flex-col gap-1.5 px-4 py-2">
               
@@ -122,7 +132,6 @@ $countKasir = getUsersByRole($pdo, 1);
       </div>
     </nav>
 
-    <!-- [ Header Topbar ] start -->
     <header class="fixed inset-x-0 top-0 z-[1025] flex h-[74px] items-center bg-white/80 px-4 shadow-sm backdrop-blur-md transition-all duration-200 ease-in-out lg:left-[280px]">
       <div class="flex grow items-center sm:px-2">
         <div class="mr-auto">
@@ -142,18 +151,15 @@ $countKasir = getUsersByRole($pdo, 1);
       </div>
     </header>
 
-    <!-- [ Main Content ] start -->
     <div class="relative ml-0 min-h-[calc(100vh-135px)] top-[74px] transition-all duration-200 ease-in-out lg:ml-[280px]">
       <div class="p-4 sm:p-6 lg:p-8">  
 
-          <!-- Dashboard Header & Filter -->
           <div class="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
             <div>
               <h2 class="text-2xl font-bold text-gray-800">Dashboard</h2>
               <p class="mt-1 text-sm text-gray-500">Ringkasan performa dan penjualan</p>
             </div>
             
-            <!-- Filter Group -->
             <div class="inline-flex rounded-xl border border-gray-200 bg-gray-100 p-1">
               <button onclick="changeFilter('hari', this)" class="filter-btn rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-blue-600 shadow-sm transition-all focus:outline-none">
                 Hari Ini
@@ -167,7 +173,6 @@ $countKasir = getUsersByRole($pdo, 1);
             </div>
           </div>
 
-          <!-- Dashboard Widgets -->
           <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-3">
             <div class="flex items-center gap-4 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
               <div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-xl text-blue-600">
@@ -175,7 +180,7 @@ $countKasir = getUsersByRole($pdo, 1);
               </div>
               <div>
                 <p class="text-sm font-medium text-gray-500">Total Pendapatan</p>
-                <h4 id="val-pendapatan" class="text-2xl font-bold text-gray-800">Rp 1.250.000</h4>
+                <h4 id="val-pendapatan" class="text-2xl font-bold text-gray-800"><?php echo $initial_revenue; ?></h4>
               </div>
             </div>
             
@@ -185,7 +190,7 @@ $countKasir = getUsersByRole($pdo, 1);
               </div>
               <div>
                 <p class="text-sm font-medium text-gray-500">Total Transaksi</p>
-                <h4 id="val-transaksi" class="text-2xl font-bold text-gray-800">45 Pesanan</h4>
+                <h4 id="val-transaksi" class="text-2xl font-bold text-gray-800"><?php echo $initial_transactions; ?></h4>
               </div>
             </div>
 
@@ -195,12 +200,11 @@ $countKasir = getUsersByRole($pdo, 1);
               </div>
               <div>
                 <p class="text-sm font-medium text-gray-500">Menu Terjual</p>
-                <h4 id="val-terjual" class="text-2xl font-bold text-gray-800">120 Item</h4>
+                <h4 id="val-terjual" class="text-2xl font-bold text-gray-800">-</h4>
               </div>
             </div>
           </div>
 
-          <!-- Welcome Banner -->
           <div class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
               <h3 class="mb-2 text-lg font-bold text-gray-800">Selamat Datang di Halaman Admin</h3>
               <p class="text-gray-600">Gunakan menu di sebelah kiri untuk mengelola laporan penjualan, daftar menu, dan akun kasir.</p>
@@ -208,7 +212,6 @@ $countKasir = getUsersByRole($pdo, 1);
       </div>
     </div>
 
-    <!-- [ Footer ] start -->
     <footer class="relative ml-0 mt-[74px] z-[995] py-[20px] border-t border-gray-200 bg-white transition-all duration-200 ease-in-out lg:ml-[280px]">
       <div class="mx-auto px-6">
         <div class="flex items-center justify-center gap-1.5 text-sm text-gray-500">
@@ -216,13 +219,24 @@ $countKasir = getUsersByRole($pdo, 1);
         </div>
       </div>
     </footer>
- 
-    <!-- Script untuk Data Filter Dashboard -->
+
     <script>
       const dataDashboard = {
-        hari: { pendapatan: 'Rp 1.250.000', transaksi: '45 Pesanan', terjual: '120 Item' },
-        minggu: { pendapatan: 'Rp 8.750.000', transaksi: '315 Pesanan', terjual: '840 Item' },
-        bulan: { pendapatan: 'Rp 35.500.000', transaksi: '1.250 Pesanan', terjual: '3.200 Item' }
+        hari: { 
+          pendapatan: '<?php echo $initial_revenue; ?>', 
+          transaksi: '<?php echo $initial_transactions; ?>', 
+          terjual: '-' 
+        },
+        minggu: { 
+          pendapatan: 'Rp ' + (<?= (int)$week_data['revenue'] ?>).toLocaleString('id-ID'), 
+          transaksi: '<?= (int)$week_data['transactions'] ?> Pesanan', 
+          terjual: '-' 
+        },
+        bulan: { 
+          pendapatan: 'Rp ' + (<?= (int)$month_data['revenue'] ?>).toLocaleString('id-ID'), 
+          transaksi: '<?= (int)$month_data['transactions'] ?> Pesanan', 
+          terjual: '-' 
+        }
       };
 
       function changeFilter(periode, elementBtn) {
@@ -230,19 +244,19 @@ $countKasir = getUsersByRole($pdo, 1);
         document.getElementById('val-transaksi').innerText = dataDashboard[periode].transaksi;
         document.getElementById('val-terjual').innerText = dataDashboard[periode].terjual;
 
-        const semuaTombol = document.querySelectorAll('.filter-btn');
-        semuaTombol.forEach(btn => {
+        document.querySelectorAll('.filter-btn').forEach(btn => {
           btn.className = 'filter-btn rounded-lg border border-transparent px-4 py-2 text-sm font-medium text-gray-500 transition-all hover:bg-gray-200/50 hover:text-gray-700 focus:outline-none';
         });
 
         elementBtn.className = 'filter-btn rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-blue-600 shadow-sm transition-all focus:outline-none';
       }
     </script>
+ 
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         const sidebar = document.querySelector('.pc-sidebar');
         const header = document.querySelector('header');
-        const mainContent = document.querySelector('header').nextElementSibling; // Mengambil div konten utama
+        const mainContent = document.querySelector('header').nextElementSibling;
         const footer = document.querySelector('footer');
 
         const btnDesktop = document.getElementById('sidebar-hide');
