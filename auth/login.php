@@ -24,6 +24,7 @@ if (isset($_POST['login'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['name'] = $user['name'];
             $_SESSION['role'] = $user['role'];
+            $_SESSION['username'] = $user['username'];
             
             if ($user['role'] === 2) {
                 header("Location: ../dashboard/admin/index.php");
