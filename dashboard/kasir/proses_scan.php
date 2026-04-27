@@ -1,5 +1,12 @@
 <?php
 include '../../config.php';
+require_once '../../path.php';
+
+if (!isset($_SESSION['name']) || $_SESSION['role'] != 1) {
+    header("Location: " . BASE_URL . "auth/login.php");
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dataScan = $_POST['qrcode_data'] ?? '';
 
