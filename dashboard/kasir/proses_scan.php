@@ -1,9 +1,10 @@
 <?php
+session_start();
 include '../../config.php';
 require_once '../../path.php';
 
 if (!isset($_SESSION['name']) || $_SESSION['role'] != 1) {
-    header("Location: " . BASE_URL . "auth/login.php");
+    echo "SESSION_EXPIRED";
     exit;
 }
 
@@ -11,7 +12,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dataScan = $_POST['qrcode_data'] ?? '';
 
     if (!empty($dataScan)) {
-        // Kita hanya cari berdasarkan code dulu agar bisa memberikan pesan error yang spesifik
         $stmt = $pdo->prepare("SELECT * FROM `order` WHERE code = ?");
         $stmt->execute([$dataScan]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);

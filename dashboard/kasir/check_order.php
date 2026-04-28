@@ -37,80 +37,18 @@ try {
 }
 
 $payment_status = ($order['status'] == 1) ? 'Lunas' : 'Belum Bayar';
+
+
 ?>
 
-<!doctype html>
-<html lang="en" dir="ltr">
-  <head>
-    <title>Detail Pesanan | Träffa Coffee</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-  </head>
-  <body class="bg-gray-50 text-gray-800">
+<?php 
 
-    <nav class="fixed inset-y-0 left-0 z-[1026] w-[280px] overflow-hidden border-r border-gray-200 bg-white transition-all duration-200 ease-in-out max-lg:-left-[280px] pc-sidebar">
-      <div class="h-full w-full">
-        <div class="flex h-[74px] items-center px-6 py-4">
-          <a href="index.php" class="flex items-center gap-3">
-            <img src="../../assets/image/logo.svg" class="h-8 w-8" alt="logo" onerror="this.src='https://placehold.co/32x32?text=Logo'" />
-            <span class="inline-block rounded-md bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">Kasir Panel</span>
-          </a>
-        </div>
+$pageTitle = "Check Pesanan";
+$currentPage = "check";
 
-        <div class="h-[calc(100vh-74px)] overflow-y-auto py-3">
-          <div class="mx-4 mb-4 rounded-xl border border-gray-100 bg-gray-50 p-4">
-            <div class="flex items-center">
-              <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600 shadow-sm text-uppercase">
-                <?= substr($_SESSION['username'], 0, 2); ?>
-              </div>
-              <div class="ml-3 mr-2 grow">
-                <h6 class="mb-0 text-sm font-semibold text-gray-800"><?php echo htmlspecialchars($_SESSION['username']); ?></h6>
-                <small class="text-xs text-gray-500">Kasir</small>
-              </div>
-            </div>
-          </div> 
-
-          <div class="w-full">
-            <ul class="flex flex-col gap-1.5 px-4 py-2">
-              
-              <li>
-                <a href="index.php" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600">
-                  <span class="flex w-6 justify-center text-lg text-gray-400 transition-colors group-hover:text-blue-600"><i class="fa-solid fa-house"></i></span>
-                  <span class="font-medium">Dashboard</span>
-                </a>
-              </li>
-
-              <li>
-                <a href="riwayat_pesanan/riwayat.php" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600">
-                  <span class="flex w-6 justify-center text-lg text-gray-400 transition-colors group-hover:text-blue-600"><i class="fa-solid fa-file-invoice-dollar"></i></span>
-                  <span class="font-medium">Riwayat Pesanan</span>
-                </a>
-              </li>
-
-              <li class="mt-5 px-4 py-2">
-                <span class="text-xs font-bold uppercase tracking-wider text-gray-400">Authentication</span>
-              </li>
-
-              <li>
-                <a href="tentang_akun/akun.php" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600">
-                  <span class="flex w-6 justify-center text-lg text-gray-400 transition-colors group-hover:text-blue-600"><i class="fa-solid fa-key"></i></span>
-                  <span class="font-medium">Tentang Akun</span>
-                </a>
-              </li>
-
-              <li>
-                <a href="../../auth/login.php" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-red-50 hover:text-red-600">
-                  <span class="flex w-6 justify-center text-lg text-gray-400 transition-colors group-hover:text-red-600"><i class="fa-solid fa-right-from-bracket"></i></span>
-                  <span class="font-medium">Log Out</span>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </nav>
+include 'layout/header.php';
+include 'layout/sidebar.php';
+?>
 
     <header class="fixed inset-x-0 top-0 z-[1025] flex h-[74px] items-center bg-white/80 px-4 shadow-sm backdrop-blur-md transition-all duration-200 ease-in-out lg:left-[280px]">
       <div class="flex grow items-center sm:px-2">
@@ -219,5 +157,8 @@ $payment_status = ($order['status'] == 1) ? 'Lunas' : 'Belum Bayar';
       </div>
     </main>
 
-  </body>
-</html>
+
+<?php 
+
+include 'layout/footer.php'; 
+?>
