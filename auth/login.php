@@ -1,9 +1,18 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 session_start();
 require_once '../config.php'; 
+require_once '../path.php';
+
+if (isset($_SESSION['role'])) {
+    if ($_SESSION['role'] == 1) {
+        header("Location: " . BASE_URL . "dashboard/kasir/index"); 
+        exit;
+    } 
+    elseif ($_SESSION['role'] == 2) {
+        header("Location: " . BASE_URL . "dashboard/admin/index");
+        exit;
+    }
+}
 
 if (isset($_POST['login'])) {
     $username = $_POST['username'];
@@ -27,9 +36,9 @@ if (isset($_POST['login'])) {
             $_SESSION['username'] = $user['username'];
             
             if ($user['role'] === 2) {
-                header("Location: ../dashboard/admin/index.php");
+                header("Location: ../dashboard/admin/index");
             } else {
-                header("Location: ../dashboard/kasir/index.php");
+                header("Location: ../dashboard/kasir/index");
             }
             exit;
         } else {

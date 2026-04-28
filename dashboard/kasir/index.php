@@ -1,18 +1,16 @@
 <?php
 session_start();
-require_once '../../config.php'; // Sesuaikan path jika perlu
-require_once '../../path.php';   // Sesuaikan path jika perlu
+require_once '../../config.php'; 
+require_once '../../path.php';   
 
 if (!isset($_SESSION['name']) || $_SESSION['role'] != 1) {
     header("Location: " . BASE_URL . "auth/login.php");
     exit;
 }
 
-// 1. Definisikan State Halaman
 $pageTitle = "Dashboard Kasir";
 $currentPage = "dashboard";
 
-// 2. Panggil Layout Atas
 include 'layout/header.php';
 include 'layout/sidebar.php';
 ?>
