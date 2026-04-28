@@ -1,14 +1,12 @@
 <?php
 session_start();
 require_once '../../../path.php';
-
-if (!isset($_SESSION['name']) || $_SESSION['role'] != 1) {
-    header("Location: " . BASE_URL . "auth/login.php");
-    exit;
-}
-
 require_once '../../../config.php';
 
+if (!isset($_SESSION['name']) || $_SESSION['role'] != 1) {
+    header("Location: " . BASE_URL . "auth/login");
+    exit;
+}
 $user_id = $_SESSION['user_id'];
 $error = '';
 $success = '';
@@ -92,7 +90,7 @@ include '../layout/sidebar.php';
                 <p class="text-sm text-gray-500">Kelola informasi profil dan keamanan akun kasir Anda.</p>
               </div>
               <ul class="flex items-center gap-2 text-sm text-gray-500">
-                  <li><a href="../index.php" class="hover:text-blue-600 transition-colors"><i class="fa-solid fa-house"></i></a></li>
+                  <li><a href="<?=  BASE_URL; ?>dashboard/kasir/index" class="hover:text-blue-600 transition-colors"><i class="fa-solid fa-house"></i></a></li>
                   <li><i class="fa-solid fa-chevron-right text-[10px]"></i></li>
                   <li class="text-gray-800 font-medium">Tentang Akun</li>
               </ul>
@@ -182,9 +180,6 @@ include '../layout/sidebar.php';
 
                     <!-- Action Buttons -->
                     <div class="flex flex-col-reverse sm:flex-row justify-end gap-3">
-                      <a href="../index.php" class="px-6 py-2.5 text-sm font-bold text-gray-600 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 transition-colors w-full sm:w-auto text-center">
-                        Batal
-                      </a>
                       <button type="submit" class="px-6 py-2.5 text-sm font-bold text-white bg-blue-600 border border-transparent rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors w-full sm:w-auto flex items-center justify-center gap-2 shadow-sm shadow-blue-600/30">
                         Simpan Perubahan
                       </button>
