@@ -59,7 +59,7 @@
                 </li>
 
                 <li>
-                    <a href="<?php echo BASE_URL; ?>dashboard/kasir/auth/login" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-red-50 hover:text-red-600">
+                    <a href="<?php echo BASE_URL; ?>auth/logout" class="group flex items-center gap-3 rounded-xl px-4 py-3 text-gray-600 transition-all duration-200 hover:bg-red-50 hover:text-red-600">
                         <span class="flex w-6 justify-center text-lg text-gray-400 group-hover:text-red-600"><i class="fa-solid fa-right-from-bracket"></i></span>
                         <span class="font-medium">Log Out</span>
                     </a>
