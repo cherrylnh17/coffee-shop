@@ -1,6 +1,6 @@
 <?php 
 include '../config.php';
-
+include '../path.php';
 // Aktifkan error reporting untuk debugging
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -114,8 +114,12 @@ if (!$exists) {
         </div>
     </main>
 
+
+
+<script src="<?= BASE_URL ?>assets/js/helperUrl.js"></script>
 <script>
     // Konversi data PHP ke JSON
+    const BASE_URL = "<?= BASE_URL ?>";
     const MENU_DATA = <?php echo json_encode($result); ?>;
 
     // Fungsi Keranjang Local Storage
@@ -170,7 +174,7 @@ if (!$exists) {
             card.onclick = () => openModal(item.id);
 
             card.innerHTML = `
-                <img src="${item.image}" class="w-24 h-24 object-cover rounded-xl">
+                <img src="${getImageUrl(item.image)}" class="w-24 h-24 object-cover rounded-xl">
                 <div class="flex-1 min-w-0">
                     <h3 class="font-bold text-gray-900 truncate">${item.name}</h3>
                     <p class="text-[11px] text-gray-500 line-clamp-2">${item.description}</p>
@@ -212,7 +216,7 @@ if (!$exists) {
             document.getElementById('modal-note').value = "";
         }
 
-        document.getElementById('modal-img').src = `${item.image}`;
+        document.getElementById('modal-img').src = `${getImageUrl(item.image)}`;
         document.getElementById('modal-title').innerText = item.name;
         document.getElementById('modal-desc').innerText = item.description;
         document.getElementById('modal-price').innerText = formatRupiah(item.price);

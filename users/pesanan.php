@@ -1,6 +1,6 @@
 <?php 
 include '../config.php';
-
+include '../path.php';
 // Aktifkan error reporting untuk debugging
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -147,7 +147,9 @@ if (!$exists) {
 
 </main>
 
+<script src="<?= BASE_URL ?>assets/js/helperUrl.js"></script>
 <script>
+    const BASE_URL = "<?= BASE_URL ?>";
     let currentNoteItemId = null;
 
     const MENU_DATA = <?php echo json_encode($result); ?>;
@@ -207,7 +209,7 @@ if (!$exists) {
             el.className = `p-4 ${isLast ? '' : 'border-b border-gray-100'}`;
             el.innerHTML = `
                 <div class="flex gap-3 items-start">
-                    <img src="${menu.image}" alt="${menu.name}" class="w-14 h-14 rounded-xl object-cover flex-shrink-0 shadow-sm border border-gray-100">
+                    <img src="${getImageUrl(item.image)}" alt="${menu.name}" class="w-14 h-14 rounded-xl object-cover flex-shrink-0 shadow-sm border border-gray-100">
                     <div class="flex-1 min-w-0">
                         <p class="font-bold text-sm text-gray-900 truncate">${menu.name}</p>
                         <p class="text-xs text-gray-400 mt-0.5">${formatRupiah(menu.price)} / item</p>
