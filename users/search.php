@@ -1,6 +1,6 @@
 <?php 
 include '../config.php';
-
+include '../path.php';
 // Aktifkan error reporting untuk debugging
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -90,8 +90,10 @@ include 'layout/header.php';
 
 </main>
 
+<script src="<?= BASE_URL ?>assets/js/helperUrl.js"></script>
 <script>
     // Tarik data dari PHP ke JS
+    const BASE_URL = "<?= BASE_URL ?>";
     const MENU_DATA = <?php echo json_encode($result); ?>;
 
     // Helper Keranjang 
@@ -131,7 +133,7 @@ include 'layout/header.php';
             card.className = `flex gap-4 p-4 items-center ${isLast ? '' : 'border-b border-gray-100'} hover:bg-gray-50 transition-colors`;
             card.innerHTML = `
                 <div class="w-20 h-20 rounded-xl overflow-hidden shrink-0 shadow-sm border border-gray-100">
-                    <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover">
+                    <img src="${getImageUrl(item.image)}" alt="${item.name}" class="w-full h-full object-cover">
                 </div>
                 <div class="flex-1 min-w-0 py-0.5">
                     <span class="text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-blue-50 text-blue-500">${catLabel}</span>

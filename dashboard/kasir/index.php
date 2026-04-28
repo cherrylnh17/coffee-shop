@@ -132,10 +132,11 @@ if (!isset($_SESSION['name']) || $_SESSION['role'] != 1) {
           </div>
       </div>
 
+    </main>
+
       <footer class="py-6 border-t border-gray-200 bg-white text-center">
         <p class="text-sm text-gray-500">© Trafa Coffee ♥ by Anak Magang</p>
       </footer>
-    </main>
 
     <script>
       document.addEventListener('DOMContentLoaded', function() {
