@@ -38,9 +38,9 @@ try {
     $total_stmt = $pdo->query("SELECT SUM(total) FROM `order` WHERE " . $where_sql);
     $grand_total = $total_stmt->fetchColumn() ?: 0;
 } catch (PDOException $e) {
-    $grand_total = 0;
+    $grand_total = 0; 
 }
-
+//t
 $order_sql = "ORDER BY created_at DESC";
 if ($sort == 'terlama') {
     $order_sql = "ORDER BY created_at ASC";
