@@ -1,9 +1,18 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 session_start();
 require_once '../config.php'; 
+require_once '../path.php';
+
+if (isset($_SESSION['role'])) {
+    if ($_SESSION['role'] == 1) {
+        header("Location: " . BASE_URL . "dashboard/kasir/index"); 
+        exit;
+    } 
+    elseif ($_SESSION['role'] == 2) {
+        header("Location: " . BASE_URL . "dashboard/admin/index");
+        exit;
+    }
+}
 
 if (isset($_POST['login'])) {
     $username = $_POST['username'];
@@ -27,9 +36,9 @@ if (isset($_POST['login'])) {
             $_SESSION['username'] = $user['username'];
             
             if ($user['role'] === 2) {
-                header("Location: ../dashboard/admin/index.php");
+                header("Location: " . BASE_URL . "dashboard/admin/index"); 
             } else {
-                header("Location: ../dashboard/kasir/index.php");
+                header("Location: " . BASE_URL . "dashboard/kasir/index");
             }
             exit;
         } else {
@@ -52,11 +61,11 @@ if (isset($_POST['login'])) {
     <meta name="description" content="Login to Träffa Coffee" />
 
     <!-- [Favicon] icon -->
-    <link rel="icon" href="../assets/image/favicon.svg" type="image/x-icon" />
+    <link rel="icon" href="<?= BASE_URL; ?>assets/image/favicon.svg" type="image/x-icon" />
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-  </head>
+  </head> 
 
   <body class="bg-gray-50 text-gray-800">
 
@@ -69,7 +78,7 @@ if (isset($_POST['login'])) {
             
             <div class="my-6 text-center">
               <a href="#" class="block w-full">
-                <img src="../assets/image/logo.svg" alt="Logo Trafa Coffee" class="mx-auto h-auto w-[120px]" />
+                <img src="<?= BASE_URL; ?>assets/image/logo.svg" alt="Logo Trafa Coffee" class="mx-auto h-auto w-[120px]" />
               </a>
             </div>
             
