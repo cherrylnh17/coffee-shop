@@ -1,11 +1,21 @@
 <?php
 session_start();
-if (!isset($_SESSION['username'])) {
-    header("Location: ../../../auth/login.php");
+require_once '../../../config.php';
+require_once '../../../path.php';
+
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 2) {
+    header("Location: " . BASE_URL . "auth/login.php");
     exit;
 }
 
-require_once '../../../config.php';
+$name = $_SESSION['name'];
+  $words = explode(" ", $name);
+  $initials = "";
+
+  foreach ($words as $w) {
+    $initials .= mb_substr($w, 0, 1);
+  }
+  $initials = strtoupper(substr($initials, 0, 2));
 
 try {
     $stmt = $pdo->prepare("SELECT * FROM user WHERE username != 'admin' ORDER BY id DESC");
@@ -47,10 +57,10 @@ try {
           <div class="mx-4 mb-4 rounded-xl border border-gray-100 bg-gray-50 p-4">
             <div class="flex items-center">
               <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600 shadow-sm">
-                AK
+                <?php echo htmlspecialchars($initials); ?>
               </div>
               <div class="ml-3 mr-2 grow">
-                <h6 class="mb-0 text-sm font-semibold text-gray-800">Admin Kece</h6>
+                <h6 class="mb-0 text-sm font-semibold text-gray-800"><?php echo htmlspecialchars($_SESSION['name']); ?></h6>
                 <small class="text-xs text-gray-500">Administrator</small>
               </div>
             </div>
@@ -253,33 +263,71 @@ try {
         const header = document.querySelector('header');
         const mainContent = document.querySelector('header').nextElementSibling;
         const footer = document.querySelector('footer');
-
         const btnDesktop = document.getElementById('sidebar-hide');
-        if (btnDesktop && sidebar && header && mainContent && footer) {
+        const btnMobile = document.getElementById('mobile-collapse');
+
+        const overlay = document.createElement('div');
+        overlay.id = 'sidebar-overlay';
+        overlay.className = 'fixed inset-0 z-[1024] bg-gray-900/40 backdrop-blur-sm hidden transition-opacity duration-200';
+        document.body.appendChild(overlay);
+
+        const closeSidebarMobile = () => {
+          sidebar.classList.add('max-lg:-left-[280px]');
+          sidebar.classList.remove('max-lg:left-0');
+          overlay.classList.add('hidden');
+          document.body.style.overflow = '';
+        };
+
+        const openSidebarMobile = () => {
+          sidebar.classList.remove('max-lg:-left-[280px]');
+          sidebar.classList.add('max-lg:left-0');
+          overlay.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+        };
+
+        if (btnDesktop) {
           btnDesktop.addEventListener('click', function(e) {
             e.preventDefault();
             sidebar.classList.toggle('lg:w-0');
             sidebar.classList.toggle('lg:border-r-0');
-            
             header.classList.toggle('lg:left-[280px]');
             header.classList.toggle('lg:left-0');
-            
             mainContent.classList.toggle('lg:ml-[280px]');
             mainContent.classList.toggle('lg:ml-0');
-            
             footer.classList.toggle('lg:ml-[280px]');
             footer.classList.toggle('lg:ml-0');
           });
         }
 
-        const btnMobile = document.getElementById('mobile-collapse');
-        if (btnMobile && sidebar) {
+        if (btnMobile) {
           btnMobile.addEventListener('click', function(e) {
             e.preventDefault();
-            sidebar.classList.toggle('max-lg:-left-[280px]');
-            sidebar.classList.toggle('max-lg:left-0');
+            const isOpen = sidebar.classList.contains('max-lg:left-0');
+            if (isOpen) {
+              closeSidebarMobile();
+            } else {
+              openSidebarMobile();
+            }
           });
         }
+
+        overlay.addEventListener('click', closeSidebarMobile);
+
+        const navLinks = sidebar.querySelectorAll('ul li a');
+        navLinks.forEach(link => {
+          link.addEventListener('click', function() {
+            if (window.innerWidth < 1024) {
+              closeSidebarMobile();
+            }
+          });
+        });
+
+        window.addEventListener('resize', function() {
+          if (window.innerWidth >= 1024) {
+            overlay.classList.add('hidden');
+            document.body.style.overflow = '';
+          }
+        });
       });
     </script>
   </body>

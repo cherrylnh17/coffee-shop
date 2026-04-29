@@ -3,7 +3,7 @@ session_start();
 require_once '../../config.php';
 require_once '../../path.php';
 
-if (!isset($_SESSION['name']) || $_SESSION['role'] != 1) {
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
     header("Location: " . BASE_URL . "auth/login.php");
     exit;
 }

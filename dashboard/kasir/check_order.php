@@ -3,7 +3,7 @@ session_start();
 require_once '../../config.php';
 require_once '../../path.php';
 
-if (!isset($_SESSION['name']) || $_SESSION['role'] != 1) {
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
     header("Location: " . BASE_URL . "auth/login.php");
     exit;
 }
@@ -49,6 +49,7 @@ $currentPage = "check";
 include 'layout/header.php';
 include 'layout/sidebar.php';
 ?>
+
 
     <header class="fixed inset-x-0 top-0 z-[1025] flex h-[74px] items-center bg-white/80 px-4 shadow-sm backdrop-blur-md transition-all duration-200 ease-in-out lg:left-[280px]">
       <div class="flex grow items-center sm:px-2">

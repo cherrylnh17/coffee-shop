@@ -3,10 +3,11 @@ session_start();
 require_once '../../config.php'; 
 require_once '../../path.php';   
 
-if (!isset($_SESSION['name']) || $_SESSION['role'] != 1) {
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
     header("Location: " . BASE_URL . "auth/login.php");
     exit;
 }
+
 
 $pageTitle = "Dashboard Kasir";
 $currentPage = "dashboard";
@@ -15,9 +16,10 @@ include 'layout/header.php';
 include 'layout/sidebar.php';
 ?>
 
-<main class="relative min-h-screen pt-[74px] transition-all duration-300 lg:ml-[280px] pc-main pb-10">
-    <div class="p-4 sm:p-6 lg:p-8">  
-        <div class="rounded-2xl border border-gray-100 bg-white p-4 sm:p-8 shadow-sm text-center">
+    
+    <main class="relative min-h-screen pt-[74px] transition-all duration-300 lg:ml-[280px] pc-main">
+      <div class="p-4 sm:p-6 lg:p-8">  
+          <div class="rounded-2xl border border-gray-100 bg-white p-4 sm:p-8 shadow-sm text-center">
             <div class="mb-6">
                 <h2 class="text-xl font-bold text-gray-800">Scan QR Code Pesanan</h2>
                 <p class="text-sm text-gray-500">Arahkan kamera ke QR Code pelanggan untuk memproses pesanan.</p>
@@ -61,6 +63,7 @@ include 'layout/sidebar.php';
                     confirmButtonColor: '#3b82f6'
                 }).then(() => location.reload());
             }
+
         });
     }
 

@@ -3,8 +3,8 @@ session_start();
 include '../../config.php';
 require_once '../../path.php';
 
-if (!isset($_SESSION['name']) || $_SESSION['role'] != 1) {
-    echo "SESSION_EXPIRED";
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
+    header("Location: " . BASE_URL . "auth/login.php");
     exit;
 }
 

@@ -1,11 +1,9 @@
 <?php
 session_start();
-
-
 require_once '../../../config.php';
 require_once '../../../path.php';
 
-if (!isset($_SESSION['name']) || $_SESSION['role'] != 1) {
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
     header("Location: " . BASE_URL . "auth/login.php");
     exit;
 }
@@ -28,7 +26,6 @@ include '../layout/header.php';
 include '../layout/sidebar.php';
 ?>
 
-   
     <!-- [ Main Content ] start -->
     <div class="relative ml-0 min-h-[calc(100vh-135px)] top-[74px] transition-all duration-200 ease-in-out lg:ml-[280px]">
       <div class="p-4 sm:p-6 lg:p-8">
@@ -216,7 +213,6 @@ include '../layout/sidebar.php';
             </div>
         </div>
     </div>
-
 
     <script>
       const rawDbOrders = <?php echo json_encode($db_orders); ?>;
