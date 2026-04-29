@@ -1,11 +1,21 @@
 <?php
 session_start();
-if (!isset($_SESSION['username'])) {
-    header("Location: ../../../auth/login.php");
+require_once '../../../config.php';
+require_once '../../../path.php';
+
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 2) {
+    header("Location: " . BASE_URL . "auth/login.php");
     exit;
 }
 
-require_once '../../../config.php';
+$name = $_SESSION['name'];
+  $words = explode(" ", $name);
+  $initials = "";
+
+  foreach ($words as $w) {
+    $initials .= mb_substr($w, 0, 1);
+  }
+  $initials = strtoupper(substr($initials, 0, 2));
 
 try {
     $stmt = $pdo->prepare("SELECT * FROM user WHERE username != 'admin' ORDER BY id DESC");
@@ -47,10 +57,10 @@ try {
           <div class="mx-4 mb-4 rounded-xl border border-gray-100 bg-gray-50 p-4">
             <div class="flex items-center">
               <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600 shadow-sm">
-                AK
+                <?php echo htmlspecialchars($initials); ?>
               </div>
               <div class="ml-3 mr-2 grow">
-                <h6 class="mb-0 text-sm font-semibold text-gray-800">Admin Kece</h6>
+                <h6 class="mb-0 text-sm font-semibold text-gray-800"><?php echo htmlspecialchars($_SESSION['name']); ?></h6>
                 <small class="text-xs text-gray-500">Administrator</small>
               </div>
             </div>

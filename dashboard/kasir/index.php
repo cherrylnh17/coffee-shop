@@ -3,10 +3,19 @@ session_start();
 require_once '../../config.php';
 require_once '../../path.php';
 
-if (!isset($_SESSION['name']) || $_SESSION['role'] != 1) {
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
     header("Location: " . BASE_URL . "auth/login.php");
     exit;
 }
+
+$name = $_SESSION['name'];
+  $words = explode(" ", $name);
+  $initials = "";
+
+  foreach ($words as $w) {
+    $initials .= mb_substr($w, 0, 1);
+  }
+  $initials = strtoupper(substr($initials, 0, 2));
 
 ?>
 
@@ -56,10 +65,10 @@ if (!isset($_SESSION['name']) || $_SESSION['role'] != 1) {
           <div class="mx-4 mb-4 rounded-xl border border-gray-100 bg-gray-50 p-4">
             <div class="flex items-center">
               <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600 shadow-sm">
-                NA
+                <?php echo htmlspecialchars ($initials); ?>
               </div>
               <div class="ml-3 overflow-hidden">
-                <h6 class="truncate text-sm font-semibold text-gray-800"><?php echo htmlspecialchars($_SESSION['username']); ?></h6>
+                <h6 class="truncate text-sm font-semibold text-gray-800"><?php echo htmlspecialchars($_SESSION['name']); ?></h6>
                 <small class="text-xs text-gray-500">Kasir</small>
               </div>
             </div>

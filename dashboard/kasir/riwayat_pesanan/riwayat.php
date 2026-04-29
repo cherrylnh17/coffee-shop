@@ -1,11 +1,9 @@
 <?php
 session_start();
-
-
 require_once '../../../config.php';
 require_once '../../../path.php';
 
-if (!isset($_SESSION['name']) || $_SESSION['role'] != 1) {
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
     header("Location: " . BASE_URL . "auth/login.php");
     exit;
 }
@@ -64,7 +62,7 @@ try {
                 NA
               </div>
               <div class="ml-3 mr-2 grow">
-                <h6 class="mb-0 text-sm font-semibold text-gray-800"><?php echo htmlspecialchars($_SESSION['username']); ?></h6>
+                <h6 class="mb-0 text-sm font-semibold text-gray-800"><?php echo htmlspecialchars($_SESSION['name']); ?></h6>
                 <small class="text-xs text-gray-500">Kasir</small>
               </div>
             </div>

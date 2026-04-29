@@ -1,29 +1,54 @@
 <?php
 session_start();
-if (!isset($_SESSION['username'])) {
-    header("Location: ../../../auth/login.php");
+require_once '../../../config.php';
+require_once '../../../path.php';
+
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 2) {
+    header("Location: " . BASE_URL . "auth/login.php");
     exit;
 }
 
-require_once '../../../config.php';
+$name = $_SESSION['name'];
+  $words = explode(" ", $name);
+  $initials = "";
 
-$limit = isset($_GET['limit']) ? max(1, (int)$_GET['limit']) : 5; 
+  foreach ($words as $w) {
+    $initials .= mb_substr($w, 0, 1);
+  }
+  $initials = strtoupper(substr($initials, 0, 2));
+
+$limit = isset($_GET['limit']) ? max(1, (int)$_GET['limit']) : 10; 
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
-$offset = ($page - 1) * $limit;
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$where_sql = "";
+$params = [];
 
-$total_stmt = $pdo->query("SELECT COUNT(*) FROM `table`");
+if (!empty($search)) {
+    $where_sql = " WHERE name LIKE :search";
+    $params[':search'] = "%$search%";
+}
+
+$count_sql = "SELECT COUNT(*) FROM `table`" . $where_sql;
+$total_stmt = $pdo->prepare($count_sql);
+$total_stmt->execute($params);
 $total_records = $total_stmt->fetchColumn();
-
 $total_pages = ceil($total_records / $limit);
+
 if ($page > $total_pages && $total_pages > 0) {
     $page = $total_pages;
 }
 
-$stmt = $pdo->prepare("SELECT * FROM `table` ORDER BY id DESC LIMIT :limit OFFSET :offset");
+$offset = ($page - 1) * $limit;
+$fetch_sql = "SELECT * FROM `table`" . $where_sql . " ORDER BY id DESC LIMIT :limit OFFSET :offset";
+$stmt = $pdo->prepare($fetch_sql);
+
+if (!empty($search)) {
+    $stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+}
+
 $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
-
 $mejas = $stmt->fetchAll();
 ?>
 <!doctype html>
@@ -58,10 +83,10 @@ $mejas = $stmt->fetchAll();
           <div class="mx-4 mb-4 rounded-xl border border-gray-100 bg-gray-50 p-4">
             <div class="flex items-center">
               <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600 shadow-sm">
-                AK
+                <?php echo htmlspecialchars($initials); ?>
               </div>
               <div class="ml-3 mr-2 grow">
-                <h6 class="mb-0 text-sm font-semibold text-gray-800">Admin Kece</h6>
+                <h6 class="mb-0 text-sm font-semibold text-gray-800"><?php echo htmlspecialchars($_SESSION['username']); ?></h6>
                 <small class="text-xs text-gray-500">Administrator</small>
               </div>
             </div>
@@ -170,14 +195,19 @@ $mejas = $stmt->fetchAll();
               <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <h3 class="text-xl font-bold text-gray-800">Manajemen Meja</h3>
                 <div class="flex items-center gap-4">
-                    <form method="GET" class="flex items-center">
-                        <label class="mr-2 text-sm text-gray-600">Tampilkan:</label>
-                        <select onchange="setLimit(this.value)" class="appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2.5 pl-4 pr-8 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm font-medium transition-all cursor-pointer">
-                          <option value="5">5</option>
-                          <option value="10">10</option>
-                          <option value="25">25</option>
-                        </select>
-                        <input type="hidden" name="page" value="1">
+                    <form method="GET" class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto" id="filter-form">
+                        <!-- Search Bar (Live Search dengan Debounce JS) -->
+                        <div class="relative w-full sm:w-auto">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+                            </div>
+                            <input type="text" name="search" id="search-input" value="<?php echo htmlspecialchars($search); ?>" 
+                                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 outline-none" 
+                                   placeholder="Cari nama meja..." autocomplete="off">
+                        </div>
+
+                        <input type="hidden" name="page" id="page-input" value="1">
+                        <button type="submit" class="hidden">Cari</button>
                     </form>
                     <button data-modal-target="tambah-meja-modal" data-modal-toggle="tambah-meja-modal" class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700" type="button">
                         <i class="fa-solid fa-plus mr-2"></i>Tambah Meja
@@ -261,21 +291,24 @@ $mejas = $stmt->fetchAll();
                   
                   <div class="flex space-x-1">
                       <?php if ($page > 1): ?>
-                          <a href="?page=<?php echo $page - 1; ?>&limit=<?php echo $limit; ?>" class="rounded border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors">Prev</a>
-                          <?php else: ?>
-                            <button disabled class="rounded border border-gray-200/50 px-3 py-1.5 text-sm text-gray-600/50 hover:bg-gray-50/50 transition-colors"><i class="fa-solid fa-chevron-left text-xs cursor-not-allowed"></i></button>
-                      <?php endif; ?>
+                          <a href="?page=<?php echo $page - 1; ?>&limit=<?php echo $limit; ?>" 
+                            class="rounded border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></a>
+                      <?php else: ?>
+                          <button disabled class="rounded border border-gray-200/50 px-3 py-1.5 text-sm text-gray-600/50 hover:bg-gray-50/50 transition-colors"><i class="fa-solid fa-chevron-left text-xs cursor-not-allowed"></i></button>
+                            <?php endif; ?>
 
                       <?php for($i = 1; $i <= $total_pages; $i++): ?>
-                          <a href="?page=<?php echo $i; ?>&limit=<?php echo $limit; ?>" class="rounded-lg border px-3 py-1.5 text-sm transition-colors <?php echo ($i == $page) ? 'border-blue-600 bg-blue-600 text-white shadow-sm' : 'border-gray-200 text-gray-600 hover:bg-gray-50'; ?>">
+                          <a href="?page=<?php echo $i; ?>&limit=<?php echo $limit; ?>" 
+                            class="rounded border px-3 py-1.5 text-sm transition-colors <?php echo ($i == $page) ? 'border-blue-600 bg-blue-600 text-white shadow-sm' : 'border-gray-200 text-gray-600 hover:bg-gray-50'; ?>">
                             <?php echo $i; ?>
                           </a>
                       <?php endfor; ?>
 
                       <?php if ($page < $total_pages): ?>
-                          <a href="?page=<?php echo $page + 1; ?>&limit=<?php echo $limit; ?>" class="rounded border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors">Next</a>
-                          <? else: ?>
-                            <button disabled class="rounded border border-gray-200/50 px-3 py-1.5 text-sm text-gray-600/50 hover:bg-gray-50/50 transition-colors"><i class="fa-solid fa-chevron-right text-xs cursor-not-allowed"></i></button>
+                          <a href="?page=<?php echo $page + 1; ?>&limit=<?php echo $limit; ?>" 
+                            class="rounded border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></a>
+                            <?php else: ?>
+                              <button disabled class="rounded border border-gray-200/50 px-3 py-1.5 text-sm text-gray-600/50 hover:bg-gray-50/50 transition-colors"><i class="fa-solid fa-chevron-right text-xs cursor-not-allowed"></i></button>
                       <?php endif; ?>
                   </div>
               </div>
@@ -395,6 +428,43 @@ $mejas = $stmt->fetchAll();
           }
         });
       });
+    </script>
+
+    <script>
+      function openEditMejaModal(button) {
+        const id = button.getAttribute('data-id');
+        const nama = button.getAttribute('data-nama');
+
+        document.getElementById('edit_id').value = id;
+        document.getElementById('edit_name').value = nama;
+
+        document.getElementById('trigger-edit-meja-modal').click();
+      }
+    </script>
+
+    <script>
+    const searchInput = document.getElementById('search-input');
+        let debounceTimer;
+
+        if (searchInput) {
+            const val = searchInput.value;
+            if (val) {
+                searchInput.focus();
+                searchInput.setSelectionRange(val.length, val.length);
+            }
+
+            searchInput.addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                
+                debounceTimer = setTimeout(() => {
+                    const pageInput = document.getElementById('page-input') || document.querySelector('input[name="page"]');
+                    if (pageInput) pageInput.value = 1;
+                    
+                    const form = document.getElementById('filter-form') || searchInput.closest('form');
+                    if (form) form.submit();
+                }, 500); 
+            });
+        }
     </script>
   </body>
 </html>

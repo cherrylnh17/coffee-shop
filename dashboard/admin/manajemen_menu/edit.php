@@ -1,6 +1,12 @@
 <?php
 session_start();
 require_once '../../../config.php';
+require_once '../../../path.php';
+
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 2) {
+    header("Location: " . BASE_URL . "auth/login.php");
+    exit;
+}
 
 if (isset($_POST['update'])) {
     $id = $_POST['id'];
