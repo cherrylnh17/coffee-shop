@@ -36,9 +36,9 @@ if (isset($_POST['login'])) {
             $_SESSION['username'] = $user['username'];
             
             if ($user['role'] === 2) {
-                header("Location: ../dashboard/admin/index");
+                header("Location: " . BASE_URL . "dashboard/admin/index"); 
             } else {
-                header("Location: ../dashboard/kasir/index");
+                header("Location: " . BASE_URL . "dashboard/kasir/index");
             }
             exit;
         } else {
@@ -61,11 +61,11 @@ if (isset($_POST['login'])) {
     <meta name="description" content="Login to Träffa Coffee" />
 
     <!-- [Favicon] icon -->
-    <link rel="icon" href="../assets/image/favicon.svg" type="image/x-icon" />
+    <link rel="icon" href="<?= BASE_URL; ?>assets/image/favicon.svg" type="image/x-icon" />
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-  </head>
+  </head> 
 
   <body class="bg-gray-50 text-gray-800">
 
@@ -78,7 +78,7 @@ if (isset($_POST['login'])) {
             
             <div class="my-6 text-center">
               <a href="#" class="block w-full">
-                <img src="../assets/image/logo.svg" alt="Logo Trafa Coffee" class="mx-auto h-auto w-[120px]" />
+                <img src="<?= BASE_URL; ?>assets/image/logo.svg" alt="Logo Trafa Coffee" class="mx-auto h-auto w-[120px]" />
               </a>
             </div>
             
