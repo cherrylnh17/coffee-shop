@@ -1,3 +1,21 @@
+<?php
+
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
+    header("Location: " . BASE_URL . "auth/login.php");
+    exit;
+}
+
+$name = $_SESSION['name'];
+  $words = explode(" ", $name);
+  $initials = "";
+
+  foreach ($words as $w) {
+    $initials .= mb_substr($w, 0, 1);
+  }
+  $initials = strtoupper(substr($initials, 0, 2));
+
+  ?>
+
 <!doctype html>
 <html lang="en" dir="ltr">
 <head>

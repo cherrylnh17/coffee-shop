@@ -44,8 +44,6 @@ try {
 }
 
 $nama_lengkap = !empty($user['name']) ? $user['name'] : $user['username'];
-$inisial = strtoupper(substr($nama_lengkap, 0, 2));
-
 ?>
 
 <?php 
@@ -108,7 +106,7 @@ include '../layout/sidebar.php';
                 <div class="flex flex-col items-center text-center">
                   <!-- Avatar -->
                   <div class="w-[88px] h-[88px] rounded-full bg-blue-100 border-[6px] border-blue-50 shadow-sm flex items-center justify-center mb-4">
-                      <span class="text-blue-600 text-3xl font-bold"><?php echo $inisial; ?></span>
+                      <span class="text-blue-600 text-3xl font-bold"><?php echo htmlspecialchars($initials); ?></span>
                   </div>
                   
                   <!-- Nama & Role -->

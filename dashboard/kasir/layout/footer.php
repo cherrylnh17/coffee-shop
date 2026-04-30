@@ -8,7 +8,7 @@
       document.addEventListener('DOMContentLoaded', function() {
         const sidebar = document.querySelector('.pc-sidebar');
         const header = document.querySelector('.pc-header');
-        const mains = document.querySelectorAll('.pc-main'); // Memilih main dan footer
+        const mains = document.querySelectorAll('.pc-main');
         const overlay = document.getElementById('sidebar-overlay');
         const btnToggle = document.getElementById('sidebar-toggle-btn');
 
