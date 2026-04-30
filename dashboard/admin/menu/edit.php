@@ -4,7 +4,7 @@ require_once '../../../config.php';
 require_once '../../../path.php';
 
 if (!isset($_SESSION['username']) || $_SESSION['role'] != 2) {
-    header("Location: " . BASE_URL . "auth/login.php");
+    header("Location: " . BASE_URL . "auth/login");
     exit;
 }
 
@@ -43,7 +43,7 @@ if (isset($_POST['update'])) {
                 }
             }
         } else {
-            header("Location: manajemenmenu.php?status=error&msg=" . urlencode("Format gambar baru tidak valid."));
+            header("Location: index?status=error&msg=" . urlencode("Format gambar baru tidak valid."));
             exit;
         }
     }
@@ -54,14 +54,14 @@ if (isset($_POST['update'])) {
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$name, $price, $category, $image_db_path, $description, $id]);
 
-        header("Location: manajemenmenu.php?status=success");
+        header("Location: mindexstatus=success");
         exit;
     } catch (PDOException $e) {
-        header("Location: manajemenmenu.php?status=error&msg=" . urlencode($e->getMessage()));
+        header("Location: index?status=error&msg=" . urlencode($e->getMessage()));
         exit;
     }
 } else {
-    header("Location: manajemenmenu.php");
+    header("Location: index");
     exit;
 }
 ?>

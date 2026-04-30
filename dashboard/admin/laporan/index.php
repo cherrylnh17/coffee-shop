@@ -4,7 +4,7 @@ require_once '../../../config.php';
 require_once '../../../path.php';
 
 if (!isset($_SESSION['username']) || $_SESSION['role'] != 2) {
-    header("Location: " . BASE_URL . "auth/login.php");
+    header("Location: " . BASE_URL . "auth/login");
     exit;
 }
 
@@ -71,7 +71,7 @@ $query_string = "&limit=$limit&filter_date=$filter_date&sort=$sort";
 <?php
 
 $pageTitle = "Laporan Penjualan";
-$currentPage = "laporan";
+$currentPage = "laporan"; 
 
 include '../layout/header.php';
 include '../layout/sidebar.php';

@@ -4,7 +4,7 @@ require_once '../../../config.php';
 require_once '../../../path.php';
 
 if (!isset($_SESSION['username']) || $_SESSION['role'] != 2) {
-    header("Location: " . BASE_URL . "auth/login.php");
+    header("Location: " . BASE_URL . "auth/login");
     exit;
 }
 
@@ -13,14 +13,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $name = trim($_POST['name']);
 
         if (empty($name)) {
-            header("Location: manajemenmeja.php?status=error&msg=" . urlencode("Nama meja tidak boleh kosong!"));
+            header("Location: index?status=error&msg=" . urlencode("Nama meja tidak boleh kosong!"));
             exit;
         }
 
         $stmt_check = $pdo->prepare("SELECT COUNT(*) FROM `table` WHERE name = ?");
         $stmt_check->execute([$name]);
         if ($stmt_check->fetchColumn() > 0) {
-            header("Location: manajemenmeja.php?status=error&msg=" . urlencode("Nama meja sudah ada di sistem."));
+            header("Location: index?status=error&msg=" . urlencode("Nama meja sudah ada di sistem."));
             exit;
         }
 
@@ -29,15 +29,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         $stmt->execute([$name]);
         
-        header("Location: manajemenmeja.php?status=success");
+        header("Location: index?status=success");
         exit;
         
     } catch (PDOException $e) {
-        header("Location: manajemenmeja.php?status=error&msg=" . urlencode("Terjadi kesalahan database: " . $e->getMessage()));
+        header("Location: index?status=error&msg=" . urlencode("Terjadi kesalahan database: " . $e->getMessage()));
         exit;
     }
 } else {
-    header("Location: manajemenmeja.php");
+    header("Location: index");
     exit;
 }
 ?>

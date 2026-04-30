@@ -4,7 +4,7 @@ require_once '../../../config.php';
 require_once '../../../path.php';
 
 if (!isset($_SESSION['username']) || $_SESSION['role'] != 2) {
-    header("Location: " . BASE_URL . "auth/login.php");
+    header("Location: " . BASE_URL . "auth/login");
     exit;
 }
 
@@ -115,7 +115,7 @@ include '../layout/sidebar.php';
                             </button>
                         </div>
                         
-                        <form action="tambah.php" method="POST" class="p-4 md:p-5">
+                        <form action="tambah" method="POST" class="p-4 md:p-5">
                             <div class="mb-6">
                                 <label for="name" class="mb-2 block text-sm font-medium text-gray-900">Nama Meja</label>
                                 <input type="text" name="name" id="name" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="Contoh: Meja 01 / Meja VIP" required />
@@ -158,7 +158,7 @@ include '../layout/sidebar.php';
                                   <i class="fa-solid fa-pen-to-square"></i>
                               </button>
                               
-                              <a href="hapus.php?id=<?php echo $row['id']; ?>" onclick="return confirm('Yakin ingin menghapus meja ini?')" class="inline-flex h-8 w-8 items-center justify-center rounded bg-red-50 text-red-600 transition-colors hover:bg-red-100 hover:text-red-900">
+                              <a href="hapus?id=<?php echo $row['id']; ?>" onclick="return confirm('Yakin ingin menghapus meja ini?')" class="inline-flex h-8 w-8 items-center justify-center rounded bg-red-50 text-red-600 transition-colors hover:bg-red-100 hover:text-red-900">
                                   <i class="fa-solid fa-trash"></i>
                               </a>
                             </div>
@@ -217,7 +217,7 @@ include '../layout/sidebar.php';
                     </button>
                 </div>
                 
-                <form action="edit.php" method="POST" class="p-4 md:p-5">
+                <form action="edit" method="POST" class="p-4 md:p-5">
                     <input type="hidden" name="id" id="edit_id">
 
                     <div class="mb-6">

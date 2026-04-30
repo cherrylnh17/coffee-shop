@@ -66,7 +66,7 @@
               </li>
 
               <li>
-                <a href="<?=  BASE_URL; ?>dashboard/admin/kasir/index" 
+                <a href="<?= BASE_URL; ?>dashboard/admin/kasir/index" 
                     class="group flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200 
                     <?= ($currentPage == 'kasir') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600'; ?>">
                     <span class="flex w-6 justify-center text-lg <?= ($currentPage == 'kasir') ? 'text-white' : 'text-gray-400 group-hover:text-blue-600'; ?>">

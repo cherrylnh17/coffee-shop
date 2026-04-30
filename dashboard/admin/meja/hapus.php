@@ -4,11 +4,9 @@ require_once '../../../config.php';
 require_once '../../../path.php';
 
 if (!isset($_SESSION['username']) || $_SESSION['role'] != 2) {
-    header("Location: " . BASE_URL . "auth/login.php");
+    header("Location: " . BASE_URL . "auth/login");
     exit;
 }
-
-require_once '../../../config.php';
 
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
@@ -18,15 +16,15 @@ if (isset($_GET['id'])) {
         $stmt = $pdo->prepare($sql);
         
         if ($stmt->execute([$id])) {
-            header("Location: manajemenmeja.php?status=success");
+            header("Location: index?status=success");
             exit;
         }
     } catch (PDOException $e) {
-        header("Location: manajemenmeja.php?status=error&msg=" . urlencode("Gagal menghapus: Meja mungkin sedang terhubung dengan data transaksi."));
+        header("Location: index?status=error&msg=" . urlencode("Gagal menghapus: Meja mungkin sedang terhubung dengan data transaksi."));
         exit;
     }
 } else {
-    header("Location: manajemenmeja.php");
+    header("Location: index");
     exit;
 }
 ?>
