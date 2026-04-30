@@ -4,7 +4,7 @@ require_once '../../config.php';
 require_once '../../path.php';
 
 if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
-    header("Location: " . BASE_URL . "auth/login.php");
+    header("Location: " . BASE_URL . "auth/login");
     exit;
 }
 
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'text' => 'Status Pesanan Berhasil Diperbarui oleh ' . $user_name
         ];
 
-        header("Location: index.php");
+        header("Location: index");
         exit;
 
     } catch(PDOException $e) {
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'text' => 'Gagal memperbarui status: ' . $e->getMessage()
         ];
         
-        header("Location: index.php");
+        header("Location: index");
         exit;
     }
 }
