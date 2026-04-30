@@ -4,7 +4,7 @@ require_once '../../../config.php';
 require_once '../../../path.php';
 
 if (!isset($_SESSION['username']) || $_SESSION['role'] != 2) {
-    header("Location: " . BASE_URL . "auth/login.php");
+    header("Location: " . BASE_URL . "auth/login");
     exit;
 }
 
@@ -16,14 +16,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $konfirmasi_password = $_POST['konfirmasi_password'];
 
         if ($password !== $konfirmasi_password) {
-            header("Location: manajemenkasir.php?status=error&msg=" . urlencode("Password dan Konfirmasi Password tidak cocok!"));
+            header("Location: index?status=error&msg=" . urlencode("Password dan Konfirmasi Password tidak cocok!"));
             exit;
         }
 
         $stmt_check = $pdo->prepare("SELECT COUNT(*) FROM user WHERE username = ?");
         $stmt_check->execute([$username]);
         if ($stmt_check->fetchColumn() > 0) {
-            header("Location: manajemenkasir.php?status=error&msg=" . urlencode("Username sudah digunakan, silakan pilih yang lain."));
+            header("Location: index?status=error&msg=" . urlencode("Username sudah digunakan, silakan pilih yang lain."));
             exit;
         }
 
@@ -32,15 +32,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         $stmt->execute([$name, $username, $password]);
         
-        header("Location: manajemenkasir.php?status=success");
+        header("Location: index?status=success");
         exit;
         
     } catch (PDOException $e) {
-        header("Location: manajemenkasir.php?status=error&msg=" . urlencode("Terjadi kesalahan database: " . $e->getMessage()));
+        header("Location: index?status=error&msg=" . urlencode("Terjadi kesalahan database: " . $e->getMessage()));
         exit;
     }
 } else {
-    header("Location: manajemenkasir.php");
+    header("Location: index");
     exit;
 }
 ?>

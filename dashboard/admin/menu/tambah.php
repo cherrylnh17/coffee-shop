@@ -4,7 +4,7 @@ require_once '../../../config.php';
 require_once '../../../path.php';
 
 if (!isset($_SESSION['username']) || $_SESSION['role'] != 2) {
-    header("Location: " . BASE_URL . "auth/login.php");
+    header("Location: " . BASE_URL . "auth/login");
     exit;
 }
 
@@ -40,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $image_db_path = 'assets/image/menu/' . $new_file_name;
                 }
             } else {
-                header("Location: manajemenmenu.php?status=error&msg=" . urlencode("Gagal! Format gambar harus JPG, JPEG, PNG, WEBP, atau GIF."));
+                header("Location: index?status=error&msg=" . urlencode("Gagal! Format gambar harus JPG, JPEG, PNG, WEBP, atau GIF."));
                 exit;
             }
         }
@@ -57,18 +57,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $description
         ]);
         
-        header("Location: manajemenmenu.php?status=success");
+        header("Location: index?status=success");
         exit;
         
     } catch (PDOException $e) {
         die("<div style='padding: 20px; border: 2px solid red; background-color: #ffebee; color: red; font-family: sans-serif;'>
                 <h2>Gagal Menyimpan ke Database!</h2>
                 <p><strong>Pesan Error MySQL:</strong> " . $e->getMessage() . "</p>
-                <a href='manajemenmenu.php' style='background: blue; color: white; padding: 10px; text-decoration: none; border-radius: 5px;'>Kembali</a>
+                <a href='index' style='background: blue; color: white; padding: 10px; text-decoration: none; border-radius: 5px;'>Kembali</a>
              </div>");
     }
 } else {
-    header("Location: manajemenmenu.php");
+    header("Location: index");
     exit;
 }
 ?>

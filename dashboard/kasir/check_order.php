@@ -4,7 +4,7 @@ require_once '../../config.php';
 require_once '../../path.php';
 
 if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
-    header("Location: " . BASE_URL . "auth/login.php");
+    header("Location: " . BASE_URL . "auth/login");
     exit;
 }
 
@@ -12,7 +12,7 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
 $order_code = isset($_GET['code']) ? $_GET['code'] : '';
 
 if (empty($order_code)) {
-    echo "<script>alert('Kode Pesanan Tidak Ditemukan'); window.location.href='index.php';</script>";
+    echo "<script>alert('Kode Pesanan Tidak Ditemukan'); window.location.href='index';</script>";
     exit;
 }
 
@@ -23,7 +23,7 @@ try {
     $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$order) {
-        echo "<script>alert('Pesanan tidak ditemukan'); window.location.href='index.php';</script>";
+        echo "<script>alert('Pesanan tidak ditemukan'); window.location.href='index';</script>";
         exit;
     }
 
@@ -96,7 +96,7 @@ include 'layout/sidebar.php';
                     </button>
                 </div>
                 <?php else: ?>
-                <form action="update_order.php" method="POST" class="flex-1">
+                <form action="update_order" method="POST" class="flex-1">
                     <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
                     <button name="aksi" type="submit"  value="selesai" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-green-200 transition-all flex items-center justify-center gap-2">
                         <i class="fa-solid fa-check-double"></i> Selesaikan Pesanan 
