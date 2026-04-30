@@ -188,7 +188,6 @@ include '../layout/sidebar.php';
                       </td>
                       <td class="px-5 py-4">
                           <div class="flex items-center justify-center gap-2">
-                              <!-- Mencegah berkedip: Menggunakan target Flowbite native (data-modal-show) & hanya memanggil JS untuk populate data -->
                               <button type="button" 
                                       data-modal-target="detail-modal" 
                                       data-modal-show="detail-modal" 
@@ -230,22 +229,24 @@ include '../layout/sidebar.php';
                 
                 <div class="flex space-x-1">
                     <?php if ($page > 1): ?>
-                        <a href="?page=<?php echo $page - 1 . $query_string; ?>" class="flex items-center justify-center w-8 h-8 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-100 transition-colors shadow-sm bg-white"><i class="fa-solid fa-chevron-left text-xs"></i></a>
+                        <a href="?page=<?php echo $page - 1; ?><?php echo $query_string; ?>" 
+                          class="rounded border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></a>
+                    <?php else: ?>
+                        <button disabled class="rounded border border-gray-200/50 px-3 py-1.5 text-sm text-gray-600/50 hover:bg-gray-50/50 transition-colors"><i class="fa-solid fa-chevron-left text-xs cursor-not-allowed"></i></button>
                     <?php endif; ?>
 
-                    <?php 
-                    $start_page = max(1, $page - 2);
-                    $end_page = min($total_pages, $page + 2);
-                    
-                    for($i = $start_page; $i <= $end_page; $i++): 
-                    ?>
-                        <a href="?page=<?php echo $i . $query_string; ?>" class="flex items-center justify-center w-8 h-8 rounded-lg text-sm font-bold transition-colors shadow-sm <?php echo ($i == $page) ? 'bg-blue-600 text-white border border-blue-600' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'; ?>">
+                    <?php for($i = 1; $i <= $total_pages; $i++): ?>
+                        <a href="?page=<?php echo $i; ?><?php echo $query_string; ?>" 
+                          class="rounded border px-3 py-1.5 text-sm transition-colors <?php echo ($i == $page) ? 'border-blue-600 bg-blue-600 text-white shadow-sm' : 'border-gray-200 text-gray-600 hover:bg-gray-50'; ?>">
                           <?php echo $i; ?>
                         </a>
                     <?php endfor; ?>
 
                     <?php if ($page < $total_pages): ?>
-                        <a href="?page=<?php echo $page + 1 . $query_string; ?>" class="flex items-center justify-center w-8 h-8 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-100 transition-colors shadow-sm bg-white"><i class="fa-solid fa-chevron-right text-xs"></i></a>
+                        <a href="?page=<?php echo $page + 1; ?><?php echo $query_string; ?>" 
+                          class="rounded border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></a>
+                    <?php else: ?>
+                        <button disabled class="rounded border border-gray-200/50 px-3 py-1.5 text-sm text-gray-600/50 hover:bg-gray-50/50 transition-colors"><i class="fa-solid fa-chevron-right text-xs cursor-not-allowed"></i></button>
                     <?php endif; ?>
                 </div>
             </div>
@@ -334,10 +335,8 @@ include '../layout/sidebar.php';
     </div>
 
     <script>
-      // Melempar data pesanan yang ada di halaman ini ke Javascript agar detail terbaca
       const pageOrders = <?php echo json_encode($orders); ?>;
 
-      // Fungsi hanya untuk me-replace data (Modal otomatis muncul karena data-modal-show)
       function populateDetail(index) {
           const o = pageOrders[index];
           
@@ -354,7 +353,7 @@ include '../layout/sidebar.php';
           document.getElementById('det-tax').innerText = 'Rp ' + parseFloat(o.tax || 0).toLocaleString('id-ID');
           document.getElementById('det-total').innerText = 'Rp ' + parseFloat(o.total || 0).toLocaleString('id-ID');
           document.getElementById('det-payment').innerText = paymentMethod;
-          document.getElementById('det-date').innerText = o.created_at || '-';
+          document.getElementById('det-status').innerText = o.status || '-';
           document.getElementById('det-detail').innerText = o.detail || 'Tidak ada catatan.';
 
           // Mengatur badge status untuk Modal
