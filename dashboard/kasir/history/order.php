@@ -196,7 +196,6 @@ include '../layout/sidebar.php';
                                   <i class="fa-solid fa-eye"></i> Detail
                               </button>
                               
-                              <!-- Tombol Print: HANYA aktif jika Status Sukses (1), jika tidak di-disable -->
                               <?php if ($raw_status === 1): ?>
                                   <button type="button" onclick="printOrder('<?php echo htmlspecialchars($o['code'] ?? ''); ?>')" 
                                           class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 border rounded-lg text-xs font-bold transition-all duration-200 shadow-sm bg-gray-50 text-gray-600 hover:bg-gray-800 hover:text-white hover:border-gray-800">
@@ -262,7 +261,6 @@ include '../layout/sidebar.php';
     <div id="detail-modal" tabindex="-1" aria-hidden="true" class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-900/50 backdrop-blur-sm">
         <div class="relative max-h-full w-full max-w-2xl p-4">
             <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
-                <!-- Modal header -->
                 <div class="flex items-center justify-between border-b border-gray-100 p-4 md:p-5">
                     <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
                         <i class="fa-solid fa-receipt text-blue-600"></i> Detail Transaksi
@@ -272,7 +270,6 @@ include '../layout/sidebar.php';
                     </button>
                 </div>
                 
-                <!-- Modal body -->
                 <div class="p-4 md:p-5">
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
@@ -324,11 +321,6 @@ include '../layout/sidebar.php';
                         <span class="block text-xs text-gray-500 uppercase font-semibold mb-2">Detail Pesanan Tambahan</span>
                         <div class="p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700 whitespace-pre-wrap min-h-[60px]" id="det-detail"></div>
                     </div>
-                </div>
-
-                <!-- Modal footer -->
-                <div class="flex items-center p-4 md:p-5 border-t border-gray-100 rounded-b">
-                    <button data-modal-hide="detail-modal" type="button" class="text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors">Tutup Detail</button>
                 </div>
             </div>
         </div>
