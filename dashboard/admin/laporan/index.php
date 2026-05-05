@@ -8,6 +8,38 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 2) {
     exit;
 }
 
+if (isset($_GET['export_json']) && $_GET['export_json'] == 1) {
+    $filter_date = isset($_GET['filter_date']) ? $_GET['filter_date'] : 'all';
+    $sort        = isset($_GET['sort'])        ? $_GET['sort']        : 'terbaru';
+
+    $where_sql = "status = 1";
+    if ($filter_date == 'harian') {
+        $where_sql .= " AND DATE(created_at) = CURDATE()";
+    } elseif ($filter_date == 'mingguan') {
+        $where_sql .= " AND created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)";
+    } elseif ($filter_date == 'bulanan') {
+        $where_sql .= " AND MONTH(created_at) = MONTH(CURDATE()) AND YEAR(created_at) = YEAR(CURDATE())";
+    } elseif ($filter_date == 'tahunan') {
+        $where_sql .= " AND YEAR(created_at) = YEAR(CURDATE())";
+    }
+
+    $order_sql = "ORDER BY created_at DESC";
+    if ($sort == 'terlama')  $order_sql = "ORDER BY created_at ASC";
+    elseif ($sort == 'termahal') $order_sql = "ORDER BY total DESC";
+    elseif ($sort == 'termurah') $order_sql = "ORDER BY total ASC";
+
+    try {
+        $stmt = $pdo->query("SELECT * FROM `order` WHERE $where_sql $order_sql");
+        $all  = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        $all = [];
+    }
+
+    header('Content-Type: application/json');
+    echo json_encode($all);
+    exit;
+}
+
 
 $limit = isset($_GET['limit']) ? max(1, (int)$_GET['limit']) : 10;
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
@@ -95,9 +127,9 @@ include '../layout/sidebar.php';
               <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto items-center">
 
                 <div class="flex items-center gap-2 w-full sm:w-auto">
-                  <button data-modal-target="authentication-modal" data-modal-toggle="authentication-modal" class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700" type="button">
+                  <button onclick="openExportModal()" class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700" type="button">
                     <i class="fa-solid fa-file-export mr-2"></i>Export
-                </button>
+                  </button>
                 </div>
                 
                 <form method="GET" id="filter-form" class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto items-center">
@@ -310,8 +342,131 @@ include '../layout/sidebar.php';
     </div>
 
     
+    <!-- SheetJS CDN  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- Modal Export Excel -->
+    <div id="export-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm">
+        <div class="relative w-full max-w-md p-4">
+            <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
+                <div class="flex items-center justify-between border-b border-gray-100 p-4 md:p-5">
+                    <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                        <i class="fa-solid fa-file-excel text-green-600"></i> Export Laporan Penjualan
+                    </h3>
+                    <button onclick="closeExportModal()" class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <div class="p-4 md:p-5 space-y-4">
+                    <p class="text-sm text-gray-600">Pilih cakupan data yang ingin di-export ke file Excel (<code>.xlsx</code>).</p>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="exportExcel('page')" class="flex flex-col items-center gap-2 rounded-xl border-2 border-gray-200 p-4 text-center text-sm font-medium text-gray-700 transition-all hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700">
+                            <i class="fa-solid fa-file-lines text-2xl text-blue-400"></i>
+                            <span>Halaman Ini</span>
+                            <span class="text-xs font-normal text-gray-400"><?php echo count($orders); ?> data</span>
+                        </button>
+                        <button onclick="exportExcel('all')" class="flex flex-col items-center gap-2 rounded-xl border-2 border-gray-200 p-4 text-center text-sm font-medium text-gray-700 transition-all hover:border-green-500 hover:bg-green-50 hover:text-green-700">
+                            <i class="fa-solid fa-database text-2xl text-green-400"></i>
+                            <span>Semua Data</span>
+                            <span class="text-xs font-normal text-gray-400"><?php echo $total_records; ?> data</span>
+                        </button>
+                    </div>
+
+                    <div class="rounded-lg bg-blue-50 border border-blue-100 p-3 text-xs text-blue-700">
+                        <i class="fa-solid fa-circle-info mr-1"></i>
+                        Filter aktif: <strong><?php
+                            $filter_labels = ['all'=>'Semua Waktu','harian'=>'Hari Ini','mingguan'=>'Minggu Ini','bulanan'=>'Bulan Ini','tahunan'=>'Tahun Ini'];
+                            echo $filter_labels[$filter_date] ?? 'Semua Waktu';
+                        ?></strong> &mdash; Urutan: <strong><?php
+                            $sort_labels = ['terbaru'=>'Paling Baru','terlama'=>'Paling Lama','termahal'=>'Total Tertinggi','termurah'=>'Total Terendah'];
+                            echo $sort_labels[$sort] ?? 'Paling Baru';
+                        ?></strong>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 p-4 md:p-5 border-t border-gray-100">
+                    <button onclick="closeExportModal()" class="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">Batal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
       const pageOrders = <?php echo json_encode($orders); ?>;
+      const allOrdersUrl = '?export_json=1&filter_date=<?php echo urlencode($filter_date); ?>&sort=<?php echo urlencode($sort); ?>';
+
+      function openExportModal() {
+          const modal = document.getElementById('export-modal');
+          modal.classList.remove('hidden');
+          modal.classList.add('flex');
+      }
+      function closeExportModal() {
+          const modal = document.getElementById('export-modal');
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+      }
+      document.getElementById('export-modal').addEventListener('click', function(e) {
+          if (e.target === this) closeExportModal();
+      });
+
+    //   export excel
+      function buildExcelRows(orders) {
+          const rows = [
+              ['No','Kode Pesanan','Nama Kasir','Nama Pelanggan','Menu Pesanan','Subtotal (Rp)','Pajak (Rp)','Total (Rp)','Metode Pembayaran','Tanggal & Waktu']
+          ];
+          orders.forEach((o, i) => {
+              const payment = o.payment == 1 ? 'Kasir' : o.payment == 2 ? 'Online' : 'Lainnya';
+              rows.push([
+                  i + 1,
+                  o.code || '-',
+                  o.user_name || '-',
+                  o.customer_name || '-',
+                  o.detail || '-',
+                  parseFloat(o.subtotal || 0),
+                  parseFloat(o.tax || 0),
+                  parseFloat(o.total || 0),
+                  payment,
+                  o.created_at || '-'
+              ]);
+          });
+          return rows;
+      }
+
+      function downloadExcel(rows, filename) {
+          const ws = XLSX.utils.aoa_to_sheet(rows);
+          ws['!cols'] = [
+              {wch:5},{wch:18},{wch:20},{wch:20},{wch:40},
+              {wch:16},{wch:14},{wch:16},{wch:18},{wch:20}
+          ];
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, 'Laporan Penjualan');
+          XLSX.writeFile(wb, filename);
+          closeExportModal();
+      }
+
+      function exportExcel(scope) {
+          const filterDate  = '<?php echo $filter_date; ?>';
+          const filterLabel = {'all':'Semua','harian':'Harian','mingguan':'Mingguan','bulanan':'Bulanan','tahunan':'Tahunan'}[filterDate] || 'Semua';
+          const today       = new Date().toISOString().slice(0, 10);
+          const filename    = 'Laporan_Penjualan_' + filterLabel + '_' + today + '.xlsx';
+
+          if (scope === 'page') {
+              downloadExcel(buildExcelRows(pageOrders), filename);
+          } else {
+              const btn = event.currentTarget;
+              const originalHTML = btn.innerHTML;
+              btn.disabled = true;
+              btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-2xl text-green-400"></i><span>Memuat...</span><span class="text-xs font-normal text-gray-400">Mohon tunggu</span>';
+
+              fetch(allOrdersUrl)
+                  .then(r => r.json())
+                  .then(data => { downloadExcel(buildExcelRows(data), filename); })
+                  .catch(() => alert('Gagal mengambil data. Silakan coba lagi.'))
+                  .finally(() => { btn.disabled = false; btn.innerHTML = originalHTML; });
+          }
+      }
 
       function showDetail(index) {
           const o = pageOrders[index];
