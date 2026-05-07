@@ -358,8 +358,25 @@ include '../layout/sidebar.php';
           document.getElementById('det-status').innerHTML = modalStatus;
       }
 
-      function printOrder(code) {
-          alert(`Mencetak struk pesanan dengan kode ${code}...`);
+    function printOrder(code) {
+          // 1. Cek apakah Iframe print sudah ada, jika belum kita buat elemennya
+          let printIframe = document.getElementById('print-iframe');
+          if (!printIframe) {
+              printIframe = document.createElement('iframe');
+              printIframe.id = 'print-iframe';
+              // PENTING: Sembunyikan iframe dari tampilan layar!
+              printIframe.style.display = 'none';
+              document.body.appendChild(printIframe);
+          }
+
+          // 2. Arahkan sumber iframe ke halaman cetak
+          printIframe.src = `../struk.php?code=${code}`;
+
+          // 3. Begitu iframe selesai memuat halaman struk, jalankan perintah Print
+          printIframe.onload = function() {
+              printIframe.contentWindow.focus();
+              printIframe.contentWindow.print();
+          };
       }
     </script>
 

@@ -96,7 +96,7 @@ include 'layout/sidebar.php';
                     </button>
                 </div>
                 <?php else: ?>
-                <form action="update_order" method="POST" class="flex-1">
+                <form action="update_order" method="POST" class="flex-1" id="checkout-form">
                     <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
                     <button name="aksi" type="submit"  value="selesai" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-green-200 transition-all flex items-center justify-center gap-2">
                         <i class="fa-solid fa-check-double"></i> Selesaikan Pesanan 
@@ -132,6 +132,40 @@ include 'layout/sidebar.php';
                   <span class="font-bold text-gray-900">Total Tagihan</span>
                   <span class="text-2xl font-black text-blue-600">Rp <?= number_format($order['total'], 0, ',', '.') ?></span>
                 </div>
+                
+                <?php if($order['status'] != 1): ?>
+                
+                <!-- Jika pesanan belum selesai, tampilkan form input uang -->
+                <div class="pt-4 flex justify-between items-center">
+                  <label for="paid-input" class="font-bold text-gray-900">Uang Bayar</label>
+                  <div class="relative w-1/2">
+                     <span class="absolute left-3 top-2 text-gray-500 font-medium text-sm">Rp</span>
+                     <!-- atribut form="checkout-form" mengaitkan input ini ke form di sisi kiri -->
+                     <input type="number" name="paid" id="paid-input" form="checkout-form" required min="<?= $order['total'] ?>" placeholder="0"
+                            class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-right font-bold text-gray-900 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
+                  </div>
+                </div>
+                
+                <div class="pt-2 flex justify-between items-center">
+                  <span class="font-bold text-green-600">Kembalian</span>
+                  <span class="text-xl font-black text-green-600" id="change-display">Rp 0</span>
+                  <!-- Input hidden kembalian akan otomatis diisi oleh Javascript -->
+                  <input type="hidden" name="change" id="change-input" form="checkout-form" value="0">
+                </div>
+
+                <?php else: ?>
+                
+                <!-- Jika pesanan sudah lunas, tampilkan riwayat uangnya dari DB -->
+                <div class="pt-4 flex justify-between items-center text-sm border-t border-dashed border-gray-200">
+                  <span class="text-gray-500">Uang Bayar</span>
+                  <span class="font-medium text-gray-800">Rp <?= number_format($order['paid'] ?? 0, 0, ',', '.') ?></span>
+                </div>
+                <div class="pt-2 flex justify-between items-center">
+                  <span class="font-bold text-green-600">Kembalian</span>
+                  <span class="font-bold text-green-600 text-lg">Rp <?= number_format($order['change'] ?? 0, 0, ',', '.') ?></span>
+                </div>
+                
+                <?php endif; ?>
               </div>
             </div>
 
@@ -157,6 +191,33 @@ include 'layout/sidebar.php';
         </div>
       </div>
     </main>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const paidInput = document.getElementById('paid-input');
+        const changeDisplay = document.getElementById('change-display');
+        const changeInput = document.getElementById('change-input');
+        const totalAmount = <?= (int)$order['total'] ?>;
+
+        if (paidInput) {
+            paidInput.addEventListener('input', function() {
+                let paid = parseInt(this.value) || 0; 
+                
+                if (change < 0) {
+                    changeDisplay.innerText = "Uang Kurang!";
+                    changeDisplay.classList.remove('text-green-600');
+                    changeDisplay.classList.add('text-red-500');
+                    changeInput.value = 0;
+                } else {
+                    changeDisplay.innerText = "Rp " + change.toLocaleString('id-ID');
+                    changeDisplay.classList.remove('text-red-500');
+                    changeDisplay.classList.add('text-green-600');
+                    changeInput.value = change;
+                }
+            });
+        }
+    });
+    </script>
 
 
 <?php 

@@ -65,15 +65,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // insert tabel order
         $sqlOrder = "INSERT INTO `order` (
             code, table_id, table_name, customer_name, customer_email,
-            qty, subtotal, tax, total, payment, detail, status,
+            qty, subtotal, tax, total, payment, detail, status, paid, `change`,
             created_at, expired_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         $stmtOrder = $pdo->prepare($sqlOrder);
         $stmtOrder->execute([
             $order_code, $id_table, $name_table, $customer_name, $customer_email,
             $total_qty, $subtotal, $tax, $total_bayar, $payment_type,
-            $detail_summary, 2, $created_at, $expired_at
+            $detail_summary, 2, 0, 0, $created_at, $expired_at
         ]);
 
         // ambil id yg baru di insert

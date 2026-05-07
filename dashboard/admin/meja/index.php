@@ -86,7 +86,6 @@ include '../layout/sidebar.php';
                 <h3 class="text-xl font-bold text-gray-800">Manajemen Meja</h3>
                 <div class="flex items-center gap-4">
                     <form method="GET" class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto" id="filter-form">
-                        <!-- Search Bar (Live Search dengan Debounce JS) -->
                         <div class="relative w-full sm:w-auto">
                             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                                 <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
