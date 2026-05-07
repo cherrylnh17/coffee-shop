@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 22, 2026 at 03:33 AM
+-- Generation Time: May 07, 2026 at 03:59 AM
 -- Server version: 8.0.45-0ubuntu0.24.04.1
 -- PHP Version: 8.4.19
 
@@ -57,7 +57,9 @@ INSERT INTO `menu` (`id`, `name`, `image`, `category`, `price`, `description`, `
 (12, 'Lemon Tea Ice', 'https://placehold.co/400x300?text=Lemon+Tea', 2, 12000, 'Teh segar dengan perasan jeruk lemon asli.', '2026-04-16 11:12:15', NULL),
 (13, 'Chocolate Shake', 'https://placehold.co/400x300?text=Chocolate', 2, 25000, 'Minuman cokelat blend dengan topping whipped cream.', '2026-04-16 11:12:15', NULL),
 (14, 'Americano Ice', 'https://placehold.co/400x300?text=Americano', 2, 15000, 'Double shot espresso dengan air mineral dingin.', '2026-04-16 11:12:15', NULL),
-(15, 'Avocado Juice', 'https://placehold.co/400x300?text=Avocado', 2, 18000, 'Jus alpukat mentega dengan topping cokelat kental.', '2026-04-16 11:12:15', NULL);
+(15, 'Avocado Juice', 'https://placehold.co/400x300?text=Avocado', 2, 18000, 'Jus alpukat mentega dengan topping cokelat kental.', '2026-04-16 11:12:15', NULL),
+(16, 'sd', 'assets/image/menu/menu_69ed402847a53.jpeg', 1, 1, '11', '2026-04-26 05:28:56', NULL),
+(17, 'sfsdfsfd', 'assets/image/menu/menu_69f0211355c56.jpg', 2, 2444, 'aaaa', '2026-04-28 09:53:07', NULL);
 
 -- --------------------------------------------------------
 
@@ -77,6 +79,8 @@ CREATE TABLE `order` (
   `qty` int UNSIGNED NOT NULL COMMENT 'Total barang',
   `subtotal` int UNSIGNED NOT NULL,
   `tax` int UNSIGNED NOT NULL,
+  `paid` int UNSIGNED DEFAULT NULL,
+  `change` int UNSIGNED DEFAULT NULL,
   `total` int UNSIGNED NOT NULL,
   `payment` tinyint NOT NULL COMMENT '1: Kasir, 2: Online',
   `detail` text,
@@ -90,21 +94,18 @@ CREATE TABLE `order` (
 -- Dumping data for table `order`
 --
 
-INSERT INTO `order` (`id`, `code`, `user_id`, `user_name`, `table_id`, `table_name`, `customer_name`, `customer_email`, `qty`, `subtotal`, `tax`, `total`, `payment`, `detail`, `status`, `created_at`, `updated_at`, `expired_at`) VALUES
-(1, '', NULL, NULL, 1, '1', 'aku mah epemr', 'aa@gmail.com', 6, 135000, 16200, 151200, 1, '1 Nasi Goreng Special, 5 Mie Goreng Jawa', 3, '2026-04-21 04:02:47', NULL, '2026-04-21 05:02:47'),
-(2, 'TRX-uuTyAqte', NULL, NULL, 1, '1', 'aku mah epemr', 'aa@gmail.com', 6, 135000, 16200, 151200, 1, '1 Nasi Goreng Special, 5 Mie Goreng Jawa', 3, '2026-04-21 04:36:45', NULL, '2026-04-21 05:36:45'),
-(3, 'TRX-wEcnnz4o', NULL, NULL, 1, '1', 'aku mah epemr', 'aa@gmail.com', 6, 135000, 16200, 151200, 1, '1 Nasi Goreng Special, 5 Mie Goreng Jawa', 3, '2026-04-21 05:15:34', NULL, '2026-04-21 06:15:34'),
-(5, 'ORD-AY3SKLUM', NULL, NULL, 1, '1', 'aku mah epemr', 'aa@gmail.com', 6, 135000, 16200, 151200, 1, '1 Nasi Goreng Special, 5 Mie Goreng Jawa', 3, '2026-04-21 05:30:35', NULL, '2026-04-21 06:30:35'),
-(6, 'ORD-K4PBZCG1', NULL, NULL, 1, '1', 'cherry', 'cherry@gmail.com', 6, 135000, 16200, 151200, 1, '1 Nasi Goreng Special, 5 Mie Goreng Jawa', 3, '2026-04-21 05:56:44', NULL, '2026-04-21 06:06:44'),
-(7, 'ORD-jf5Kg3QB', NULL, NULL, 1, '1', 'aku mah epemr', 'aa@gmail.com', 6, 135000, 16200, 151200, 1, '1 Nasi Goreng Special, 5 Mie Goreng Jawa', 1, '2026-04-21 20:48:09', NULL, '2026-04-21 20:58:09'),
-(8, 'ORD-t7YLg9LE', NULL, NULL, 1, '1', 'sdfd', 'aa@gm.com', 3, 69000, 8280, 77280, 1, '1 Nasi Goreng Special, 2 Mie Goreng Jawa', 3, '2026-04-22 02:29:27', NULL, '2026-04-22 02:39:27'),
-(9, 'ORD-k5d69mic', NULL, NULL, 1, '1', '', '', 3, 62000, 7440, 69440, 1, '1 Nasi Goreng Special, 1 Mie Goreng Jawa, 1 Kentang Goreng (Fries)', 3, '2026-04-22 09:47:59', NULL, '2026-04-22 09:57:59'),
-(10, 'ORD-jkaSFSaF', NULL, NULL, 1, '1', 'aa', '', 1, 25000, 3000, 28000, 1, '1 Nasi Goreng Special', 3, '2026-04-22 10:13:45', NULL, '2026-04-22 10:23:45'),
-(11, 'ORD-rDeTUMjN', NULL, NULL, 1, '1', 'aaa', '', 1, 25000, 3000, 28000, 1, '1 Nasi Goreng Special', 3, '2026-04-22 10:16:53', NULL, '2026-04-22 10:26:53'),
-(12, 'ORD-fEeDcV5n', NULL, NULL, 1, '1', 'aa', '', 2, 45000, 5400, 50400, 1, '1 Nasi Goreng Special, 1 Sandwich Gandum', 3, '2026-04-22 10:20:29', NULL, '2026-04-22 10:30:29'),
-(13, 'ORD-FCCjAggx', NULL, NULL, 1, '1', 'g', '', 1, 25000, 3000, 28000, 1, '1 Nasi Goreng Special', 3, '2026-04-22 10:22:05', NULL, '2026-04-22 10:32:05'),
-(14, 'ORD-n5dyEfRP', NULL, NULL, 1, '1', 'ss', '', 1, 25000, 3000, 28000, 1, '1 Nasi Goreng Special', 3, '2026-04-22 10:22:19', NULL, '2026-04-22 10:32:19'),
-(15, 'ORD-dcVMlvZA', NULL, NULL, 1, '1', 'ggg', '', 1, 25000, 3000, 28000, 1, '1 Nasi Goreng Special', 2, '2026-04-22 10:23:44', NULL, '2026-04-22 10:33:44');
+INSERT INTO `order` (`id`, `code`, `user_id`, `user_name`, `table_id`, `table_name`, `customer_name`, `customer_email`, `qty`, `subtotal`, `tax`, `paid`, `change`, `total`, `payment`, `detail`, `status`, `created_at`, `updated_at`, `expired_at`) VALUES
+(7, 'ORD-jf5Kg3QB', NULL, NULL, 1, '1', 'aku mah epemr', 'aa@gmail.com', 6, 135000, 16200, NULL, NULL, 151200, 1, '1 Nasi Goreng Special, 5 Mie Goreng Jawa', 1, '2026-04-21 20:48:09', NULL, '2026-04-21 20:58:09'),
+(26, 'ORD-exhQgcMd', NULL, NULL, 1, '1', 'topek cilik', '', 2, 60000, 7200, NULL, NULL, 67200, 1, '1 Nasi Goreng Special, 1 Pasta Carbonara', 1, '2026-04-22 13:36:39', NULL, '2026-04-22 13:46:39'),
+(31, 'ORD-XDZmJacZ', NULL, NULL, 1, '1', 'cherr', '', 3, 72000, 8640, NULL, NULL, 80640, 1, '2 Nasi Goreng Special, 1 Mie Goreng Jawa', 1, '2026-04-23 09:52:50', NULL, '2026-04-23 10:02:50'),
+(33, 'ORD-9sYb3PF2', NULL, NULL, 1, '1', 'aa', '', 1, 25000, 3000, NULL, NULL, 28000, 1, '1 Nasi Goreng Special', 1, '2026-04-23 12:00:31', NULL, '2026-04-23 12:10:31'),
+(34, 'ORD-qQCiA295', NULL, NULL, 1, '1', 'aa', '', 1, 25000, 3000, NULL, NULL, 28000, 1, '1 Nasi Goreng Special', 1, '2026-04-23 12:07:19', NULL, '2026-04-23 12:17:19'),
+(35, 'ORD-RLE6tis1', NULL, NULL, 1, '1', 'cherry', '', 4, 75000, 9000, NULL, NULL, 84000, 1, '1 Sate Ayam Madura, 3 Kentang Goreng (Fries)', 1, '2026-04-23 13:59:11', NULL, '2026-04-23 14:09:11'),
+(36, 'ORD-6LEXSM5Q', NULL, NULL, 1, '1', 'sss', '', 1, 25000, 3000, NULL, NULL, 28000, 1, '1 Nasi Goreng Special', 1, '2026-04-23 16:43:23', NULL, '2026-04-23 16:53:23'),
+(38, 'ORD-zJrzqpvz', NULL, NULL, 1, '1', 'cher', '', 7, 145000, 17400, NULL, NULL, 162400, 1, '1 Nasi Goreng Special, 6 Sandwich Gandum', 1, '2026-04-26 05:22:25', NULL, '2026-04-26 05:32:25'),
+(39, 'ORD-T3WbsvRn', 1, 'q', 1, '1', '11', '', 1, 20000, 2400, NULL, NULL, 22400, 1, '1 Sandwich Gandum', 1, '2026-04-27 09:59:32', NULL, '2026-04-27 10:09:32'),
+(43, 'ORD-6FnhGiPz', NULL, NULL, 1, '1', 'qq', '', 2, 24444, 2933, NULL, NULL, 27377, 1, '1 Mie Goreng Jawa, 1 sfsdfsfd', 1, '2026-04-28 10:09:02', NULL, '2026-04-28 10:19:02'),
+(45, 'ORD-cm5KnHjg', NULL, NULL, 2, '7', 'aa', '', 2, 20444, 2453, NULL, NULL, 22897, 1, '1 Avocado Juice, 1 sfsdfsfd', 3, '2026-05-05 11:46:57', NULL, '2026-05-05 11:56:57');
 
 -- --------------------------------------------------------
 
@@ -129,24 +130,24 @@ CREATE TABLE `order_item` (
 --
 
 INSERT INTO `order_item` (`id`, `order_id`, `menu_id`, `menu_name`, `qty`, `subtotal`, `notes`, `created_at`, `updated_at`) VALUES
-(1, 5, 1, 'Nasi Goreng Special', 1, 25000, 'pake telur 5', '2026-04-21 12:30:35', NULL),
-(2, 5, 2, 'Mie Goreng Jawa', 5, 110000, 'mieee', '2026-04-21 12:30:35', NULL),
-(3, 6, 1, 'Nasi Goreng Special', 1, 25000, 'pake telur 5', '2026-04-21 12:56:44', NULL),
-(4, 6, 2, 'Mie Goreng Jawa', 5, 110000, 'mieee', '2026-04-21 12:56:44', NULL),
 (5, 7, 1, 'Nasi Goreng Special', 1, 25000, 'pake telur 5', '2026-04-22 03:48:09', NULL),
 (6, 7, 2, 'Mie Goreng Jawa', 5, 110000, 'mieee', '2026-04-22 03:48:09', NULL),
-(7, 8, 1, 'Nasi Goreng Special', 1, 25000, '', '2026-04-22 09:29:27', NULL),
-(8, 8, 2, 'Mie Goreng Jawa', 2, 44000, '', '2026-04-22 09:29:27', NULL),
-(9, 9, 1, 'Nasi Goreng Special', 1, 25000, '', '2026-04-22 09:47:59', NULL),
-(10, 9, 2, 'Mie Goreng Jawa', 1, 22000, '', '2026-04-22 09:47:59', NULL),
-(11, 9, 6, 'Kentang Goreng (Fries)', 1, 15000, '', '2026-04-22 09:47:59', NULL),
-(12, 10, 1, 'Nasi Goreng Special', 1, 25000, 'pesdas', '2026-04-22 10:13:45', NULL),
-(13, 11, 1, 'Nasi Goreng Special', 1, 25000, '', '2026-04-22 10:16:53', NULL),
-(14, 12, 1, 'Nasi Goreng Special', 1, 25000, '', '2026-04-22 10:20:29', NULL),
-(15, 12, 4, 'Sandwich Gandum', 1, 20000, '', '2026-04-22 10:20:29', NULL),
-(16, 13, 1, 'Nasi Goreng Special', 1, 25000, 'enakkk', '2026-04-22 10:22:05', NULL),
-(17, 14, 1, 'Nasi Goreng Special', 1, 25000, 'enakkk', '2026-04-22 10:22:19', NULL),
-(18, 15, 1, 'Nasi Goreng Special', 1, 25000, 'enakkk', '2026-04-22 10:23:44', NULL);
+(39, 26, 1, 'Nasi Goreng Special', 1, 25000, '', '2026-04-22 13:36:39', NULL),
+(40, 26, 5, 'Pasta Carbonara', 1, 35000, '', '2026-04-22 13:36:39', NULL),
+(48, 31, 1, 'Nasi Goreng Special', 2, 50000, '', '2026-04-23 09:52:50', NULL),
+(49, 31, 2, 'Mie Goreng Jawa', 1, 22000, '', '2026-04-23 09:52:50', NULL),
+(51, 33, 1, 'Nasi Goreng Special', 1, 25000, '', '2026-04-23 12:00:31', NULL),
+(52, 34, 1, 'Nasi Goreng Special', 1, 25000, '', '2026-04-23 12:07:19', NULL),
+(53, 35, 8, 'Sate Ayam Madura', 1, 30000, '', '2026-04-23 13:59:11', NULL),
+(54, 35, 6, 'Kentang Goreng (Fries)', 3, 45000, '', '2026-04-23 13:59:11', NULL),
+(55, 36, 1, 'Nasi Goreng Special', 1, 25000, 'sdsd', '2026-04-23 16:43:23', NULL),
+(58, 38, 1, 'Nasi Goreng Special', 1, 25000, 'jhkjhk', '2026-04-26 05:22:25', NULL),
+(59, 38, 4, 'Sandwich Gandum', 6, 120000, '', '2026-04-26 05:22:25', NULL),
+(60, 39, 4, 'Sandwich Gandum', 1, 20000, '', '2026-04-27 09:59:32', NULL),
+(64, 43, 2, 'Mie Goreng Jawa', 1, 22000, '', '2026-04-28 10:09:03', NULL),
+(65, 43, 17, 'sfsdfsfd', 1, 2444, '', '2026-04-28 10:09:03', NULL),
+(68, 45, 15, 'Avocado Juice', 1, 18000, '', '2026-05-05 11:46:57', NULL),
+(69, 45, 17, 'sfsdfsfd', 1, 2444, '', '2026-05-05 11:46:57', NULL);
 
 -- --------------------------------------------------------
 
@@ -166,7 +167,8 @@ CREATE TABLE `table` (
 --
 
 INSERT INTO `table` (`id`, `name`, `created_at`, `updated_at`) VALUES
-(1, '1', '2026-04-21 10:20:20', NULL);
+(1, '1', '2026-04-21 10:20:20', NULL),
+(2, '7', '2026-04-28 09:52:47', NULL);
 
 -- --------------------------------------------------------
 
@@ -189,7 +191,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `name`, `username`, `password`, `role`, `created_at`, `updated_at`) VALUES
-(1, 'rtyry', 'rtr', 'tyry', 1, '2026-04-15 12:17:34', NULL),
+(1, 'q', 'q', 'q', 1, '2026-04-15 12:17:34', NULL),
 (2, 'admin', 'admin', 'admin', 2, '2026-04-16 12:13:38', NULL);
 
 --
@@ -238,25 +240,25 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `menu`
 --
 ALTER TABLE `menu`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `order`
 --
 ALTER TABLE `order`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- AUTO_INCREMENT for table `order_item`
 --
 ALTER TABLE `order_item`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
 
 --
 -- AUTO_INCREMENT for table `table`
 --
 ALTER TABLE `table`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `user`
