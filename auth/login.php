@@ -5,11 +5,11 @@ require_once '../path.php';
 
 if (isset($_SESSION['role'])) {
     if ($_SESSION['role'] == 1) {
-        header("Location: " . BASE_URL . "dashboard/kasir/index"); 
+        header("Location: " . BASE_URL . "kasir/index"); 
         exit;
     } 
     elseif ($_SESSION['role'] == 2) {
-        header("Location: " . BASE_URL . "dashboard/admin/index");
+        header("Location: " . BASE_URL . "admin/index");
         exit;
     }
 }
@@ -36,9 +36,9 @@ if (isset($_POST['login'])) {
             $_SESSION['username'] = $user['username'];
             
             if ($user['role'] === 2) {
-                header("Location: " . BASE_URL . "dashboard/admin/index"); 
+                header("Location: " . BASE_URL . "admin/index"); 
             } else {
-                header("Location: " . BASE_URL . "dashboard/kasir/index");
+                header("Location: " . BASE_URL . "kasir/index");
             }
             exit;
         } else {
