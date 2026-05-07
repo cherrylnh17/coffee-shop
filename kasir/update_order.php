@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'text' => 'Pesanan berhasil diselesaikan oleh ' . $user_name
                 ];
 
-                header("Location: check_order.php?code=" . htmlspecialchars($orderCode));
+                header("Location: index.php?code=" . htmlspecialchars($orderCode));
                 exit;
             }
 
