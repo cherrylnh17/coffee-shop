@@ -203,7 +203,8 @@ include 'layout/sidebar.php';
 
         if (paidInput) {
             paidInput.addEventListener('input', function() {
-                let paid = parseInt(this.value) || 0; 
+                let paid = parseInt(this.value) || 0;
+                let change = paid - totalAmount; 
                 
                 if (change < 0) {
                     changeDisplay.innerText = "Uang Kurang!";
