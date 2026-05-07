@@ -22,9 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['aksi']) && $_POST['aksi'] == 'selesai') {
         try {
             $paid = isset($_POST['paid']) ? (int)$_POST['paid'] : 0;
-            $change = isset($_POST['change']) ? (int)$_POST['change'] : 0;
-            
-            $sql = "UPDATE `order` SET paid = ?, `change` = ?, status = 1, payment = 1, user_id = ?, user_name = ? WHERE id = ?";
+            $total = isset($_POST['total']) ? (int)$_POST['total'] : 0;
+            $change = $paid - $total;
+            $sql = "UPDATE `order` SET `paid` = ?, `change` = ?, `status` = 1, `payment` = 1, `user_id` = ?, `user_name` = ? WHERE id = ?";
             $stmt = $pdo->prepare($sql);
             
             if ($stmt->execute([$paid, $change, $user_id, $user_name, $order_id])) {

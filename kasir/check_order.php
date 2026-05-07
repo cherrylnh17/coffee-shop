@@ -99,6 +99,7 @@ include 'layout/sidebar.php';
                 <?php else: ?>
                 <form action="update_order" method="POST" class="flex-1" id="checkout-form">
                     <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
+                    <input type="hidden" name="total" value="<?= $order['total'] ?>">
                     <button name="aksi" type="submit"  value="selesai" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-green-200 transition-all flex items-center justify-center gap-2">
                         <i class="fa-solid fa-check-double"></i> Selesaikan Pesanan 
                     </button>
