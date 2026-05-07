@@ -11,7 +11,7 @@
             <div class="mx-4 mb-4 rounded-xl border border-gray-100 bg-gray-50 p-4">
                 <div class="flex items-center">
                     <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600 shadow-sm">
-                        NA
+                        <?php echo htmlspecialchars($initials); ?>
                     </div>
                     <div class="ml-3 overflow-hidden">
                         <h6 class="truncate text-sm font-semibold text-gray-800"><?= htmlspecialchars($_SESSION['username'] ?? 'Kasir'); ?></h6>

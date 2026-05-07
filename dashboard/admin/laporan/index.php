@@ -333,10 +333,6 @@ include '../layout/sidebar.php';
                         <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-800 whitespace-pre-wrap font-medium font-mono min-h-[80px]" id="det-detail"></div>
                     </div>
                 </div>
-
-                <div class="flex items-center p-4 md:p-5 border-t border-gray-100 rounded-b">
-                    <button data-modal-hide="detail-modal" type="button" class="text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors">Tutup Detail</button>
-                </div>
             </div>
         </div>
     </div>
@@ -402,7 +398,7 @@ include '../layout/sidebar.php';
           modal.classList.remove('hidden');
           modal.classList.add('flex');
       }
-      function closeExportModal() {
+      function closeExportModal() { 
           const modal = document.getElementById('export-modal');
           modal.classList.add('hidden');
           modal.classList.remove('flex');
