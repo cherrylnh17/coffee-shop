@@ -9,34 +9,24 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
 }
 
 define('PRINTER_BT_MAC',     'DC:0D:51:78:D7:83');
-define('PRINTER_BT_CHANNEL', 1);                    // Ganti jika sdptool menunjukkan channel berbeda
-define('PRINTER_RFCOMM_DEV', '/dev/rfcomm0');       // Device setelah rfcomm bind
-define('PRINTER_TIMEOUT',    5);                    // Timeout koneksi dalam detik
+define('PRINTER_BT_CHANNEL', 1);
+define('PRINTER_RFCOMM_DEV', '/dev/rfcomm0');
 
 
 // ============================================================
-//  FUNGSI HELPER ESC/POS
+//  HELPER ESC/POS
 // ============================================================
 
-/**
- * Format angka ke Rupiah (tanpa simbol)
- */
 function fmt($angka) {
     return number_format((float)$angka, 0, ',', '.');
 }
 
-/**
- * Teks rata kiri-kanan dalam satu baris (kertas 58mm = 32 karakter)
- */
 function justify($left, $right, $width = 32) {
     $space = $width - strlen($left) - strlen($right);
     if ($space < 1) $space = 1;
     return $left . str_repeat(' ', $space) . $right;
 }
 
-/**
- * Teks rata tengah dalam lebar 32 karakter
- */
 function center($text, $width = 32) {
     $len = strlen($text);
     if ($len >= $width) return $text;
@@ -44,9 +34,6 @@ function center($text, $width = 32) {
     return str_repeat(' ', $pad) . $text;
 }
 
-/**
- * Build raw ESC/POS bytes untuk struk 58mm
- */
 function buildEscPos($order, $order_items) {
     $ESC       = "\x1B";
     $GS        = "\x1D";
@@ -60,34 +47,28 @@ function buildEscPos($order, $order_items) {
     $LF        = "\n";
     $CUT       = $GS  . "V\x41\x03";
 
-    $data = "";
+    $data  = $INIT;
 
-    $data .= $INIT;
-
-    // -- Header --
+    // Header
     $data .= $ALIGN_C;
     $data .= $BOLD_ON . $SIZE_2X . "TRAFFA COFFEE" . $SIZE_NORM . $BOLD_OFF . $LF;
     $data .= "Jl. HM Subchan ZE No.3" . $LF;
     $data .= "IG: @traffacoffee" . $LF;
     $data .= $LF;
 
-    // -- Divider --
+    // Info transaksi
     $data .= $ALIGN_L;
     $data .= str_repeat('-', 32) . $LF;
-
-    // -- Info Transaksi --
-    $data .= justify("No :" , "" .$order['code']  )                                . $LF;
-    $data .= justify("Tgl :" , ""  . date('d-m-Y H:i', strtotime($order['created_at']))) . $LF;
-    $data .= justify("Kasir :" , "" . $order['user_name'])                                 . $LF;
-    $data .= justify("Meja :", "" . $order['table_name'] )                              . $LF;
-    $data .= justify("Pembeli :", "" . $order['customer_name'] )                           . $LF;
-
-    // -- Divider --
+    $data .= justify("No :",      $order['code'])                                          . $LF;
+    $data .= justify("Tgl :",     date('d-m-Y H:i', strtotime($order['created_at'])))     . $LF;
+    $data .= justify("Kasir :",   $order['user_name']     ?? '-')                          . $LF;
+    $data .= justify("Meja :",    $order['table_name']    ?? '-')                          . $LF;
+    $data .= justify("Pembeli :", $order['customer_name'] ?? '-')                          . $LF;
     $data .= str_repeat('-', 32) . $LF;
 
-    // -- Item Pesanan --
+    // Item pesanan
     foreach ($order_items as $item) {
-        $harga_satuan = $item['subtotal'] / $item['qty'];
+        $harga_satuan = $item['qty'] > 0 ? $item['subtotal'] / $item['qty'] : 0;
         $nama  = mb_substr($item['menu_name'], 0, 32);
         $left  = "  " . $item['qty'] . " x " . fmt($harga_satuan);
         $right = fmt($item['subtotal']);
@@ -100,37 +81,31 @@ function buildEscPos($order, $order_items) {
         }
     }
 
-    // -- Divider --
-    $data .= str_repeat('-', 32) . $LF;
-
-    // -- Total Section --
+    // Total
     $uang_bayar = $order['paid']   ?? $order['total'];
     $kembalian  = $order['change'] ?? 0;
     $metode     = ($order['payment'] == 1) ? 'Kasir' : 'Online';
 
-    $data .= justify("Subtotal :",        "Rp " . fmt($order['subtotal'])) . $LF;
-    $data .= justify("Pajak (12%) :",     "Rp " . fmt($order['tax']))      . $LF;
+    $data .= str_repeat('-', 32) . $LF;
+    $data .= justify("Subtotal :",    "Rp " . fmt($order['subtotal']))  . $LF;
+    $data .= justify("Pajak (12%) :", "Rp " . fmt($order['tax']))       . $LF;
     $data .= str_repeat('-', 32) . $LF;
     $data .= $BOLD_ON;
-    $data .= justify("TOTAL :",           "Rp " . fmt($order['total']))    . $LF;
+    $data .= justify("TOTAL :",       "Rp " . fmt($order['total']))     . $LF;
     $data .= $BOLD_OFF;
-    $data .= justify("Tunai ($metode) :", "Rp " . fmt($uang_bayar))        . $LF;
+    $data .= justify("Tunai ($metode) :", "Rp " . fmt($uang_bayar))     . $LF;
     $data .= $BOLD_ON;
-    $data .= justify("KEMBALIAN :",       "Rp " . fmt($kembalian))         . $LF;
+    $data .= justify("KEMBALIAN :",   "Rp " . fmt($kembalian))          . $LF;
     $data .= $BOLD_OFF;
 
-    // -- Divider --
+    // Footer
     $data .= str_repeat('-', 32) . $LF;
-
-    // -- Footer --
     $data .= $ALIGN_C;
     $data .= $LF;
     $data .= "Terima kasih atas kunjungannya!" . $LF;
     $data .= "Layanan Kritik & Saran:"         . $LF;
-    $data .= "Telp: 0856-4195-4719"               . $LF;
+    $data .= "Telp: 0856-4195-4719"            . $LF;
     $data .= $LF . $LF . $LF;
-
-    // -- Cut Paper --
     $data .= $CUT;
 
     return $data;
@@ -138,17 +113,10 @@ function buildEscPos($order, $order_items) {
 
 
 // ============================================================
-//  FUNGSI PRINT KE BLUETOOTH PRINTER
-//
-//  Strategi: coba rfcomm device dulu (/dev/rfcomm0),
-//  fallback ke socket Bluetooth langsung jika device belum di-bind.
+//  PRINT KE BLUETOOTH THERMAL PRINTER via /dev/rfcomm0
 // ============================================================
 
-/**
- * Metode 1: Kirim via /dev/rfcomm0 (setelah rfcomm bind)
- * Ini metode paling stabil untuk produksi.
- */
-function printViaRfcomm($escposData) {
+function printToThermal($escposData) {
     $devicePath = PRINTER_RFCOMM_DEV;
 
     if (!file_exists($devicePath)) {
@@ -169,7 +137,7 @@ function printViaRfcomm($escposData) {
     if (!$fp) {
         return [
             'success' => false,
-            'message' => "Gagal membuka device {$devicePath}. Cek apakah printer Bluetooth menyala dan sudah di-pair."
+            'message' => "Gagal membuka {$devicePath}. Pastikan printer Bluetooth menyala dan sudah di-pair."
         ];
     }
 
@@ -180,101 +148,70 @@ function printViaRfcomm($escposData) {
         return ['success' => false, 'message' => "Gagal menulis data ke {$devicePath}."];
     }
 
-    return ['success' => true, 'message' => 'Struk berhasil dicetak via rfcomm.'];
-}
-
-/**
- * Metode 2: Kirim via shell command rfcomm (fallback jika device belum di-bind permanen)
- * Membutuhkan www-data sudah di group dialout dan sudah pair/trust printer.
- */
-function printViaShell($escposData) {
-    $mac     = PRINTER_BT_MAC;
-    $channel = PRINTER_BT_CHANNEL;
-    $tmpFile = tempnam(sys_get_temp_dir(), 'escpos_') . '.bin';
-
-    // Tulis ESC/POS ke file sementara
-    if (file_put_contents($tmpFile, $escposData) === false) {
-        return ['success' => false, 'message' => 'Gagal membuat file temporary ESC/POS.'];
-    }
-
-    // Bind rfcomm sementara, kirim data, lalu release
-    $cmd = "rfcomm connect /dev/rfcomm1 {$mac} {$channel} < /dev/null & sleep 1 && cat " . escapeshellarg($tmpFile) . " > /dev/rfcomm1 ; rfcomm release /dev/rfcomm1 2>&1";
-    $output = shell_exec($cmd);
-
-    unlink($tmpFile);
-
-    // Jika rfcomm connect gagal
-    if (strpos($output, 'Can\'t') !== false || strpos($output, 'error') !== false) {
-        return [
-            'success' => false,
-            'message' => "Gagal koneksi Bluetooth: " . trim($output) . ". Pastikan printer menyala & sudah di-pair."
-        ];
-    }
-
-    return ['success' => true, 'message' => 'Struk berhasil dicetak via rfcomm shell.'];
-}
-
-/**
- * Fungsi utama: coba rfcomm device dulu, fallback ke shell
- */
-function printToThermal($escposData) {
-    // Coba Metode 1: /dev/rfcomm0 (lebih stabil)
-    $result = printViaRfcomm($escposData);
-
-    if ($result['success']) {
-        return $result;
-    }
-
-    // Jika gagal karena device tidak ada, coba Metode 2: shell rfcomm
-    if (strpos($result['message'], 'tidak ditemukan') !== false) {
-        return printViaShell($escposData);
-    }
-
-    // Gagal karena alasan lain (izin, dll) → kembalikan error langsung
-    return $result;
+    return ['success' => true, 'message' => 'Struk berhasil dicetak.'];
 }
 
 
 // ============================================================
-//  MAIN LOGIC
+//  MAIN
 // ============================================================
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $order_id  = $_POST['order_id'];
-    
-    $stmtOrder = $pdo->prepare("SELECT * FROM `order` WHERE id = ?");
-    $stmtOrder->execute([$order_id]);
-    $orderData = $stmtOrder->fetch(PDO::FETCH_ASSOC);
-
-    $stmtItems = $pdo->prepare("SELECT * FROM order_item WHERE order_id = ?");
-    $stmtItems->execute([$order_id]);
-    $orderItems = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
-
-    $escpos      = buildEscPos($orderData, $orderItems);
-    $printResult = printToThermal($escpos);
-
-    // Transaksi TETAP tersimpan meski print gagal
-    if ($printResult['success']) {
-        $_SESSION['swal_msg'] = [
-            'icon'  => 'success',
-            'title' => 'Berhasil!',
-            'text'  => 'Pesanan diselesaikan & struk dicetak oleh ' . $orderData->user_name
-        ];
-    } else {
-        $_SESSION['swal_msg'] = [
-            'icon'  => 'warning',
-            'title' => 'Transaksi Tersimpan',
-            'text'  => 'Pesanan diselesaikan, tapi struk GAGAL dicetak. ' . $printResult['message']
-        ];
-    }
-
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: order");
     exit;
+}
 
-    
+$order_id = (int)$_POST['order_id'];
 
-} else {
-    header("Location: index.php");
+// Ambil data order beserta nama kasir, meja, dan pelanggan
+$stmtOrder = $pdo->prepare("
+    SELECT o.*,
+           u.name AS user_name,
+           t.name AS table_name
+    FROM `order` o
+    LEFT JOIN `user`  u ON u.id = o.user_id
+    LEFT JOIN `table` t ON t.id = o.table_id
+    WHERE o.id = ?
+");
+$stmtOrder->execute([$order_id]);
+$orderData = $stmtOrder->fetch(PDO::FETCH_ASSOC);
+
+if (!$orderData) {
+    $_SESSION['swal_msg'] = [
+        'icon'  => 'error',
+        'title' => 'Gagal',
+        'text'  => 'Data pesanan tidak ditemukan.'
+    ];
+    header("Location: order");
     exit;
 }
-?>
+
+// Ambil item pesanan
+$stmtItems = $pdo->prepare("
+    SELECT oi.*, m.name AS menu_name
+    FROM order_item oi
+    LEFT JOIN menu m ON m.id = oi.menu_id
+    WHERE oi.order_id = ?
+");
+$stmtItems->execute([$order_id]);
+$orderItems = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
+
+$escpos      = buildEscPos($orderData, $orderItems);
+$printResult = printToThermal($escpos);
+
+if ($printResult['success']) {
+    $_SESSION['swal_msg'] = [
+        'icon'  => 'success',
+        'title' => 'Berhasil!',
+        'text'  => 'Struk berhasil dicetak oleh ' . ($orderData['user_name'] ?? '-')
+    ];
+} else {
+    $_SESSION['swal_msg'] = [
+        'icon'  => 'warning',
+        'title' => 'Transaksi Tersimpan',
+        'text'  => 'Pesanan selesai, tapi struk GAGAL dicetak. ' . $printResult['message']
+    ];
+}
+
+header("Location: order");
+exit;
