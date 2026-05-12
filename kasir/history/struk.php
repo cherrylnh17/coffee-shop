@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once '../config.php';
-require_once '../path.php';
+require_once '../../config.php';
+require_once '../../path.php';
 
 if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
     header("Location: " . BASE_URL . "auth/login");
@@ -241,103 +241,37 @@ function printToThermal($escposData) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $order_id  = $_POST['order_id'];
-    $user_id   = $_SESSION['user_id'] ?? null;
-    $user_name = $_SESSION['name']    ?? null;
+    
+    $stmtOrder = $pdo->prepare("SELECT * FROM `order` WHERE id = ?");
+    $stmtOrder->execute([$order_id]);
+    $orderData = $stmtOrder->fetch(PDO::FETCH_ASSOC);
 
-    if (!$user_id) {
-        die("Error: Sesi login tidak ditemukan. Silahkan login kembali.");
-    }
+    $stmtItems = $pdo->prepare("SELECT * FROM order_item WHERE order_id = ?");
+    $stmtItems->execute([$order_id]);
+    $orderItems = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
 
-    // --------------------------------------------------------
-    //  AKSI: Selesaikan Pesanan (dengan pembayaran kasir)
-    // --------------------------------------------------------
-    if (isset($_POST['aksi']) && $_POST['aksi'] == 'selesai') {
-        try {
-            $paid   = isset($_POST['paid'])  ? (int)$_POST['paid']  : 0;
-            $total  = isset($_POST['total']) ? (int)$_POST['total'] : 0;
-            $change = $paid - $total;
+    $escpos      = buildEscPos($orderData, $orderItems);
+    $printResult = printToThermal($escpos);
 
-            $sql  = "UPDATE `order` SET `paid` = ?, `change` = ?, `status` = 1, `payment` = 1, `user_id` = ?, `user_name` = ? WHERE id = ?";
-            $stmt = $pdo->prepare($sql);
-
-            if ($stmt->execute([$paid, $change, $user_id, $user_name, $order_id])) {
-
-                // Ambil kode order untuk redirect
-                $stmtCode = $pdo->prepare("SELECT code FROM `order` WHERE id = ?");
-                $stmtCode->execute([$order_id]);
-                $orderCode = $stmtCode->fetchColumn();
-
-                // ------------------------------------------------
-                //  PRINT OTOMATIS KE PRINTER THERMAL BLUETOOTH
-                // ------------------------------------------------
-                $stmtOrder = $pdo->prepare("SELECT * FROM `order` WHERE id = ?");
-                $stmtOrder->execute([$order_id]);
-                $orderData = $stmtOrder->fetch(PDO::FETCH_ASSOC);
-
-                $stmtItems = $pdo->prepare("SELECT * FROM order_item WHERE order_id = ?");
-                $stmtItems->execute([$order_id]);
-                $orderItems = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
-
-                $escpos      = buildEscPos($orderData, $orderItems);
-                $printResult = printToThermal($escpos);
-
-                // Transaksi TETAP tersimpan meski print gagal
-                if ($printResult['success']) {
-                    $_SESSION['swal_msg'] = [
-                        'icon'  => 'success',
-                        'title' => 'Berhasil!',
-                        'text'  => 'Pesanan diselesaikan & struk dicetak oleh ' . $user_name
-                    ];
-                } else {
-                    $_SESSION['swal_msg'] = [
-                        'icon'  => 'warning',
-                        'title' => 'Transaksi Tersimpan',
-                        'text'  => 'Pesanan diselesaikan, tapi struk GAGAL dicetak. ' . $printResult['message']
-                    ];
-                }
-
-                header("Location: index.php?code=" . htmlspecialchars($orderCode));
-                exit;
-            }
-
-        } catch (PDOException $e) {
-            $_SESSION['swal_msg'] = [
-                'icon'  => 'error',
-                'title' => 'Gagal!',
-                'text'  => 'Gagal menyimpan ke database! Error: ' . $e->getMessage()
-            ];
-            echo "<script>window.history.back();</script>";
-            exit;
-        }
-
-    // --------------------------------------------------------
-    //  AKSI LAIN: Update status saja (tanpa pembayaran)
-    // --------------------------------------------------------
+    // Transaksi TETAP tersimpan meski print gagal
+    if ($printResult['success']) {
+        $_SESSION['swal_msg'] = [
+            'icon'  => 'success',
+            'title' => 'Berhasil!',
+            'text'  => 'Pesanan diselesaikan & struk dicetak oleh ' . $orderData->user_name
+        ];
     } else {
-        try {
-            $sql  = "UPDATE `order` SET status = 1, user_id = ?, user_name = ? WHERE id = ?";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([$user_id, $user_name, $order_id]);
-
-            $_SESSION['swal_msg'] = [
-                'icon'  => 'success',
-                'title' => 'Berhasil!',
-                'text'  => 'Status Pesanan Berhasil Diperbarui oleh ' . $user_name
-            ];
-
-            header("Location: index");
-            exit;
-
-        } catch (PDOException $e) {
-            $_SESSION['swal_msg'] = [
-                'icon'  => 'error',
-                'title' => 'Gagal!',
-                'text'  => 'Gagal memperbarui status: ' . $e->getMessage()
-            ];
-            header("Location: index");
-            exit;
-        }
+        $_SESSION['swal_msg'] = [
+            'icon'  => 'warning',
+            'title' => 'Transaksi Tersimpan',
+            'text'  => 'Pesanan diselesaikan, tapi struk GAGAL dicetak. ' . $printResult['message']
+        ];
     }
+
+    header("Location: order");
+    exit;
+
+    
 
 } else {
     header("Location: index.php");

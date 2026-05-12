@@ -27,3 +27,6 @@ Untuk konfigurasi di linux perlu memberikan izin untuk pengubahan folder, beriku
 
 # Berikan izin tulis
 ```sudo chmod -R 775 assets```
+
+
+sudo systemctl start cups

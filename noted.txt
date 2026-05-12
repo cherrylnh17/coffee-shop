@@ -1,0 +1,61 @@
+// ============================================================
+//  KONFIGURASI PRINTER THERMAL BLUETOOTH
+//
+//  MAC Address printer: DC:0D:51:78:D7:83
+//
+//  SETUP AWAL (jalankan sekali di terminal server):
+//  ─────────────────────────────────────────────────────────
+//  1. Cek bluetoothd aktif:
+//       $ sudo systemctl status bluetooth
+//       $ sudo systemctl enable --now bluetooth
+//
+//  2. Install tools jika belum ada:
+//       $ sudo apt install bluez bluez-tools rfcomm
+//
+//  3. Scan & pair printer:
+//       $ bluetoothctl
+//       [bluetooth]# power on
+//       [bluetooth]# agent on
+//       [bluetooth]# scan on
+//         → tunggu muncul: DC:0D:51:78:D7:83 (nama printer)
+//       [bluetooth]# scan off
+//       [bluetooth]# pair DC:0D:51:78:D7:83
+//       [bluetooth]# trust DC:0D:51:78:D7:83
+//       [bluetooth]# quit
+//
+//  4. Cek channel SPP printer:
+//       $ sdptool browse DC:0D:51:78:D7:83
+//         → cari "Serial Port" → catat nomor Channel (biasanya 1)
+//
+//  5. Buat rfcomm binding (jalankan setiap boot, atau buat service):
+//       $ sudo rfcomm bind 0 DC:0D:51:78:D7:83 1
+//         → ini membuat device /dev/rfcomm0
+//
+//  6. Beri izin www-data ke rfcomm:
+//       $ sudo usermod -aG dialout www-data
+//       $ sudo chmod 666 /dev/rfcomm0
+//       $ sudo systemctl restart apache2
+//
+//  7. Test manual:
+//       $ echo "test print" > /dev/rfcomm0
+//
+//  AGAR rfcomm OTOMATIS AKTIF SAAT BOOT:
+//  ─────────────────────────────────────────────────────────
+//  Buat file: sudo nano /etc/systemd/system/rfcomm-printer.service
+//  isi:
+//    [Unit]
+//    Description=RFCOMM Bluetooth Printer Bind
+//    After=bluetooth.target
+//
+//    [Service]
+//    ExecStart=/usr/bin/rfcomm bind 0 DC:0D:51:78:D7:83 1
+//    RemainAfterExit=yes
+//
+//    [Install]
+//    WantedBy=multi-user.target
+//
+//  Lalu aktifkan:
+//    $ sudo systemctl daemon-reload
+//    $ sudo systemctl enable rfcomm-printer.service
+//    $ sudo systemctl start rfcomm-printer.service
+// ============================================================

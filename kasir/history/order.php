@@ -197,10 +197,14 @@ include '../layout/sidebar.php';
                               </button>
                               
                               <?php if ($raw_status === 1): ?>
-                                  <button type="button" onclick="printOrder('<?php echo htmlspecialchars($o['code'] ?? ''); ?>')" 
-                                          class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 border rounded-lg text-xs font-bold transition-all duration-200 shadow-sm bg-gray-50 text-gray-600 hover:bg-gray-800 hover:text-white hover:border-gray-800">
+                                  
+                                <form action="struk" method="POST">
+                                     <input type="hidden" name="order_id" value="<?= $o['id'] ?>">
+                                     <button type="submit" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 border rounded-lg text-xs font-bold transition-all duration-200 shadow-sm bg-gray-50 text-gray-600 hover:bg-gray-800 hover:text-white hover:border-gray-800">
                                       <i class="fa-solid fa-print"></i> Print
                                   </button>
+                                </form>
+                                
                               <?php else: ?>
                                   <button type="button" disabled 
                                           class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 border rounded-lg text-xs font-bold transition-all duration-200 shadow-sm bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60">
@@ -358,26 +362,6 @@ include '../layout/sidebar.php';
           document.getElementById('det-status').innerHTML = modalStatus;
       }
 
-    function printOrder(code) {
-          // 1. Cek apakah Iframe print sudah ada, jika belum kita buat elemennya
-          let printIframe = document.getElementById('print-iframe');
-          if (!printIframe) {
-              printIframe = document.createElement('iframe');
-              printIframe.id = 'print-iframe';
-              // PENTING: Sembunyikan iframe dari tampilan layar!
-              printIframe.style.display = 'none';
-              document.body.appendChild(printIframe);
-          }
-
-          // 2. Arahkan sumber iframe ke halaman cetak
-          printIframe.src = `../struk.php?code=${code}`;
-
-          // 3. Begitu iframe selesai memuat halaman struk, jalankan perintah Print
-          printIframe.onload = function() {
-              printIframe.contentWindow.focus();
-              printIframe.contentWindow.print();
-          };
-      }
     </script>
 
 
