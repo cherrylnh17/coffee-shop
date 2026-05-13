@@ -2,17 +2,13 @@
 session_start();
 require_once '../../config.php';
 require_once '../../path.php';
+require_once '../../key.php';
 
 if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
     header("Location: " . BASE_URL . "auth/login");
     exit;
 }
-
-define('PRINTER_BT_MAC',     'DC:0D:51:78:D7:83');
-define('PRINTER_BT_CHANNEL', 1);
-define('PRINTER_RFCOMM_DEV', '/dev/rfcomm0');
-
-
+ 
 // ============================================================
 //  HELPER ESC/POS
 // ============================================================

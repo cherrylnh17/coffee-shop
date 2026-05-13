@@ -1,9 +1,6 @@
 <?php 
 include '../config.php';
 include '../path.php';
-// Aktifkan error reporting untuk debugging
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
 
 try {
     // Ambil data menu dari database

@@ -5,10 +5,16 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^index/?$ index.php [L,NC]
 
-# Menghilangkan ekstensi .php 
+# Menghilangkan ekstensi .php
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}\.php -f
 RewriteRule ^([^\.]+)$ $1.php [NC,L]
+
+# Semua URL yang tidak ditemukan → redirect ke 404.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php !-f
+RewriteRule ^(.*)$ 404.php [L,NC]
 
 php_flag display_errors On
 php_value error_reporting 32767

@@ -7,7 +7,7 @@
 
 <main class="w-full max-w-md mx-auto bg-gray-50 min-h-screen relative flex flex-col justify-center px-4 overflow-hidden shadow-2xl">
     
-    <div class="absolute top-0 left-0 w-full h-64 bg-sky-500 rounded-b-[50px] z-0"></div>
+    <div class="absolute top-0 left-0 w-full h-80 bg-sky-500 rounded-b-[50px] z-0"></div>
 
     <div class="relative z-10 w-full">
         <div class="text-center mb-6 text-white">
@@ -66,9 +66,9 @@ function prosesMeja() {
     btnLanjut.disabled = true;
 
     // Proses pengecekan ke database (AJAX)
-    fetch('check_table', {
+    fetch('server/check_table', {
         method: 'POST',
-        headers: {
+        headers: { 
             'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: 'table_name=' + encodeURIComponent(tableName)
@@ -76,7 +76,6 @@ function prosesMeja() {
     .then(response => response.json())
     .then(data => {
         if (!data.status) {
-            // JIKA GAGAL: Kembalikan tombol, munculkan error, tetap di halaman ini
             btnLanjut.innerHTML = originalBtnContent;
             btnLanjut.disabled = false;
             
@@ -90,7 +89,6 @@ function prosesMeja() {
                 inputEl.focus();    // Fokuskan kembali kursor ke input
             });
         } else {
-            // JIKA BERHASIL: Redirect ke index.php?code=...
             Swal.fire({
                 icon: 'success',
                 title: 'Berhasil',
@@ -98,7 +96,6 @@ function prosesMeja() {
                 timer: 1000,
                 showConfirmButton: false
             }).then(() => {
-                // Ini adalah kode yang melakukan redirect/pemindahan halaman
                 window.location.href = 'index?code=' + encodeURIComponent(tableName);
             });
         }

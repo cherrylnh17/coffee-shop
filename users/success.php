@@ -1,10 +1,6 @@
 <?php 
 include '../config.php';
 
-// Aktifkan error reporting untuk debugging
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 $order_code = $_GET['code'];
 
 if (!isset($_GET['code']) || empty($_GET['code'])) {

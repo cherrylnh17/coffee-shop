@@ -30,3 +30,10 @@ Untuk konfigurasi di linux perlu memberikan izin untuk pengubahan folder, beriku
 
 
 sudo systemctl start cups
+
+
+# Buat file key.php di root berisi
+define('PRINTER_BT_MAC',     'alamat printer');     // alamat printer
+define('PRINTER_BT_CHANNEL', 1);                    // channel printer
+define('PRINTER_RFCOMM_DEV', '/dev/rfcomm0');       // Device setelah rfcomm bind
+define('PRINTER_TIMEOUT',    5);                    // Timeout koneksi 

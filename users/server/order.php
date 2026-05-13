@@ -1,5 +1,6 @@
 <?php
-include '../config.php';
+include '../../config.php';
+include '../../path.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
@@ -106,13 +107,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $pdo->commit();
-        header("Location: checkout?table=" . $table_code . "&code=" . $order_code);
+        header("Location: ". BASE_URL . "users/checkout?table=" . $table_code . "&code=" . $order_code);
         exit(); 
 
     } catch (Exception $e) {
         $pdo->rollBack();
         $table_code = $_POST['table_name'];
-        header("Location: identitas?code=" . $table_code . "&m=" . urlencode($e->getMessage()));
+        header("Location: ". BASE_URL . "users/identitas?code=" . $table_code . "&m=" . urlencode($e->getMessage()));
         exit();
-    }
+    } 
 }

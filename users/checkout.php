@@ -207,10 +207,10 @@ const order_code = "<?= $order['code']; ?>";
     // Fungsi untuk cek status ke server setiap 3 detik
     const checkInterval = setInterval(async () => {
         try {
-            const response = await fetch('cek_status?id=' + <?= $order['id'] ?>);
+            const response = await fetch('server/cek_status?id=' + <?= $order['id'] ?>);
             const data = await response.json();
 
-            // Jika status berubah jadi 1 (Success)
+            // Jika status berubah jadi 1 (Success) 
             if (data.status == 1) {
                 localStorage.removeItem('cart');
                  localStorage.removeItem('buyer_data');

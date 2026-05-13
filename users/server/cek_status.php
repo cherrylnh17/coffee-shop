@@ -1,7 +1,7 @@
 <?php
 ob_clean();
 header('Content-Type: application/json');
-include '../config.php';
+include '../../config.php';
 
 // Cek parameter 'code'
 if (!isset($_GET['id'])) {

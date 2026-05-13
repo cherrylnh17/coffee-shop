@@ -1,9 +1,6 @@
 <?php 
 include '../config.php';
 include '../path.php';
-// Aktifkan error reporting untuk debugging
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
 
 try {
     // Ambil data menu dari database
@@ -118,7 +115,7 @@ if (!$exists) {
         </button>
     </div>
 
-    <!-- Note Modal (bottom sheet) -->
+    <!-- Note Modal -->
     <div id="note-modal" class="fixed inset-0 bg-black/40 z-50 flex items-end justify-center opacity-0 transition-opacity duration-300">
         <div id="note-sheet" class="bg-white w-full max-w-[480px] rounded-t-3xl p-6 transform translate-y-full transition-transform duration-300 flex flex-col gap-4">
             <div class="flex items-center justify-between">

@@ -49,7 +49,7 @@ if (!$exists) {
         <h1 class="text-xl font-bold text-gray-900">Data Pemesan</h1>
     </header>
 
-    <form id="formPesanan" method="POST" action="order">
+    <form id="formPesanan" method="POST" action="server/order"> 
         <input type="hidden" name="table_name" value="<?= $table_code ?>">
     <div class="flex-1 px-4 py-6 space-y-5 pb-32 fade-in">
 

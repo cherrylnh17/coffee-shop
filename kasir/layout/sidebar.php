@@ -2,7 +2,7 @@
     <div class="h-full w-full flex flex-col">
         <div class="flex h-[74px] items-center px-6 py-4">
             <a href="<?= BASE_URL; ?>index" class="flex items-center gap-3">
-                <img src="<?= BASE_URL; ?>assets/image/logo.svg" class="h-8 w-8" alt="logo" />
+                <img src="<?= BASE_URL; ?>assets/image/icon.png" class="h-8 w-8" alt="logo" />
                 <span class="inline-block rounded-md bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700">Kasir Panel</span>
             </a>
         </div>

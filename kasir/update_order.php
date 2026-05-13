@@ -2,17 +2,12 @@
 session_start();
 require_once '../config.php';
 require_once '../path.php';
+require_once '../key.php';
 
 if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
     header("Location: " . BASE_URL . "auth/login");
     exit;
 }
-
-define('PRINTER_BT_MAC',     'DC:0D:51:78:D7:83');
-define('PRINTER_BT_CHANNEL', 1);                    // Ganti jika sdptool menunjukkan channel berbeda
-define('PRINTER_RFCOMM_DEV', '/dev/rfcomm0');       // Device setelah rfcomm bind
-define('PRINTER_TIMEOUT',    5);                    // Timeout koneksi dalam detik
-
 
 // ============================================================
 //  FUNGSI HELPER ESC/POS
