@@ -27,7 +27,7 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="icon" href="<?= BASE_URL; ?>assets/image/favicon.svg" type="image/x-icon" />
+    <link rel="icon" href="<?= BASE_URL; ?>assets/image/icon.png" type="image/x-icon" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <style>
