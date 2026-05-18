@@ -2,12 +2,16 @@
 session_start();
 require_once '../config.php';
 require_once '../path.php';
-require_once '../key.php';
 
 if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
     header("Location: " . BASE_URL . "auth/login");
     exit;
 }
+
+define('PRINTER_BT_MAC',     $_ENV['PRINTER_BT_MAC']); // alamat printer
+define('PRINTER_BT_CHANNEL', $_ENV['PRINTER_BT_CHANNEL']);                    // channel printer
+define('PRINTER_RFCOMM_DEV', $_ENV['PRINTER_RFCOMM_DEV']);       // Device setelah rfcomm bind
+define('PRINTER_TIMEOUT',    $_ENV['PRINTER_TIMEOUT']);                    // Timeout koneksi 
 
 // ============================================================
 //  FUNGSI HELPER ESC/POS
