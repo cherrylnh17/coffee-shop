@@ -295,7 +295,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ];
                 }
 
-                header("Location: index.php?code=" . htmlspecialchars($orderCode));
+                header("Location: check_kitchen?code=" . htmlspecialchars($orderCode));
                 exit;
             }
 
