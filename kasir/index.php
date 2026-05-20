@@ -36,6 +36,22 @@ include 'layout/sidebar.php';
                     <i class="fa-solid fa-camera text-green-500"></i> Gunakan kamera belakang
                 </div>
             </div>
+            <div class="mt-8 flex items-center justify-center gap-4">
+                <div class="h-px bg-gray-200 flex-1 max-w-[100px]"></div>
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">ATAU</span>
+                <div class="h-px bg-gray-200 flex-1 max-w-[100px]"></div>
+            </div>
+
+            <div class="mt-6 max-w-sm mx-auto">
+                <p class="text-sm font-medium text-gray-700 text-center mb-3">Masukkan Kode Pesanan Manual</p>
+                <form action="proses_input.php" method="POST" class="flex flex-col gap-3">
+                    <input type="text" name="code" placeholder="Contoh: ORD-12345678" required
+                        class="w-full text-center tracking-widest uppercase bg-white border border-gray-300 text-gray-900 rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-3 outline-none font-bold">
+                    <button type="submit" class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-xl text-sm px-5 py-3 text-center flex items-center justify-center gap-2 transition-colors">
+                        <i class="fa-solid fa-keyboard"></i> Proses Pesanan Manual
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </main>
@@ -76,6 +92,30 @@ include 'layout/sidebar.php';
         aspectRatio: 1.0
     });
     html5QrcodeScanner.render(onScanSuccess);
+
+    document.querySelector('form[action="proses_input.php"]').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+
+        fetch('proses_input.php', {
+            method: 'POST',
+            body: new URLSearchParams(formData)
+        })
+        .then(response => response.text())
+        .then(data => {
+            if (data.includes("SUCCESS:")) {
+                const targetUrl = data.split(":")[1];
+                window.location.href = targetUrl;
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Gagal',
+                    text: data,
+                    confirmButtonColor: '#3b82f6'
+                });
+            }
+        });
+    });
 </script>
 
 <?php 
