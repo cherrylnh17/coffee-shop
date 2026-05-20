@@ -1,6 +1,2 @@
-node_modules
-image/menu
-key.php
-.env
-vendor
-profile.php
+assets/image/menu
+env.php
