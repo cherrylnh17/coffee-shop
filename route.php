@@ -19,7 +19,7 @@ order server
 if (preg_match('~^/coffee-shop/order/server/([a-zA-Z0-9_-]+)$~', $request_uri, $matches)) {
 
     loadPage(
-        '/order/server/' . $matches[1] . '.php'
+        'order/server/' . $matches[1] . '.php'
     );
 }
 
@@ -32,8 +32,8 @@ if (preg_match('~^/coffee-shop/order/(\d+)/([a-zA-Z0-9_-]+)/([^/]+)$~', $request
     $_GET['code']  = $matches[3];
 
     loadPage(
-        '/order/' . $matches[2] . '.php',
-        '/order/index.php'
+        'order/' . $matches[2] . '.php',
+        'order/index.php'
     );
 }
 
@@ -45,8 +45,8 @@ if (preg_match('~^/coffee-shop/order/(\d+)/(\w+)$~', $request_uri, $matches)) {
     $_GET['table'] = $matches[1];
 
     loadPage(
-        '/order/' . $matches[2] . '.php',
-        '/order/index.php'
+        'order/' . $matches[2] . '.php',
+        'order/index.php'
     );
 }
 
