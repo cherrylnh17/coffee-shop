@@ -1,10 +1,12 @@
 <?php
 require_once('path.php');
-http_response_code(404);
 $request_uri = htmlspecialchars($_SERVER['REQUEST_URI'] ?? '/');
+
+http_response_code(404);
 ?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,45 +23,68 @@ $request_uri = htmlspecialchars($_SERVER['REQUEST_URI'] ?? '/');
           },
           colors: {
             coffee: {
-              bg:      '#0e0b08',
+              bg: '#0e0b08',
               surface: '#1a1510',
-              border:  '#2e2318',
-              cream:   '#f0e6d3',
-              muted:   '#7a6a55',
-              accent:  '#c8873a',
-              light:   '#e8a85c',
-              text:    '#e8ddd0',
+              border: '#2e2318',
+              cream: '#f0e6d3',
+              muted: '#7a6a55',
+              accent: '#c8873a',
+              light: '#e8a85c',
+              text: '#e8ddd0',
             }
           },
           keyframes: {
             fadeUp: {
-              '0%':   { opacity: '0', transform: 'translateY(24px)' },
-              '100%': { opacity: '1', transform: 'translateY(0)' },
+              '0%': {
+                opacity: '0',
+                transform: 'translateY(24px)'
+              },
+              '100%': {
+                opacity: '1',
+                transform: 'translateY(0)'
+              },
             },
             float: {
-              '0%, 100%': { transform: 'translateY(0px)' },
-              '50%':      { transform: 'translateY(-10px)' },
+              '0%, 100%': {
+                transform: 'translateY(0px)'
+              },
+              '50%': {
+                transform: 'translateY(-10px)'
+              },
             },
             steam: {
-              '0%':   { opacity: '0', transform: 'translateY(0) scaleX(1)' },
-              '50%':  { opacity: '1', transform: 'translateY(-5px) scaleX(1.1)' },
-              '100%': { opacity: '0', transform: 'translateY(-10px) scaleX(0.8)' },
+              '0%': {
+                opacity: '0',
+                transform: 'translateY(0) scaleX(1)'
+              },
+              '50%': {
+                opacity: '1',
+                transform: 'translateY(-5px) scaleX(1.1)'
+              },
+              '100%': {
+                opacity: '0',
+                transform: 'translateY(-10px) scaleX(0.8)'
+              },
             },
             glow: {
-              '0%, 100%': { opacity: '0.06' },
-              '50%':      { opacity: '0.14' },
+              '0%, 100%': {
+                opacity: '0.06'
+              },
+              '50%': {
+                opacity: '0.14'
+              },
             }
           },
           animation: {
-            'fade-up':   'fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) both',
+            'fade-up': 'fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) both',
             'fade-up-1': 'fadeUp 0.7s 0.1s cubic-bezier(0.16,1,0.3,1) both',
             'fade-up-2': 'fadeUp 0.7s 0.2s cubic-bezier(0.16,1,0.3,1) both',
             'fade-up-3': 'fadeUp 0.7s 0.3s cubic-bezier(0.16,1,0.3,1) both',
             'fade-up-4': 'fadeUp 0.7s 0.4s cubic-bezier(0.16,1,0.3,1) both',
-            'float':     'float 4s ease-in-out infinite',
-            'steam':     'steam 2s ease-in-out infinite',
-            'steam2':    'steam 2s 0.5s ease-in-out infinite',
-            'glow':      'glow 4s ease-in-out infinite',
+            'float': 'float 4s ease-in-out infinite',
+            'steam': 'steam 2s ease-in-out infinite',
+            'steam2': 'steam 2s 0.5s ease-in-out infinite',
+            'glow': 'glow 4s ease-in-out infinite',
           }
         }
       }
@@ -76,27 +101,28 @@ $request_uri = htmlspecialchars($_SERVER['REQUEST_URI'] ?? '/');
     }
   </style>
 </head>
+
 <body class="bg-coffee-bg text-coffee-text font-sans min-h-screen flex items-center justify-center overflow-hidden relative">
 
   <div class="animate-glow fixed w-[600px] h-[600px] rounded-full pointer-events-none z-0"
-       style="background: radial-gradient(circle, rgba(200,135,58,0.15) 0%, transparent 70%); top:50%; left:50%; transform:translate(-50%,-50%)">
+    style="background: radial-gradient(circle, rgba(200,135,58,0.15) 0%, transparent 70%); top:50%; left:50%; transform:translate(-50%,-50%)">
   </div>
 
   <div class="relative z-10 text-center px-6 py-10 max-w-lg w-full">
 
     <div class="animate-fade-up inline-flex items-center justify-center w-24 h-24 rounded-full bg-coffee-surface border border-coffee-border mb-8 animate-float">
       <svg class="w-12 h-12" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path class="animate-steam"  d="M15 8 Q16 5 15 3" stroke="#c8873a" stroke-width="1.5" stroke-linecap="round"/>
-        <path class="animate-steam2" d="M22 8 Q23 5 22 3" stroke="#c8873a" stroke-width="1.5" stroke-linecap="round"/>
-        <path d="M8 14h22l-3 16H11L8 14z" stroke="#c8873a" stroke-width="1.5" stroke-linejoin="round" fill="rgba(200,135,58,0.08)"/>
-        <path d="M30 18h3a4 4 0 010 8h-3" stroke="#c8873a" stroke-width="1.5" stroke-linecap="round"/>
-        <path d="M5 30h28" stroke="#c8873a" stroke-width="1.5" stroke-linecap="round"/>
-        <ellipse cx="19" cy="31.5" rx="10" ry="2" stroke="#c8873a" stroke-width="1.5" fill="none"/>
+        <path class="animate-steam" d="M15 8 Q16 5 15 3" stroke="#c8873a" stroke-width="1.5" stroke-linecap="round" />
+        <path class="animate-steam2" d="M22 8 Q23 5 22 3" stroke="#c8873a" stroke-width="1.5" stroke-linecap="round" />
+        <path d="M8 14h22l-3 16H11L8 14z" stroke="#c8873a" stroke-width="1.5" stroke-linejoin="round" fill="rgba(200,135,58,0.08)" />
+        <path d="M30 18h3a4 4 0 010 8h-3" stroke="#c8873a" stroke-width="1.5" stroke-linecap="round" />
+        <path d="M5 30h28" stroke="#c8873a" stroke-width="1.5" stroke-linecap="round" />
+        <ellipse cx="19" cy="31.5" rx="10" ry="2" stroke="#c8873a" stroke-width="1.5" fill="none" />
       </svg>
     </div>
 
     <h2 class="animate-fade-up-1 font-display font-black leading-none tracking-tighter mb-2"
-        style="font-size: clamp(6rem,20vw,9rem); background: linear-gradient(135deg, #c8873a 0%, #e8a85c 50%, #f0e6d3 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+      style="font-size: clamp(6rem,20vw,9rem); background: linear-gradient(135deg, #c8873a 0%, #e8a85c 50%, #f0e6d3 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
       404
     </h2>
 
@@ -119,15 +145,15 @@ $request_uri = htmlspecialchars($_SERVER['REQUEST_URI'] ?? '/');
     </div>
 
     <div class="animate-fade-up-4 flex flex-wrap gap-3 justify-center">
-      <a href="<?=  BASE_URL ?>"
-         class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:-translate-y-0.5"
-         style="background: linear-gradient(135deg, #c8873a, #e8a85c); color: #1a0f00;"
-         onmouseover="this.style.boxShadow='0 8px 24px rgba(200,135,58,0.3)'"
-         onmouseout="this.style.boxShadow='none'">
+      <a href="<?= BASE_URL ?>"
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:-translate-y-0.5"
+        style="background: linear-gradient(135deg, #c8873a, #e8a85c); color: #1a0f00;"
+        onmouseover="this.style.boxShadow='0 8px 24px rgba(200,135,58,0.3)'"
+        onmouseout="this.style.boxShadow='none'">
         Kembali ke Beranda
       </a>
       <a href="javascript:history.back()"
-         class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium bg-coffee-surface border border-coffee-border text-coffee-text transition-all duration-200 hover:-translate-y-0.5 hover:border-coffee-accent hover:text-coffee-accent">
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium bg-coffee-surface border border-coffee-border text-coffee-text transition-all duration-200 hover:-translate-y-0.5 hover:border-coffee-accent hover:text-coffee-accent">
         Halaman Sebelumnya
       </a>
     </div>
@@ -135,4 +161,5 @@ $request_uri = htmlspecialchars($_SERVER['REQUEST_URI'] ?? '/');
   </div>
 
 </body>
+
 </html>

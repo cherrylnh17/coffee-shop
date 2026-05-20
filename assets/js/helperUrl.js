@@ -9,4 +9,4 @@ function getImageUrl(imagePath) {
     const cleanImagePath = imagePath.startsWith('/') ? imagePath.substring(1) : imagePath;
     
     return cleanBaseUrl + cleanImagePath;
-}
+} 

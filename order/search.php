@@ -1,4 +1,4 @@
-<?php 
+<?php
 include '../config.php';
 include '../path.php';
 
@@ -7,15 +7,15 @@ try {
     $query = "SELECT * FROM menu ORDER BY created_at ASC";
     $stmt = $pdo->prepare($query);
     $stmt->execute();
-    $result = $stmt->fetchAll(PDO::FETCH_ASSOC); 
-} catch(PDOException $e) {
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
     die("Error pada query: " . $e->getMessage());
 }
 
 if (!isset($_GET['code']) || empty($_GET['code'])) {
     // Redirect jika tidak ada kode meja
     header("Location: table");
-    exit(); 
+    exit();
 }
 
 $table_code = htmlspecialchars($_GET['code']);
@@ -29,27 +29,35 @@ $exists = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$exists) {
     header("Location: table.php");
     exit();
-} 
+}
 
 ?>
 
-<?php 
-$title = "Cari Menu"; 
-include 'layout/header.php'; 
+<?php
+$title = "Cari Menu";
+include 'layout/header.php';
 ?>
 
 <style>
     /* Sembunyikan scrollbar bawaan */
-    ::-webkit-scrollbar { display: none; }
+    ::-webkit-scrollbar {
+        display: none;
+    }
+
     /* Animasi cart floating */
-    .cart-visible { transform: translateY(0); }
-    .cart-hidden  { transform: translateY(100%); }
+    .cart-visible {
+        transform: translateY(0);
+    }
+
+    .cart-hidden {
+        transform: translateY(100%);
+    }
 </style>
 
 <main class="w-full max-w-[480px] mx-auto bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-x-hidden">
 
     <header class="sticky top-0 z-30 bg-white shadow-sm px-4 py-3 flex items-center gap-3">
-        <a href='index.php?code=<?= $table_code ?>'" class="text-gray-700 hover:text-sky-500 transition-colors shrink-0">
+        <a href='index.php?code=<?= $table_code ?>'" class=" text-gray-700 hover:text-sky-500 transition-colors shrink-0">
             <i class="ph-bold ph-arrow-left text-xl"></i>
         </a>
         <div class="relative w-full">
@@ -94,16 +102,27 @@ include 'layout/header.php';
     const MENU_DATA = <?php echo json_encode($result); ?>;
 
     // Helper Keranjang 
-    function getCart() { return JSON.parse(localStorage.getItem('cart')) || []; }
-    function saveCart(cartData) { localStorage.setItem('cart', JSON.stringify(cartData)); }
-    function formatRupiah(angka) { return 'Rp ' + parseInt(angka).toLocaleString('id-ID'); }
-    function cartCount() { return cart.reduce((s, i) => s + (i.qty || 1), 0); }
+    function getCart() {
+        return JSON.parse(localStorage.getItem('cart')) || [];
+    }
+
+    function saveCart(cartData) {
+        localStorage.setItem('cart', JSON.stringify(cartData));
+    }
+
+    function formatRupiah(angka) {
+        return 'Rp ' + parseInt(angka).toLocaleString('id-ID');
+    }
+
+    function cartCount() {
+        return cart.reduce((s, i) => s + (i.qty || 1), 0);
+    }
 
     let cart = getCart();
 
     function renderMenus(data) {
         const container = document.getElementById('menu-container');
-        const countEl   = document.getElementById('result-count');
+        const countEl = document.getElementById('result-count');
         container.innerHTML = '';
         countEl.innerText = `${data.length} menu ditemukan`;
 
@@ -122,7 +141,7 @@ include 'layout/header.php';
         data.forEach((item, index) => {
             const isLast = index === data.length - 1;
             const inCart = cart.find(c => c.id == item.id);
-            
+
             // Konversi ID Kategori ke Label (sesuai index.php)
             const catLabel = item.category == '1' ? 'Makanan' : (item.category == '2' ? 'Minuman' : item.category);
 
@@ -156,20 +175,20 @@ include 'layout/header.php';
     function addToCart(itemId) {
         const e = cart.find(i => i.id == itemId);
         if (e) {
-            e.qty += 1; 
+            e.qty += 1;
         } else {
             // Mempertahankan struktur yang sama dengan index.php
             const item = MENU_DATA.find(i => i.id == itemId);
-            cart.push({ 
-                id: item.id, 
-                name: item.name, 
-                price: item.price, 
-                qty: 1, 
-                note: "", 
-                image: item.image 
+            cart.push({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                qty: 1,
+                note: "",
+                image: item.image
             });
         }
-        saveCart(cart); 
+        saveCart(cart);
         updateCartUI();
         renderMenus(currentFiltered());
     }
@@ -179,7 +198,7 @@ include 'layout/header.php';
         if (idx === -1) return;
         cart[idx].qty += delta;
         if (cart[idx].qty <= 0) cart.splice(idx, 1);
-        saveCart(cart); 
+        saveCart(cart);
         updateCartUI();
         renderMenus(currentFiltered());
     }
@@ -190,23 +209,23 @@ include 'layout/header.php';
     }
 
     function updateCartUI() {
-        const fc    = document.getElementById('floating-cart');
+        const fc = document.getElementById('floating-cart');
         const total = cartCount();
-        
+
         if (total > 0) {
             let price = 0;
-            cart.forEach(ci => { 
-                const m = MENU_DATA.find(x => x.id == ci.id); 
-                if(m) price += m.price * ci.qty; 
+            cart.forEach(ci => {
+                const m = MENU_DATA.find(x => x.id == ci.id);
+                if (m) price += m.price * ci.qty;
             });
-            document.getElementById('cart-badge-icon').innerText  = total;
-            document.getElementById('cart-btn-qty').innerText     = total;
+            document.getElementById('cart-badge-icon').innerText = total;
+            document.getElementById('cart-btn-qty').innerText = total;
             document.getElementById('cart-total-price').innerText = formatRupiah(price);
-            
-            fc.classList.remove('cart-hidden'); 
+
+            fc.classList.remove('cart-hidden');
             fc.classList.add('cart-visible');
         } else {
-            fc.classList.remove('cart-visible'); 
+            fc.classList.remove('cart-visible');
             fc.classList.add('cart-hidden');
         }
     }

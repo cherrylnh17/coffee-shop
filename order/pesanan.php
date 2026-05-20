@@ -1,46 +1,33 @@
-<?php 
-include '../config.php';
-include '../path.php';
+<?php
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../path.php';
+require_once __DIR__ . '/../helper/validateTable.php';
+
+$table_code = htmlspecialchars($_GET['table']);
+
+validateTable($pdo, $table_code);
 
 try {
     // Ambil data menu dari database
     $query = "SELECT * FROM menu ORDER BY created_at ASC";
     $stmt = $pdo->prepare($query);
     $stmt->execute();
-    $result = $stmt->fetchAll(PDO::FETCH_ASSOC); 
-} catch(PDOException $e) {
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
     die("Error pada query: " . $e->getMessage());
 }
 
-
-if (!isset($_GET['code']) || empty($_GET['code'])) {
-    header("Location: table");
-    exit(); 
-}
-
-$table_code = htmlspecialchars($_GET['code']);
-
-$query = "SELECT 1 FROM `table` WHERE name = ? LIMIT 1";
-$stmt = $pdo->prepare($query);
-$stmt->execute([$table_code]);
-
-$exists = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$exists) {
-    header("Location: table.php");
-    exit();
-} 
 ?>
 
-<?php 
-  $title = "Pesanan"; 
-  include 'layout/header.php'; 
+<?php
+$title = "Pesanan";
+include 'layout/header.php';
 ?>
 
 <main class="w-full max-w-[480px] mx-auto bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-x-hidden">
- 
+
     <header class="sticky top-0 z-20 bg-white shadow-sm pt-5 pb-4 px-4 flex items-center gap-3">
-        <a href="index?code=<?= $table_code ?>" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
+        <a href="<?= BASE_URL ?>order/<?= $table_code ?>/index" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
             <i class="ph-bold ph-arrow-left text-lg"></i>
         </a>
         <h1 class="text-xl font-bold text-gray-900">Keranjang Pesanan</h1>
@@ -75,7 +62,7 @@ if (!$exists) {
                 </div>
                 <p class="font-bold text-gray-900">Keranjang kosong</p>
                 <p class="text-xs text-gray-500 mt-1">Tambahkan menu terlebih dahulu.</p>
-                <a href="index?code=<?= $table_code ?>" class="mt-4 px-5 py-2 bg-sky-500 text-white rounded-full text-sm font-semibold">
+                <a href="<?= BASE_URL ?>order/<?= $table_code ?>/index" class="mt-4 px-5 py-2 bg-sky-500 text-white rounded-full text-sm font-semibold">
                     Lihat Menu
                 </a>
             </div>
@@ -101,7 +88,7 @@ if (!$exists) {
         </div>
 
         <!-- Tambah menu lagi -->
-        <a href="index?code=<?= $table_code ?>"  class="w-full border-2 border-dashed border-gray-200 rounded-2xl py-4 text-sm font-semibold text-gray-400 hover:border-sky-300 hover:text-sky-500 transition-all flex items-center justify-center gap-2">
+        <a href="<?= BASE_URL ?>order/<?= $table_code ?>/index" class="w-full border-2 border-dashed border-gray-200 rounded-2xl py-4 text-sm font-semibold text-gray-400 hover:border-sky-300 hover:text-sky-500 transition-all flex items-center justify-center gap-2">
             <i class="ph ph-plus-circle text-lg"></i> Tambah Menu Lagi
         </a>
 
@@ -109,7 +96,10 @@ if (!$exists) {
 
     <!-- Footer CTA -->
     <div class="fixed bottom-0 w-full max-w-[480px] left-1/2 -translate-x-1/2 p-4 bg-white border-t border-gray-200 z-30">
-        <button id="checkout-btn" onclick="goToIdentitas()" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3.5 font-bold text-base shadow-lg transition-transform active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer">
+        <button
+            id="checkout-btn"
+            onclick="goToIdentitas()"
+            class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl py-3.5 font-bold text-base shadow-lg transition-transform active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer">
             <span>Lanjut ke Pembayaran</span>
             <i class="ph-bold ph-caret-right"></i>
         </button>
@@ -191,20 +181,20 @@ if (!$exists) {
         let totalQty = 0;
 
         cart.forEach((item, index) => {
-            const menu = MENU_DATA.find(m => m.id == item.id);
-            if (!menu) return;
-            
-            const sub = menu.price * item.qty;
-            subtotal += sub;
-            totalQty += item.qty;
-            const isLast = index === cart.length - 1; 
-            
-            const note = item.note || ''; 
-            const hasNote = note.trim() !== '';
+                    const menu = MENU_DATA.find(m => m.id == item.id);
+                    if (!menu) return;
 
-            const el = document.createElement('div');
-            el.className = `p-4 ${isLast ? '' : 'border-b border-gray-100'}`;
-            el.innerHTML = `
+                    const sub = menu.price * item.qty;
+                    subtotal += sub;
+                    totalQty += item.qty;
+                    const isLast = index === cart.length - 1;
+
+                    const note = item.note || '';
+                    const hasNote = note.trim() !== '';
+
+                    const el = document.createElement('div');
+                    el.className = `p-4 ${isLast ? '' : 'border-b border-gray-100'}`;
+                    el.innerHTML = `
                 <div class="flex gap-3 items-start">
                     <img src="${getImageUrl(item.image)}" alt="${menu.name}" class="w-14 h-14 rounded-xl object-cover flex-shrink-0 shadow-sm border border-gray-100">
                     <div class="flex-1 min-w-0">
@@ -275,77 +265,83 @@ if (!$exists) {
     function openNoteModal(itemId, menuName) {
         currentNoteItemId = itemId;
         document.getElementById('note-modal-title').innerText    = `Catatan untuk: ${menuName}`;
-        document.getElementById('note-modal-subtitle').innerText = 'Opsional — bisa dikosongkan';
-        
-        const cart = getCart();
-        // PERBAIKAN 3: === menjadi ==
-        const item = cart.find(i => i.id == itemId);
-        document.getElementById('note-input').value = (item && item.note) ? item.note : '';
+                    document.getElementById('note-modal-subtitle').innerText = 'Opsional — bisa dikosongkan';
 
-        const modal = document.getElementById('note-modal');
-        const sheet = document.getElementById('note-sheet');
-        modal.classList.remove('hidden');
-        setTimeout(() => {
-            modal.classList.remove('opacity-0');
-            sheet.classList.remove('translate-y-full');
-            document.getElementById('note-input').focus();
-        }, 10);
-    }
+                    const cart = getCart();
+                    const item = cart.find(i => i.id == itemId);
+                    document.getElementById('note-input').value = (item && item.note) ? item.note : '';
 
-    function closeNoteModal() {
-        const modal = document.getElementById('note-modal');
-        const sheet = document.getElementById('note-sheet');
-        modal.classList.add('opacity-0');
-        sheet.classList.add('translate-y-full');
-        setTimeout(() => modal.classList.add('hidden'), 300);
-        currentNoteItemId = null;
-    }
+                    const modal = document.getElementById('note-modal');
+                    const sheet = document.getElementById('note-sheet');
+                    modal.classList.remove('hidden');
+                    setTimeout(() => {
+                        modal.classList.remove('opacity-0');
+                        sheet.classList.remove('translate-y-full');
+                        document.getElementById('note-input').focus();
+                    }, 10);
+                }
 
-    function saveNote() {
-        if (!currentNoteItemId) return;
-        const val = document.getElementById('note-input').value.trim();
-        
-        let cart = getCart();
-        const itemIndex = cart.findIndex(i => i.id == currentNoteItemId);
-        if (itemIndex !== -1) {
-            cart[itemIndex].note = val;
-            saveCart(cart);
-        }
-        
-        closeNoteModal();
-        setTimeout(renderOrder, 310);
-    }
+                function closeNoteModal() {
+                    const modal = document.getElementById('note-modal');
+                    const sheet = document.getElementById('note-sheet');
+                    modal.classList.add('opacity-0');
+                    sheet.classList.add('translate-y-full');
+                    setTimeout(() => modal.classList.add('hidden'), 300);
+                    currentNoteItemId = null;
+                }
 
-    function clearNote() {
-        document.getElementById('note-input').value = '';
-        
-        if (currentNoteItemId) {
-            let cart = getCart();
-            const itemIndex = cart.findIndex(i => i.id == currentNoteItemId);
-            if (itemIndex !== -1) {
-                cart[itemIndex].note = '';
-                saveCart(cart);
-            }
-        }
-        
-        closeNoteModal();
-        setTimeout(renderOrder, 310);
-    }
+                function saveNote() {
+                    if (!currentNoteItemId) return;
+                    const val = document.getElementById('note-input').value.trim();
 
-    // Tutup modal kalau klik backdrop
-    document.getElementById('note-modal').addEventListener('click', function(e) {
-        if (e.target === this) closeNoteModal();
-    });
+                    let cart = getCart();
+                    const itemIndex = cart.findIndex(i => i.id == currentNoteItemId);
+                    if (itemIndex !== -1) {
+                        cart[itemIndex].note = val;
+                        saveCart(cart);
+                    }
 
-    function goToIdentitas() {
-        const cart = getCart();
-        if (!cart.length) return;
-        window.location.href = 'identitas.php?code=<?= $table_code ?>';
-    }
+                    closeNoteModal();
+                    setTimeout(renderOrder, 310);
+                }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        renderOrder();
-    });
+                function clearNote() {
+                    document.getElementById('note-input').value = '';
+
+                    if (currentNoteItemId) {
+                        let cart = getCart();
+                        const itemIndex = cart.findIndex(i => i.id == currentNoteItemId);
+                        if (itemIndex !== -1) {
+                            cart[itemIndex].note = '';
+                            saveCart(cart);
+                        }
+                    }
+
+                    closeNoteModal();
+                    setTimeout(renderOrder, 310);
+                }
+
+                // Tutup modal kalau klik backdrop
+                document.getElementById('note-modal').addEventListener('click', function(e) {
+                    if (e.target === this) closeNoteModal();
+                });
+
+                function updateGotoButton() {
+                    const cart = getCart();
+                    const btn = document.getElementById('gotoidentitas');
+
+                    btn.disabled = cart.length === 0;
+                }
+
+                function goToIdentitas() {
+                    const cart = getCart();
+                    if (!cart.length) return;
+                    window.location.href = '<?= BASE_URL ?>order/<?= $table_code ?>/identitas';
+                }
+
+                document.addEventListener('DOMContentLoaded', () => {
+                    renderOrder();
+                });
 </script>
 
 <?php include 'layout/footer.php'; ?>

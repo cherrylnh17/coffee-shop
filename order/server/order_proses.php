@@ -1,6 +1,6 @@
 <?php
-include '../../config.php';
-include '../../path.php';
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../path.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
@@ -15,8 +15,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             for ($i = 0; $i < 8; $i++) {
                 $randomString .= $characters[rand(0, strlen($characters) - 1)];
             }
-            $order_code = "ORD-" . $randomString; 
-            
+            $order_code = "ORD-" . $randomString;
+
             $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM `order` WHERE code = ?");
             $stmtCheck->execute([$order_code]);
             if ($stmtCheck->fetchColumn() == 0) $isUnique = true;
@@ -38,14 +38,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Metode pembayaran wajib diisi!");
         }
         // cari id meja
-        $id_table = null; $name_table = null;
+        $id_table = null;
+        $name_table = null;
         if ($table_code) {
             $stmt = $pdo->prepare("SELECT id, name FROM `table` WHERE name = ?");
             $stmt->execute([$table_code]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($row) { $id_table = $row['id']; $name_table = $row['name']; }
+            if ($row) {
+                $id_table = $row['id'];
+                $name_table = $row['name'];
+            }
         }
-        
+
 
         // hitung total dan buat detail
         $subtotal = 0;
@@ -56,9 +60,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $total_qty += $item['qty'];
             $summary_list[] = $item['qty'] . " " . $item['name'];
         }
-        
+
         $detail_summary = implode(", ", $summary_list);
-        $tax = $subtotal * 0.12; 
+        $tax = $subtotal * 0.12;
         $total_bayar = $subtotal + $tax;
         $created_at = date('Y-m-d H:i:s');
         $expired_at = date('Y-m-d H:i:s', strtotime('+10 minutes'));
@@ -69,12 +73,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             qty, subtotal, tax, total, payment, detail, status, paid, `change`,
             created_at, expired_at
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        
+
         $stmtOrder = $pdo->prepare($sqlOrder);
         $stmtOrder->execute([
-            $order_code, $id_table, $name_table, $customer_name, $customer_email,
-            $total_qty, $subtotal, $tax, $total_bayar, $payment_type,
-            $detail_summary, 2, 0, 0, $created_at, $expired_at
+            $order_code,
+            $id_table,
+            $name_table,
+            $customer_name,
+            $customer_email,
+            $total_qty,
+            $subtotal,
+            $tax,
+            $total_bayar,
+            $payment_type,
+            $detail_summary,
+            2,
+            0,
+            0,
+            $created_at,
+            $expired_at
         ]);
 
         // ambil id yg baru di insert
@@ -89,31 +106,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             subtotal, 
             notes
         ) VALUES (?, ?, ?, ?, ?, ?)";
-        
+
         $stmtItem = $pdo->prepare($sqlItem);
 
         foreach ($cart_items as $item) {
             // Hitung subtotal per item (price * qty)
             $item_subtotal = $item['price'] * $item['qty'];
-            
+
             $stmtItem->execute([
-                $order_id,          
-                $item['id'],        
-                $item['name'],     
-                $item['qty'],      
-                $item_subtotal,   
-                $item['note'] ?? '' 
+                $order_id,
+                $item['id'],
+                $item['name'],
+                $item['qty'],
+                $item_subtotal,
+                $item['note'] ?? ''
             ]);
         }
 
         $pdo->commit();
-        header("Location: ". BASE_URL . "users/checkout?table=" . $table_code . "&code=" . $order_code);
-        exit(); 
-
+        header("Location: " . BASE_URL . "order/" . $table_code . "/checkout/" . $order_code);
+        exit();
     } catch (Exception $e) {
         $pdo->rollBack();
         $table_code = $_POST['table_name'];
-        header("Location: ". BASE_URL . "users/identitas?code=" . $table_code . "&m=" . urlencode($e->getMessage()));
+        header("Location: " . BASE_URL . "order/" . $table_code . "/identitas" . "&m=" . urlencode($e->getMessage()));
         exit();
-    } 
+    }
 }

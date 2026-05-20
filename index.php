@@ -29,7 +29,7 @@
         }
     </style>
 </head>
-<body class="font-sans text-stone-800 antialiased bg-stone-50 selection:bg-stone-500 selection:text-white">
+<body class="font-sans text-stone-800 antialiased bg-stone-20 cover selection:bg-stone-500 selection:text-white">
 
     <!-- Navbar -->
     <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 py-4 bg-transparent">

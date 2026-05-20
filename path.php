@@ -6,4 +6,4 @@ require_once 'env.php';
 define('ROOT_PATH', __DIR__);
 
 // Untuk link Gambar/CSS/JS (Client side)
-define('BASE_URL', $_ENV['APP_URL'] ?? 'http://localhost' );
+define('BASE_URL', APP_URL ?? 'http://localhost' );

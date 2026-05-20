@@ -1,65 +1,52 @@
-<?php 
-include '../config.php';
+<?php
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../path.php';
+require_once __DIR__ . '/../helper/validateTable.php';
 
-// Aktifkan error reporting untuk debugging
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+$table_code = htmlspecialchars($_GET['table']);
 
-$table_code = $_GET['table'];
+validateTable($pdo, $table_code);
 
 if (!isset($_GET['code']) || empty($_GET['code'])) {
-    header("Location: table");
-    exit(); 
+    header("Location:  " . BASE_URL . "order/" . $table_code . "/index");
+    exit();
 } else {
     $order_code = $_GET['code'];
 }
 
 try {
     // Ambil data Order utama
-    $stmt = $pdo->prepare("SELECT * FROM `order` WHERE code = ?"); // Sesuaikan nama tabel 'orders' atau 'order'
+    $stmt = $pdo->prepare("SELECT * FROM `order` WHERE code = ? AND `status` = 2");
     $stmt->execute([$order_code]);
     $order = $stmt->fetch(PDO::FETCH_ASSOC);
-    if(empty($order)){
-        header("Location: index?code=" . $table_code);
-        exit(); 
+    if (empty($order)) {
+        header("Location: " . BASE_URL . "order/" . $table_code . "/index");
+        exit();
     }
     // Ambil rincian menu yang dibeli
     $stmtItem = $pdo->prepare("SELECT * FROM order_item WHERE order_id = ?");
     $stmtItem->execute([$order['id']]);
     $order_items = $stmtItem->fetchAll(PDO::FETCH_ASSOC);
-} catch(PDOException $e) {
+} catch (PDOException $e) {
     die("Error pada query: " . $e->getMessage());
 }
 
 $payment = ($order['payment'] == 1) ? 'Bayar di Kasir' : 'Bayar Online';
 
 
-$table_code = htmlspecialchars($order['table_name']);
-
-$query = "SELECT 1 FROM `table` WHERE name = ? LIMIT 1";
-$stmt = $pdo->prepare($query);
-$stmt->execute([$table_code]);
-
-$exists = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$exists) {
-    header("Location: table.php");
-    exit();
-} 
-
 $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . $order['code'];
 
 ?>
 
-<?php 
-  $title = "Identitas"; 
-  include 'layout/header.php'; 
+<?php
+$title = "Identitas";
+include 'layout/header.php';
 ?>
 
 <main class="w-full max-w-[480px] mx-auto bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-x-hidden">
 
     <header class="sticky top-0 z-20 bg-white shadow-sm pt-5 pb-4 px-4 flex items-center gap-3">
-        <a href="identitas?code=<?= $table_code ?>" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
+        <a href="<?= BASE_URL ?>order/<?= $table_code ?>/identitas" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
             <i class="ph-bold ph-arrow-left text-lg"></i>
         </a>
         <h1 class="text-xl font-bold text-gray-900">Checkout</h1>
@@ -90,8 +77,8 @@ $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . $ord
                 </div>
                 <div>
                     <p class="text-xs text-gray-500 mb-1">Batas Pembayaran</p>
-                    <span class="text-sm font-bold text-blue-600" 
-                        id="display-countdown" 
+                    <span class="text-sm font-bold text-blue-600"
+                        id="display-countdown"
                         data-expire="<?= $order['expired_at'] ?>">
                         Loading...
                     </span>
@@ -103,7 +90,7 @@ $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . $ord
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 text-center">
             <h2 class="text-sm font-bold text-gray-900 mb-1">Order Code</h2>
             <div class="mb-4 flex justify-center font-semibold">
-                <span class="bg-gray-100 border px-4 py-1.5 rounded-lg text-gray-500 text-sm" ><?= $order['code'] ?></span>
+                <span class="bg-gray-100 border px-4 py-1.5 rounded-lg text-gray-500 text-sm"><?= $order['code'] ?></span>
             </div>
             <div class="mx-auto mb-3 p-2 bg-white border-2 border-gray-200 rounded-xl shadow-inner w-40 h-40 flex items-center justify-center">
                 <img src="<?= $qrUrl; ?>" alt="QR Pembayaran" class="w-full h-full object-contain">
@@ -144,14 +131,16 @@ $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . $ord
     </div>
 
     <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-white border-t border-gray-100 px-4 py-4 shadow-2xl z-20">
-      <button onclick="backToMenu()"
-        class="w-full bg-blue-500 text-white font-black py-4 rounded-2xl text-base shadow-lg shadow-blue-200 active:scale-95 transition-transform flex items-center justify-center gap-2">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-        Pesan Lagi
-      </button>
+        <button onclick="backToMenu()"
+            class="w-full bg-blue-500 text-white font-black py-4 rounded-2xl text-base shadow-lg shadow-blue-200 active:scale-95 transition-transform flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            </svg>
+            Pesan Lagi
+        </button>
     </div>
 
-    
+
 
 </main>
 
@@ -159,26 +148,25 @@ $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . $ord
     function backToMenu() {
         localStorage.removeItem('cart');
         localStorage.removeItem('buyer_data');
-        window.location.href = 'index?code=<?= $order['table_name'] ?>';
+        window.location.href = '<?= BASE_URL ?>order/<?= $table_code ?>/index';
     }
-
     const itemNotes = JSON.parse(localStorage.getItem('item_notes')) || {};
 
     document.addEventListener('DOMContentLoaded', () => {
-        // 1. Ambil data dari PHP ke JS (opsional jika ingin dipakai di JS)
+        // Ambil data dari PHP ke JS 
         const orderData = <?php echo json_encode($order); ?>;
         const itemsData = <?php echo json_encode($order_items); ?>;
 
-        // 2. Tampilkan Nama dan Metode Pembayaran dari Database
+        // Tampilkan Nama dan Metode Pembayaran dari Database
         document.getElementById('display-name').innerText = orderData.customer_name;
-        
+
         // Konversi angka payment (1/2) ke teks
         const paymentText = orderData.payment == 1 ? 'Bayar di Kasir' : 'Online';
         document.getElementById('display-payment').innerText = paymentText;
 
-        // 3. Render Daftar Pesanan dari Database (Bukan dari LocalStorage)
+        // Render Daftar Pesanan dari Database 
         const orderList = document.getElementById('order-list');
-        orderList.innerHTML = ''; // Kosongkan dulu
+        orderList.innerHTML = '';
 
         itemsData.forEach(item => {
             const div = document.createElement('div');
@@ -193,29 +181,23 @@ $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . $ord
             orderList.appendChild(div);
         });
 
-        
+
         // localStorage.removeItem('cart');
         // localStorage.removeItem('buyer_data');
 
     });
 
-
-
-    // Tambahkan tanda petik dua atau satu di sekitar tag PHP
-const order_code = "<?= $order['code']; ?>";
-    
     // Fungsi untuk cek status ke server setiap 3 detik
     const checkInterval = setInterval(async () => {
         try {
-            const response = await fetch('server/cek_status?id=' + <?= $order['id'] ?>);
+            const response = await fetch('<?= BASE_URL ?>order/server/cek_status?id=<?= $order['id'] ?>');
             const data = await response.json();
 
-            // Jika status berubah jadi 1 (Success) 
             if (data.status == 1) {
                 localStorage.removeItem('cart');
-                 localStorage.removeItem('buyer_data');
-                clearInterval(checkInterval); // Stop pengecekan
-                window.location.href = 'success?code=' + order_code; // Pindah halaman
+                localStorage.removeItem('buyer_data');
+                clearInterval(checkInterval);
+                window.location.href = '<?= BASE_URL ?>order/<?= $table_code ?>/success/<?= $order_code ?>';
             }
         } catch (error) {
             console.error("Gagal cek status", error);
@@ -223,40 +205,39 @@ const order_code = "<?= $order['code']; ?>";
     }, 3000); // 3000ms = 3 detik
 
     function startCountdown() {
-    const display = document.getElementById('display-countdown');
-    const expireTime = new Date(display.getAttribute('data-expire')).getTime();
+        const display = document.getElementById('display-countdown');
+        const expireTime = new Date(display.getAttribute('data-expire')).getTime();
 
-    // Update setiap 1 detik
-    const timer = setInterval(function() {
-        const now = new Date().getTime();
-        const distance = expireTime - now;
+        // Update setiap 1 detik
+        const timer = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = expireTime - now;
 
-        // Jika waktu sudah habis atau lewat
-        if (distance <= 0) {
-            clearInterval(timer);
-            display.innerHTML = "Kadaluarsa";
-            display.classList.remove('text-blue-600');
-            display.classList.add('text-red-600'); // Ubah warna jadi merahss
-            return;
-        }
+            // Jika waktu sudah habis atau lewat
+            if (distance <= 0) {
+                clearInterval(timer);
+                display.innerHTML = "Kadaluarsa";
+                display.classList.remove('text-blue-600');
+                display.classList.add('text-red-600'); // Ubah warna jadi merahss
+                return;
+            }
 
-        // Kalkulasi jam, menit, detik
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            // Kalkulasi jam, menit, detik
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        // Tampilkan format 00:00:00
-        display.innerHTML =  
-            (hours < 10 ? "0" + hours : hours) + ":" + 
-            (minutes < 10 ? "0" + minutes : minutes) + ":" + 
-            (seconds < 10 ? "0" + seconds : seconds);
-            
-    }, 1000);
-}
+            // Tampilkan format 00:00:00
+            display.innerHTML =
+                (hours < 10 ? "0" + hours : hours) + ":" +
+                (minutes < 10 ? "0" + minutes : minutes) + ":" +
+                (seconds < 10 ? "0" + seconds : seconds);
 
-// Jalankan fungsi saat halaman dimuat
-document.addEventListener('DOMContentLoaded', startCountdown);
+        }, 1000);
+    }
+
+    // Jalankan fungsi saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', startCountdown);
 </script>
 
 <?php include 'layout/footer.php'; ?>
-

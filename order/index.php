@@ -1,115 +1,98 @@
-<?php 
-include '../config.php';
-include '../path.php';
+<?php
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../path.php';
+require_once __DIR__ . '/../helper/validateTable.php';
+
+$table_code = htmlspecialchars($_GET['table']);
+
+validateTable($pdo, $table_code);
 
 try {
-    // Ambil data menu dari database
     $query = "SELECT * FROM menu ORDER BY created_at ASC";
     $stmt = $pdo->prepare($query);
     $stmt->execute();
-    $result = $stmt->fetchAll(PDO::FETCH_ASSOC); 
-} catch(PDOException $e) {
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
     die("Error pada query: " . $e->getMessage());
 }
 
-if (!isset($_GET['code']) || empty($_GET['code'])) {
-    header("Location: table");
-    exit(); 
-}
-
-$table_code = htmlspecialchars($_GET['code']);
-
-$query = "SELECT 1 FROM `table` WHERE name = ? LIMIT 1";
-$stmt = $pdo->prepare($query);
-$stmt->execute([$table_code]);
-
-$exists = $stmt->fetch(PDO::FETCH_ASSOC);
-
-if (!$exists) {
-    header("Location: table");
-    exit();
-} 
-
 ?>
 
-<?php 
-  $title = "Beranda"; 
-  include 'layout/header.php'; 
+<?php
+$title = "Beranda";
+include 'layout/header.php';
 ?>
 
-    <main class="w-full max-w-md mx-auto bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-x-hidden">
-        <header class="sticky top-0 z-20 bg-white shadow-sm pt-5 pb-3 px-4 rounded-b-2xl">
-            <div class="flex justify-between items-center mb-5">
-                <a href="profile?code=<?=$table_code ?>" class="text-gray-800 hover:text-sky-500 transition-colors">
-                    <i class="ph ph-list text-2xl"></i>
-                </a>
-                <a href="search?code=<?= $table_code ?>" class="text-gray-800 hover:text-sky-500 transition-colors">
-                    <i class="ph ph-magnifying-glass text-2xl"></i>
-                </a>
+<main class="w-full max-w-md mx-auto bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-x-hidden">
+    <header class="sticky top-0 z-20 bg-white shadow-sm pt-5 pb-3 px-4 rounded-b-2xl">
+        <div class="flex justify-end items-center mb-5">
+            <a href="#" class="text-gray-800 hover:text-sky-500 transition-colors">
+                <i class="ph ph-magnifying-glass text-2xl"></i>
+            </a>
+        </div>
+        <div class="flex justify-between items-center mb-4">
+            <div>
+                <h1 class="text-xl font-bold text-gray-900">Träffa Coffee & Eatery</h1>
+                <p class="text-xs text-gray-500 mt-0.5">Pesan langsung dari mejamu 🍽️</p>
             </div>
-            <div class="flex justify-between items-center mb-4">
-                <div>
-                    <h1 class="text-xl font-bold text-gray-900">Träffa Coffee & Eatery</h1>
-                    <p class="text-xs text-gray-500 mt-0.5">Pesan langsung dari mejamu 🍽️</p>
+            <div class="bg-sky-500 text-white px-3 py-1.5 rounded-xl flex flex-col items-center justify-center shadow-md border-[3px] border-sky-100 shrink-0 min-w-15">
+                <span class="text-[9px] font-bold uppercase tracking-widest opacity-90 -mb-0.75">Meja</span>
+                <span class="text-xl font-black tracking-wider"><?= $table_code ?></span>
+            </div>
+        </div>
+        <div class="flex overflow-x-auto gap-2.5 no-scrollbar pb-1" id="category-container"></div>
+    </header>
+
+    <div class="flex-1 px-4 py-5 space-y-4 pb-28" id="menu-container"></div>
+
+    <div class="fixed bottom-6 w-full max-w-120 left-1/2 -translate-x-1/2 px-5 z-30 flex justify-end pointer-events-none">
+        <button onclick="goToCheckout()" class="pointer-events-auto bg-sky-500 hover:bg-sky-600 text-white w-15 h-15 rounded-full shadow-xl flex items-center justify-center relative transition-transform active:scale-90 shrink-0 border-4 border-white">
+            <i class="ph ph-shopping-cart text-2xl"></i>
+            <span id="cart-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[11px] font-bold w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-sm ">0</span>
+        </button>
+    </div>
+
+    <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg z-50 hidden toast-animate items-center gap-2">
+        <i class="ph-fill ph-check-circle text-green-400 text-lg"></i>
+        <span id="toast-msg">Ditambahkan ke keranjang</span>
+    </div>
+
+    <div id="modal-backdrop" class="fixed inset-0 bg-black/50 z-40 hidden opacity-0 transition-opacity duration-300" onclick="closeModal()"></div>
+
+    <div id="product-modal" class="fixed max-w-md bottom-0 left-1/2 -translate-x-1/2 w-full  bg-white rounded-t-3xl z-50 transform translate-y-full transition-transform duration-300 flex flex-col max-h-[90vh]">
+        <div class="flex justify-center pt-4 pb-2 cursor-pointer" onclick="closeModal()">
+            <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+        </div>
+        <div class="overflow-y-auto no-scrollbar pb-24">
+            <div class="px-4 pb-4">
+                <img id="modal-img" src="" alt="" class="w-full h-56 object-cover rounded-2xl bg-gray-100 shadow-sm">
+            </div>
+            <div class="px-5">
+                <div class="flex justify-between items-start gap-4 mb-2">
+                    <h2 id="modal-title" class="text-xl font-bold text-gray-900 leading-tight">Nama Produk</h2>
+                    <span id="modal-price" class="text-lg font-black text-sky-500 whitespace-nowrap">Rp 0</span>
                 </div>
-                <div class="bg-sky-500 text-white px-3 py-1.5 rounded-xl flex flex-col items-center justify-center shadow-md border-[3px] border-sky-100 shrink-0 min-w-15">
-                    <span class="text-[9px] font-bold uppercase tracking-widest opacity-90 -mb-0.75">Meja</span>
-                    <span class="text-xl font-black tracking-wider"><?=  $table_code ?></span>
+                <p id="modal-desc" class="text-sm text-gray-500 leading-relaxed">Deskripsi produk...</p>
+                <div class="mt-6">
+                    <label class="block text-sm font-bold text-gray-800 mb-2 items-center gap-1.5">
+                        <i class="ph ph-note-pencil text-lg text-gray-500"></i> Catatan Khusus
+                    </label>
+                    <textarea id="modal-note" rows="2" placeholder="Contoh: Esnya sedikit..." class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 bg-gray-50"></textarea>
                 </div>
             </div>
-            <div class="flex overflow-x-auto gap-2.5 no-scrollbar pb-1" id="category-container"></div>
-        </header>
-
-        <div class="flex-1 px-4 py-5 space-y-4 pb-28" id="menu-container"></div>
-
-        <div class="fixed bottom-6 w-full max-w-120 left-1/2 -translate-x-1/2 px-5 z-30 flex justify-end pointer-events-none">
-            <button onclick="goToCheckout()" class="pointer-events-auto bg-sky-500 hover:bg-sky-600 text-white w-15 h-15 rounded-full shadow-xl flex items-center justify-center relative transition-transform active:scale-90 shrink-0 border-4 border-white">
-                <i class="ph ph-shopping-cart text-2xl"></i>
-                <span id="cart-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[11px] font-bold w-6 h-6 rounded-full flex items-center justify-center border-2 border-white shadow-sm ">0</span>
+        </div>
+        <div class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-100 p-4 flex gap-4 items-center rounded-t-2xl shadow-lg">
+            <div class="flex items-center gap-3 bg-gray-50 border border-gray-200 p-1.5 rounded-xl">
+                <button onclick="changeModalQty(-1)" class="w-9 h-9 rounded-lg flex items-center justify-center text-gray-600 hover:bg-white"><i class="ph-bold ph-minus"></i></button>
+                <span id="modal-qty" class="font-bold text-gray-800 min-w-6 text-center">1</span>
+                <button onclick="changeModalQty(1)" class="w-9 h-9 rounded-lg flex items-center justify-center text-sky-600 hover:bg-white"><i class="ph-bold ph-plus"></i></button>
+            </div>
+            <button onclick="addFromModalToCart()" class="flex-1 bg-sky-500 hover:bg-sky-600 text-white rounded-xl py-3.5 font-bold text-sm flex items-center justify-center gap-2">
+                <span id="modal-total-btn">Rp 0</span>
             </button>
         </div>
-
-        <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg z-50 hidden toast-animate items-center gap-2">
-            <i class="ph-fill ph-check-circle text-green-400 text-lg"></i>
-            <span id="toast-msg">Ditambahkan ke keranjang</span>
-        </div>
-
-        <div id="modal-backdrop" class="fixed inset-0 bg-black/50 z-40 hidden opacity-0 transition-opacity duration-300" onclick="closeModal()"></div>
-
-        <div id="product-modal" class="fixed max-w-md bottom-0 left-1/2 -translate-x-1/2 w-full  bg-white rounded-t-3xl z-50 transform translate-y-full transition-transform duration-300 flex flex-col max-h-[90vh]">
-            <div class="flex justify-center pt-4 pb-2 cursor-pointer" onclick="closeModal()">
-                <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
-            </div>
-            <div class="overflow-y-auto no-scrollbar pb-24">
-                <div class="px-4 pb-4">
-                    <img id="modal-img" src="" alt="" class="w-full h-56 object-cover rounded-2xl bg-gray-100 shadow-sm">
-                </div>
-                <div class="px-5">
-                    <div class="flex justify-between items-start gap-4 mb-2">
-                        <h2 id="modal-title" class="text-xl font-bold text-gray-900 leading-tight">Nama Produk</h2>
-                        <span id="modal-price" class="text-lg font-black text-sky-500 whitespace-nowrap">Rp 0</span>
-                    </div>
-                    <p id="modal-desc" class="text-sm text-gray-500 leading-relaxed">Deskripsi produk...</p>
-                    <div class="mt-6">
-                        <label class="block text-sm font-bold text-gray-800 mb-2 items-center gap-1.5">
-                            <i class="ph ph-note-pencil text-lg text-gray-500"></i> Catatan Khusus
-                        </label>
-                        <textarea id="modal-note" rows="2" placeholder="Contoh: Esnya sedikit..." class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 bg-gray-50"></textarea>
-                    </div>
-                </div>
-            </div>
-            <div class="absolute bottom-0 left-0 w-full bg-white border-t border-gray-100 p-4 flex gap-4 items-center rounded-t-2xl shadow-lg">
-                <div class="flex items-center gap-3 bg-gray-50 border border-gray-200 p-1.5 rounded-xl">
-                    <button onclick="changeModalQty(-1)" class="w-9 h-9 rounded-lg flex items-center justify-center text-gray-600 hover:bg-white"><i class="ph-bold ph-minus"></i></button>
-                    <span id="modal-qty" class="font-bold text-gray-800 min-w-6 text-center">1</span>
-                    <button onclick="changeModalQty(1)" class="w-9 h-9 rounded-lg flex items-center justify-center text-sky-600 hover:bg-white"><i class="ph-bold ph-plus"></i></button>
-                </div>
-                <button onclick="addFromModalToCart()" class="flex-1 bg-sky-500 hover:bg-sky-600 text-white rounded-xl py-3.5 font-bold text-sm flex items-center justify-center gap-2">
-                    <span id="modal-total-btn">Rp 0</span>
-                </button>
-            </div>
-        </div>
-    </main>
+    </div>
+</main>
 
 
 
@@ -123,6 +106,7 @@ if (!$exists) {
     function getCart() {
         return JSON.parse(localStorage.getItem('cart')) || [];
     }
+
     function saveCart(cartData) {
         localStorage.setItem('cart', JSON.stringify(cartData));
     }
@@ -131,10 +115,18 @@ if (!$exists) {
         return 'Rp ' + parseInt(angka).toLocaleString('id-ID');
     }
 
-    const categories = [
-        { id: "Semua", label: "Semua" },
-        { id: "1", label: "Makanan" }, // Menggunakan string untuk sinkronisasi DB
-        { id: "2", label: "Minuman" }
+    const categories = [{
+            id: "Semua",
+            label: "Semua"
+        },
+        {
+            id: "1",
+            label: "Makanan"
+        }, // Menggunakan string untuk sinkronisasi DB
+        {
+            id: "2",
+            label: "Minuman"
+        }
     ];
 
     let currentCategory = "Semua";
@@ -149,8 +141,12 @@ if (!$exists) {
             const isActive = cat.id === currentCategory;
             const btn = document.createElement('button');
             btn.className = `px-5 py-2 rounded-full whitespace-nowrap text-sm transition-all ${isActive ? 'bg-sky-500 text-white' : 'bg-white border text-gray-600'}`;
-            btn.innerText = cat.label; 
-            btn.onclick = () => { currentCategory = cat.id; renderCategories(); renderMenus(); };
+            btn.innerText = cat.label;
+            btn.onclick = () => {
+                currentCategory = cat.id;
+                renderCategories();
+                renderMenus();
+            };
             container.appendChild(btn);
         });
     }
@@ -158,14 +154,14 @@ if (!$exists) {
     function renderMenus() {
         const container = document.getElementById('menu-container');
         container.innerHTML = '';
-        
-        const filtered = currentCategory === "Semua" 
-            ? MENU_DATA 
-            : MENU_DATA.filter(i => String(i.category) === currentCategory);
+
+        const filtered = currentCategory === "Semua" ?
+            MENU_DATA :
+            MENU_DATA.filter(i => String(i.category) === currentCategory);
 
         filtered.forEach(item => {
             const totalInCart = cart.filter(c => c.id == item.id).reduce((s, c) => s + c.qty, 0);
-            
+
             const card = document.createElement('div');
             card.className = "menu-card flex bg-white p-3.5 rounded-2xl shadow-sm gap-4 items-center border border-gray-100 cursor-pointer";
             card.onclick = () => openModal(item.id);
@@ -199,10 +195,10 @@ if (!$exists) {
         const item = MENU_DATA.find(i => i.id == itemId);
         if (!item) return;
         currentModalItem = item;
-        
+
         // cek keranjang Apakah item ini sudah pernah ditambahkan?
         const existingItem = cart.find(c => c.id == itemId);
-        
+
         if (existingItem) {
             // Jika sudah ada, gunakan quantity dan catatan dari keranjang
             modalQty = existingItem.qty;
@@ -217,9 +213,9 @@ if (!$exists) {
         document.getElementById('modal-title').innerText = item.name;
         document.getElementById('modal-desc').innerText = item.description;
         document.getElementById('modal-price').innerText = formatRupiah(item.price);
-        
+
         updateModalUI();
-        
+
         document.getElementById('modal-backdrop').classList.remove('hidden');
         setTimeout(() => {
             document.getElementById('modal-backdrop').classList.add('opacity-100');
@@ -245,26 +241,26 @@ if (!$exists) {
 
     function addFromModalToCart() {
         const note = document.getElementById('modal-note').value.trim();
-        
+
         // hanya cek berdasarkan id
         const existingIndex = cart.findIndex(i => i.id == currentModalItem.id);
-        
+
         if (existingIndex !== -1) {
             // Jika sudah ada, timpa quantity dan catatannya dengan yang baru dari modal
-            cart[existingIndex].qty = modalQty; 
+            cart[existingIndex].qty = modalQty;
             cart[existingIndex].note = note;
         } else {
             // Jika belum ada, buat sebagai item baru di keranjang
-            cart.push({ 
-                id: currentModalItem.id, 
-                name: currentModalItem.name, 
-                price: currentModalItem.price, 
-                qty: modalQty, 
-                note: note, 
-                image: currentModalItem.image 
+            cart.push({
+                id: currentModalItem.id,
+                name: currentModalItem.name,
+                price: currentModalItem.price,
+                qty: modalQty,
+                note: note,
+                image: currentModalItem.image
             });
         }
-        
+
         syncCart();
         closeModal();
         showToast("Keranjang diperbarui");
@@ -301,10 +297,14 @@ if (!$exists) {
 
     function goToCheckout() {
         if (cart.length === 0) return showToast("Keranjang kosong!");
-        window.location.href = 'pesanan?code=<?= $table_code ?>';
+        window.location.href = '<?= BASE_URL ?>order/<?= $table_code ?>/pesanan';
     }
 
-    window.onload = () => { renderCategories(); renderMenus(); updateCartBadge(); };
+    window.onload = () => {
+        renderCategories();
+        renderMenus();
+        updateCartBadge();
+    };
 </script>
 
 

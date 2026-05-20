@@ -1,9 +1,10 @@
 <?php
-ob_clean();
+require_once __DIR__ . '/../../config.php';
+if (ob_get_level()) {
+    ob_clean();
+}
 header('Content-Type: application/json');
-include '../../config.php';
 
-// Cek parameter 'code'
 if (!isset($_GET['id'])) {
     echo json_encode(['error' => 'Code tidak ditemukan']);
     exit;
@@ -11,7 +12,6 @@ if (!isset($_GET['id'])) {
 
 try {
     $id = $_GET['id'];
-    // QUERY MENGGUNAKAN KOLOM code
     $stmt = $pdo->prepare("SELECT status FROM `order` WHERE id = ?");
     $stmt->execute([$id]);
     $order = $stmt->fetch(PDO::FETCH_ASSOC);

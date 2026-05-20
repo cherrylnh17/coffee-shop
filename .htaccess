@@ -1,18 +1,21 @@
 RewriteEngine On
 
-# Menghilangkan index.php dari URL root folder
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^index/?$ index.php [L,NC]
+RewriteRule ^(env\.php|coffee\.sql|path\.php|config\.php)$ - [F,L,NC]
+
 
 # Menghilangkan ekstensi .php
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}\.php -f
 RewriteRule ^([^\.]+)$ $1.php [NC,L]
 
-# Semua URL yang tidak ditemukan → redirect ke 404.php
+# redirect url ke route php
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php !-f
+RewriteRule ^(.*)$ route.php [L,NC]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} -d
 RewriteCond %{REQUEST_FILENAME}\.php !-f
 RewriteRule ^(.*)$ 404.php [L,NC]
 

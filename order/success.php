@@ -1,38 +1,46 @@
-<?php 
-include '../config.php';
+<?php
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../path.php';
+require_once __DIR__ . '/../helper/validateTable.php';
 
+$table_code = $_GET['table'];
 $order_code = $_GET['code'];
 
+validateTable($pdo, $table_code);
+
 if (!isset($_GET['code']) || empty($_GET['code'])) {
-    header("Location: table");
-    exit(); 
+  header("Location:  " . BASE_URL . "order/" . $table_code . "/index");
+  exit();
 }
 
+
 try {
-    // Ambil data Order utama
-    $stmt = $pdo->prepare("SELECT * FROM `order` WHERE code = ?"); 
-    $stmt->execute([$order_code]);
-    $order = $stmt->fetch(PDO::FETCH_ASSOC);
-    if(empty($order)){
-        header("Location: table");
-        exit(); 
-    }
-    // Ambil rincian menu yang dibeli
-    $stmtItem = $pdo->prepare("SELECT * FROM order_item WHERE order_id = ?");
-    $stmtItem->execute([$order['id']]);
-    $order_items = $stmtItem->fetchAll(PDO::FETCH_ASSOC);
-} catch(PDOException $e) {
-    die("Error pada query: " . $e->getMessage());
+  // Ambil data Order utama
+  $stmt = $pdo->prepare("SELECT * FROM `order` WHERE code = ?");
+  $stmt->execute([$order_code]);
+  $order = $stmt->fetch(PDO::FETCH_ASSOC);
+  if (empty($order)) {
+    header("Location:  " . BASE_URL . "order/" . $table_code . "/index");
+    exit();
+  }
+  // Ambil rincian menu yang dibeli
+  $stmtItem = $pdo->prepare("SELECT * FROM order_item WHERE order_id = ?");
+  $stmtItem->execute([$order['id']]);
+  $order_items = $stmtItem->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+  die("Error pada query: " . $e->getMessage());
 }
 
 $payment = ($order['payment'] == 1) ? 'Bayar di Kasir' : 'Bayar Online';
 
+
+
 ?>
 
 
-<?php 
-  $title = "Identitas"; 
-  include 'layout/header.php'; 
+<?php
+$title = "Identitas";
+include 'layout/header.php';
 ?>
 
 <main class="w-full max-w-[480px] mx-auto bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-x-hidden">
@@ -48,7 +56,7 @@ $payment = ($order['payment'] == 1) ? 'Bayar di Kasir' : 'Bayar Online';
       </div>
       <div class="success-icon pulse-ring w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-xl shadow-green-700/20 relative z-10">
         <svg class="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
         </svg>
       </div>
     </div>
@@ -91,24 +99,24 @@ $payment = ($order['payment'] == 1) ? 'Bayar di Kasir' : 'Bayar Online';
         <h2 class="font-black text-gray-800 mb-3 flex items-center gap-2">
           <span class="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center text-sm">🛍️</span> Item Pesanan
         </h2>
-        
+
         <ul id="success-items" class="space-y-4 text-sm divide-y divide-gray-50">
           <?php foreach ($order_items as $item): ?>
             <li class="flex justify-between items-start first:pt-0">
               <div class="flex-1">
                 <p class="font-semibold text-gray-800 text-sm"><?= htmlspecialchars($item['menu_name']) ?></p>
-                
+
                 <p class="text-xs text-gray-400">
                   <?= $item['qty'] ?>x @ Rp <?= number_format($item['subtotal'] / $item['qty'], 0, ',', '.') ?>
                 </p>
-                
+
                 <?php if (!empty($item['notes'])): ?>
                   <p class="text-xs text-amber-600 italic mt-0.5">
                     📝 <?= htmlspecialchars($item['notes']) ?>
                   </p>
                 <?php endif; ?>
               </div>
-              
+
               <div class="font-semibold text-gray-900 text-sm">
                 Rp <?= number_format($item['subtotal'], 0, ',', '.') ?>
               </div>
@@ -132,7 +140,7 @@ $payment = ($order['payment'] == 1) ? 'Bayar di Kasir' : 'Bayar Online';
         </div>
       </div>
 
-     
+
 
       <!-- Tips -->
       <div class="fade-up-5 bg-gradient-to-r from-blue-50 to-amber-50 border border-blue-200 rounded-xl px-4 py-3 flex gap-3">
@@ -149,7 +157,9 @@ $payment = ($order['payment'] == 1) ? 'Bayar di Kasir' : 'Bayar Online';
     <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-white border-t border-gray-100 px-4 py-4 shadow-2xl z-20">
       <a href="index?code=<?= $order['table_name'] ?>"
         class="w-full bg-blue-500 text-white font-black py-4 rounded-2xl text-base shadow-lg shadow-blue-200 active:scale-95 transition-transform flex items-center justify-center gap-2">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+        </svg>
         Kembali ke Menu
       </a>
     </div>
@@ -159,4 +169,3 @@ $payment = ($order['payment'] == 1) ? 'Bayar di Kasir' : 'Bayar Online';
 </main>
 
 <?php include 'layout/footer.php'; ?>
-
