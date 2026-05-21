@@ -286,32 +286,7 @@ include '../layout/sidebar.php';
         </div>
 
         <!-- Ringkasan biaya -->
-        <div class="border border-gray-200 rounded-lg overflow-hidden">
-          <table class="w-full text-sm text-left text-gray-500">
-            <tbody class="divide-y divide-gray-200">
-              <tr class="bg-white">
-                <th class="px-4 py-3 font-medium text-gray-900 bg-gray-50 w-1/3">Subtotal</th>
-                <td class="px-4 py-3" id="det-subtotal">Rp 0</td>
-              </tr>
-              <tr class="bg-white">
-                <th class="px-4 py-3 font-medium text-gray-900 bg-gray-50">Pajak</th>
-                <td class="px-4 py-3" id="det-tax">Rp 0</td>
-              </tr>
-              <tr class="bg-blue-50">
-                <th class="px-4 py-3 font-bold text-blue-900">Total Tagihan</th>
-                <td class="px-4 py-3 font-bold text-blue-700" id="det-total">Rp 0</td>
-              </tr>
-              <tr class="bg-white">
-                <th class="px-4 py-3 font-medium text-gray-900 bg-gray-50">Metode Bayar</th>
-                <td class="px-4 py-3" id="det-payment">-</td>
-              </tr>
-              <tr class="bg-white">
-                <th class="px-4 py-3 font-medium text-gray-900 bg-gray-50">Status</th>
-                <td class="px-4 py-3" id="det-status">-</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        
 
         <!-- Order Items -->
         <div>
@@ -337,6 +312,33 @@ include '../layout/sidebar.php';
               Tidak ada item ditemukan.
             </div>
           </div>
+        </div>
+
+        <div class="border border-gray-200 rounded-lg overflow-hidden">
+          <table class="w-full text-sm text-left text-gray-500">
+            <tbody class="divide-y divide-gray-200">
+              <tr class="bg-white">
+                <th class="px-4 py-3 font-medium text-gray-900 bg-gray-50 w-1/3">Subtotal</th>
+                <td class="px-4 py-3" id="det-subtotal">Rp 0</td>
+              </tr>
+              <tr class="bg-white">
+                <th class="px-4 py-3 font-medium text-gray-900 bg-gray-50">Pajak</th>
+                <td class="px-4 py-3" id="det-tax">Rp 0</td>
+              </tr>
+              <tr class="bg-blue-50">
+                <th class="px-4 py-3 font-bold text-blue-900">Total Tagihan</th>
+                <td class="px-4 py-3 font-bold text-blue-700" id="det-total">Rp 0</td>
+              </tr>
+              <tr class="bg-white">
+                <th class="px-4 py-3 font-medium text-gray-900 bg-gray-50">Metode Bayar</th>
+                <td class="px-4 py-3" id="det-payment">-</td>
+              </tr>
+              <tr class="bg-white">
+                <th class="px-4 py-3 font-medium text-gray-900 bg-gray-50">Status</th>
+                <td class="px-4 py-3" id="det-status">-</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
       </div>
