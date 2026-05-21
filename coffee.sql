@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: May 21, 2026 at 05:15 AM
+-- Generation Time: May 21, 2026 at 05:23 AM
 -- Server version: 8.0.45-0ubuntu0.24.04.1
 -- PHP Version: 8.4.19
 
@@ -199,17 +199,17 @@ INSERT INTO `table` (`id`, `name`, `created_at`, `updated_at`) VALUES
 
 CREATE TABLE `tax` (
   `id` int NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `rate` decimal(10,2) NOT NULL
+  `name` varchar(50) NOT NULL,
+  `amount` decimal(10,0) UNSIGNED NOT NULL,
+  `created_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `tax`
 --
 
-INSERT INTO `tax` (`id`, `name`, `rate`) VALUES
-(1, 'ppn', 10.00),
-(2, 'fee', 50.00);
+INSERT INTO `tax` (`id`, `name`, `amount`, `created_at`) VALUES
+(1, 'pajak ppn', 12, '2026-05-20 06:02:30');
 
 -- --------------------------------------------------------
 
@@ -324,7 +324,7 @@ ALTER TABLE `table`
 -- AUTO_INCREMENT for table `tax`
 --
 ALTER TABLE `tax`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `user`

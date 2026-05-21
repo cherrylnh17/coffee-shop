@@ -81,7 +81,7 @@
                     class="group flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200 
                     <?= ($currentPage == 'printer') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600'; ?>">
                     <span class="flex w-6 justify-center text-lg <?= ($currentPage == 'printer') ? 'text-white' : 'text-gray-400 group-hover:text-blue-600'; ?>">
-                        <i class="fa-solid fa-print"></i>
+                        <i class="fa-solid fa-receipt"></i>
                     </span>
                         <span class="font-medium">Manajemen Printer</span>
                 </a>
