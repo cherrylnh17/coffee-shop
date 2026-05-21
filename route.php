@@ -83,7 +83,6 @@ http_response_code(404);
 if (str_starts_with($request_uri, '/coffee-shop/order/')) {
     include 'order/404.php';
 } else {
-    include '404.php';  
+    include '404.php';
 }
-//
 exit;
