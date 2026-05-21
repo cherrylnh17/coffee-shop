@@ -6,16 +6,11 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 2) {
 }
 
 require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../path.php';
 
-$pdo->exec("CREATE TABLE IF NOT EXISTS `tax` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `name` varchar(255) NOT NULL,
-    `rate` decimal(10,2) NOT NULL,
-    PRIMARY KEY (`id`)
-)");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'] ?? '';
+    $action = $_POST['action'] ?? ''; 
     
     try {
         if ($action === 'add') {
@@ -60,8 +55,13 @@ $taxes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $pageTitle = "Manajemen Pajak";
 $currentPage = "tax";
  
+?>
+
+<?php 
+
 include __DIR__ . '/../layout/header.php';
 include __DIR__ . '/../layout/sidebar.php';
+
 ?>
 
     <header class="fixed inset-x-0 top-0 z-[1025] flex h-[74px] items-center bg-white/80 px-4 shadow-sm backdrop-blur-md transition-all duration-200 ease-in-out lg:left-[280px]">

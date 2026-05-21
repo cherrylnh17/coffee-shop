@@ -59,8 +59,8 @@ $query_string = "&search=" . urlencode($search) . "&category=" . urlencode($cate
 $pageTitle = "Manajemen Menu";
 $currentPage = "menu";
 
-include '../layout/header.php';
-include '../layout/sidebar.php';
+include __DIR__ . '/../layout/header.php';
+include __DIR__ . '/../layout/sidebar.php';
 
 ?>
 
