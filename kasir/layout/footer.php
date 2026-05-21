@@ -47,8 +47,7 @@
             icon: '<?= $_SESSION['swal_msg']['icon'] ?>',
             title: '<?= $_SESSION['swal_msg']['title'] ?>',
             text: '<?= $_SESSION['swal_msg']['text'] ?>',
-            timer: 3000,
-            showConfirmButton: false
+            showConfirmButton: true
         });
       </script>
       <?php unset($_SESSION['swal_msg']); ?>

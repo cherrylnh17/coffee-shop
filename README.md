@@ -22,8 +22,6 @@ Untuk konfigurasi di linux perlu memberikan izin untuk pengubahan folder, beriku
 
 
 
-bagian sweetalert di bagian print perbaiki 
-
 
 nasi goreng terbeli berapa??
 
@@ -31,3 +29,16 @@ tambaahan tabel report dimana bisa tau tanggal itu user beli berapa aja
 
 
 tambahan tabel printer dimana user bisa langsung komfigurasi di dalam laptop nya langsung
+
+| Field        | Fungsi                 |
+| ------------ | ---------------------- |
+| `name`       | Nama printer           |
+| `type`       | Jenis koneksi printer  |
+| `bt_mac`     | MAC Bluetooth          |
+| `bt_channel` | Channel RFCOMM         |
+| `rfcomm_dev` | `/dev/rfcomm0`         |
+| `ip_address` | Untuk printer LAN/WiFi |
+| `port`       | Biasanya 9100          |
+| `usb_device` | Misal `/dev/usb/lp0`   |
+| `timeout`    | Timeout koneksi        |
+| `is_active`  | Aktif/nonaktif         |
