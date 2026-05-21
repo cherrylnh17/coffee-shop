@@ -40,7 +40,7 @@ $qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . $ord
 
 <?php
 $title = "Identitas";
-include 'layout/header.php';
+include __DIR__ . '/layout/header.php';
 ?>
 
 <main class="w-full max-w-[480px] mx-auto bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-x-hidden">
@@ -240,4 +240,4 @@ include 'layout/header.php';
     document.addEventListener('DOMContentLoaded', startCountdown);
 </script>
 
-<?php include 'layout/footer.php'; ?>
+<?php include __DIR__ . '/layout/footer.php'; ?>

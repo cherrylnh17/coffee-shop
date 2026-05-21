@@ -2,7 +2,7 @@
 require_once('path.php');
 $request_uri = htmlspecialchars($_SERVER['REQUEST_URI'] ?? '/');
 
-http_response_code(404);
+// http_response_code(404);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -21,6 +21,7 @@ http_response_code(404);
             display: ['"Playfair Display"', 'serif'],
             sans: ['"DM Sans"', 'sans-serif'],
           },
+
           colors: {
             coffee: {
               bg: '#0e0b08',
@@ -33,6 +34,12 @@ http_response_code(404);
               text: '#e8ddd0',
             }
           },
+
+          backgroundImage: {
+            noise:
+              `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E")`
+          },
+
           keyframes: {
             fadeUp: {
               '0%': {
@@ -44,6 +51,7 @@ http_response_code(404);
                 transform: 'translateY(0)'
               },
             },
+
             float: {
               '0%, 100%': {
                 transform: 'translateY(0px)'
@@ -52,6 +60,7 @@ http_response_code(404);
                 transform: 'translateY(-10px)'
               },
             },
+
             steam: {
               '0%': {
                 opacity: '0',
@@ -66,6 +75,7 @@ http_response_code(404);
                 transform: 'translateY(-10px) scaleX(0.8)'
               },
             },
+
             glow: {
               '0%, 100%': {
                 opacity: '0.06'
@@ -75,31 +85,23 @@ http_response_code(404);
               },
             }
           },
+
           animation: {
             'fade-up': 'fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) both',
             'fade-up-1': 'fadeUp 0.7s 0.1s cubic-bezier(0.16,1,0.3,1) both',
             'fade-up-2': 'fadeUp 0.7s 0.2s cubic-bezier(0.16,1,0.3,1) both',
             'fade-up-3': 'fadeUp 0.7s 0.3s cubic-bezier(0.16,1,0.3,1) both',
             'fade-up-4': 'fadeUp 0.7s 0.4s cubic-bezier(0.16,1,0.3,1) both',
-            'float': 'float 4s ease-in-out infinite',
-            'steam': 'steam 2s ease-in-out infinite',
-            'steam2': 'steam 2s 0.5s ease-in-out infinite',
-            'glow': 'glow 4s ease-in-out infinite',
+
+            float: 'float 4s ease-in-out infinite',
+            steam: 'steam 2s ease-in-out infinite',
+            steam2: 'steam 2s 0.5s ease-in-out infinite',
+            glow: 'glow 4s ease-in-out infinite',
           }
         }
       }
     }
   </script>
-  <style>
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 0;
-    }
-  </style>
 </head>
 
 <body class="bg-coffee-bg text-coffee-text font-sans min-h-screen flex items-center justify-center overflow-hidden relative">

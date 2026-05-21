@@ -16,7 +16,7 @@ if (!isset($_GET['code']) || empty($_GET['code'])) {
 
 try {
   // Ambil data Order utama
-  $stmt = $pdo->prepare("SELECT * FROM `order` WHERE code = ?");
+  $stmt = $pdo->prepare("SELECT * FROM `order` WHERE code = ? AND `status` = 1");
   $stmt->execute([$order_code]);
   $order = $stmt->fetch(PDO::FETCH_ASSOC);
   if (empty($order)) {
@@ -40,7 +40,7 @@ $payment = ($order['payment'] == 1) ? 'Bayar di Kasir' : 'Bayar Online';
 
 <?php
 $title = "Identitas";
-include 'layout/header.php';
+include __DIR__ . '/layout/header.php';
 ?>
 
 <main class="w-full max-w-[480px] mx-auto bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-x-hidden">
@@ -168,4 +168,4 @@ include 'layout/header.php';
 
 </main>
 
-<?php include 'layout/footer.php'; ?>
+<?php include __DIR__ . '/layout/footer.php'; ?>
