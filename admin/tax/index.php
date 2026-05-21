@@ -9,45 +9,12 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../path.php';
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'] ?? ''; 
-    
-    try {
-        if ($action === 'add') {
-            $name = trim($_POST['name']);
-            $rate = (float)$_POST['rate'];
-            
-            $stmt = $pdo->prepare("INSERT INTO tax (name, rate) VALUES (?, ?)");
-            $stmt->execute([$name, $rate]);
-            
-            header("Location: tax.php?status=success&msg=Data Pajak berhasil ditambahkan.");
-            exit;
-            
-        } elseif ($action === 'edit') {
-            $id = (int)$_POST['id'];
-            $name = trim($_POST['name']);
-            $rate = (float)$_POST['rate'];
-            
-            $stmt = $pdo->prepare("UPDATE tax SET name = ?, rate = ? WHERE id = ?");
-            $stmt->execute([$name, $rate, $id]);
-            
-            header("Location: tax.php?status=success&msg=Data Pajak berhasil diperbarui.");
-            exit;
-            
-        } elseif ($action === 'delete') {
-            $id = (int)$_POST['id'];
-            
-            $stmt = $pdo->prepare("DELETE FROM tax WHERE id = ?");
-            $stmt->execute([$id]);
-            
-            header("Location: tax.php?status=success&msg=Data Pajak berhasil dihapus.");
-            exit;
-        }
-    } catch (PDOException $e) {
-        header("Location: tax.php?status=error&msg=" . urlencode($e->getMessage()));
-        exit;
-    }
-}
+$pdo->exec("CREATE TABLE IF NOT EXISTS `tax` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `name` varchar(255) NOT NULL,
+    `amount` decimal(10,2) NOT NULL,
+    PRIMARY KEY (`id`)
+)");
 
 $stmt = $pdo->query("SELECT * FROM tax ORDER BY id DESC");
 $taxes = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -115,15 +82,6 @@ include __DIR__ . '/../layout/sidebar.php';
                 <h3 class="text-xl font-bold text-gray-800 whitespace-nowrap">Daftar Pajak & Layanan</h3>
                 
                 <div class="flex items-center gap-4 w-full sm:w-auto">
-                    <div class="flex items-center">
-                        <label class="mr-2 text-sm text-gray-600 whitespace-nowrap">Tampilkan:</label>
-                        <select id="limit-select" onchange="changeLimit(this.value)" class="rounded border-gray-300 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                            <option value="5">5</option>
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                        </select>
-                    </div>
-                    
                     <button data-modal-target="tambah-pajak-modal" data-modal-toggle="tambah-pajak-modal" class="inline-flex w-full sm:w-auto items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 whitespace-nowrap" type="button">
                         <i class="fa-solid fa-plus mr-2"></i>Tambah Pajak
                     </button>
@@ -140,16 +98,40 @@ include __DIR__ . '/../layout/sidebar.php';
                       <th scope="col" class="w-32 px-6 py-4 text-center">Aksi</th>
                     </tr>
                   </thead>
-                  <tbody id="table-body">
+                  <tbody>
+                    <?php if (empty($taxes)): ?>
+                        <tr><td colspan="4" class="px-6 py-6 text-center text-gray-500">Data pajak belum tersedia.</td></tr>
+                    <?php else: ?>
+                        <?php $no = 1; foreach ($taxes as $tax): ?>
+                        <tr class="border-b border-gray-100 bg-white hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 text-center text-gray-500 font-medium"><?php echo $no++; ?></td>
+                            <td class="px-6 py-4 font-bold text-gray-900"><?php echo htmlspecialchars($tax['name']); ?></td>
+                            <td class="px-6 py-4 text-center font-bold text-blue-600"><?php echo (float)$tax['amount']; ?> %</td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button type="button"
+                                            onclick="openEditModal(<?php echo $tax['id']; ?>, '<?php echo htmlspecialchars(addslashes($tax['name'])); ?>', <?php echo (float)$tax['amount']; ?>)" 
+                                            class="inline-flex h-8 w-8 items-center justify-center rounded bg-blue-50 text-blue-600 hover:bg-blue-100">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </button>
+                                    
+                                    <a href="hapus.php?id=<?php echo $tax['id']; ?>" 
+                                       onclick="return confirm('Yakin ingin menghapus <?php echo htmlspecialchars(addslashes($tax['name'])); ?>?')"
+                                       class="inline-flex h-8 w-8 items-center justify-center rounded bg-red-50 text-red-600 hover:bg-red-100">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                   </tbody>
                 </table>
               </div>
 
-              <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <span class="text-sm text-gray-500" id="pagination-info">Menampilkan 0 - 0 dari 0 data</span>
-                  <div class="flex space-x-1" id="pagination-buttons">
-                  </div>
-              </div>
+                <div class="mt-4 text-sm text-gray-500">
+                    Total Keseluruhan: <span class="font-bold text-gray-900"><?php echo count($taxes); ?> Data</span>
+                </div>
           </div>
       </div>
     </main>
@@ -163,15 +145,14 @@ include __DIR__ . '/../layout/sidebar.php';
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
                 </div>
-                <form action="" method="POST" class="p-4 md:p-5">
-                    <input type="hidden" name="action" value="add">
+                <form action="tambah.php" method="POST" class="p-4 md:p-5">
                     <div class="mb-4">
                         <label class="mb-2 block text-sm font-medium text-gray-900">Nama Pajak</label>
                         <input type="text" name="name" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="Contoh: PPN / Service Charge" required />
                     </div>
                     <div class="mb-6">
                         <label class="mb-2 block text-sm font-medium text-gray-900">Besaran Persentase (%)</label>
-                        <input type="number" step="0.01" name="rate" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="Contoh: 12 atau 10.5" required />
+                        <input type="number" step="0.01" name="amount" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="Contoh: 12 atau 10.5" required />
                     </div>
                     <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700">
                         <i class="fa-solid fa-plus mr-2 mt-1"></i> Simpan ke Database
@@ -191,8 +172,7 @@ include __DIR__ . '/../layout/sidebar.php';
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
                 </div>
-                <form action="" method="POST" class="p-4 md:p-5">
-                    <input type="hidden" name="action" value="edit">
+                <form action="edit.php" method="POST" class="p-4 md:p-5">
                     <input type="hidden" name="id" id="edit_id">
 
                     <div class="mb-4">
@@ -201,11 +181,11 @@ include __DIR__ . '/../layout/sidebar.php';
                     </div>
                     <div class="mb-6">
                         <label class="mb-2 block text-sm font-medium text-gray-900">Besaran Persentase (%)</label>
-                        <input type="number" step="0.01" name="rate" id="edit_rate" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" required />
+                        <input type="number" step="0.01" name="amount" id="edit_amount" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" required />
                     </div>
                     <div class="flex items-center space-x-3 border-t border-gray-100 pt-4 md:pt-5">
                         <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700">
-                            <i class="fa-solid fa-floppy-disk mr-2"></i> Simpan
+                            <i class="fa-solid fa-floppy-disk mr-2"></i> Simpan Perubahan
                         </button>
                         <button data-modal-hide="edit-pajak-modal" type="button" class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
                             Batal
@@ -223,104 +203,16 @@ include __DIR__ . '/../layout/footer.php';
 ?>
 
 <script>
-    const dataTaxes = <?php echo json_encode($taxes); ?>;
-    
-    let currentPage = 1;
-    let itemsPerPage = 5;
-
-    function changeLimit(limit) {
-        itemsPerPage = parseInt(limit);
-        currentPage = 1;
-        renderTable();
-    }
-
-    function renderTable() {
-        const tbody = document.getElementById('table-body');
-        tbody.innerHTML = '';
-        
-        const start = (currentPage - 1) * itemsPerPage;
-        const end = start + itemsPerPage;
-        const paginatedData = dataTaxes.slice(start, end);
-
-        if (paginatedData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-6 text-center text-gray-500">Data pajak belum tersedia.</td></tr>';
-            renderPagination(0, 0, 0);
-            return;
-        }
-
-        paginatedData.forEach((tax, index) => {
-            const tr = document.createElement('tr');
-            tr.className = 'border-b border-gray-100 bg-white hover:bg-gray-50 transition-colors';
-            
-            tr.innerHTML = `
-                <td class="px-6 py-4 text-center text-gray-500 font-medium">${start + index + 1}</td>
-                <td class="px-6 py-4 font-bold text-gray-900">${tax.name}</td>
-                <td class="px-6 py-4 text-center font-bold text-blue-600">${parseFloat(tax.rate)} %</td>
-                <td class="px-6 py-4 text-center">
-                    <div class="flex items-center justify-center gap-2">
-                        <button onclick="openEditModal(${tax.id}, '${tax.name.replace(/'/g, "\\'")}', ${tax.rate})" 
-                                class="inline-flex h-8 w-8 items-center justify-center rounded bg-blue-50 text-blue-600 hover:bg-blue-100">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                        
-                        <form method="POST" action="" class="inline" onsubmit="return confirm('Yakin ingin menghapus ${tax.name}?')">
-                            <input type="hidden" name="action" value="delete">
-                            <input type="hidden" name="id" value="${tax.id}">
-                            <button type="submit" class="inline-flex h-8 w-8 items-center justify-center rounded bg-red-50 text-red-600 hover:bg-red-100">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </form>
-                    </div>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-
-        renderPagination(start + 1, Math.min(end, dataTaxes.length), dataTaxes.length);
-    }
-
-    function renderPagination(startItem, endItem, totalItems) {
-        const totalPages = Math.ceil(totalItems / itemsPerPage);
-        const paginationContainer = document.getElementById('pagination-buttons');
-        const infoText = document.getElementById('pagination-info');
-        
-        infoText.innerHTML = `Menampilkan <span class="font-medium text-gray-900">${startItem} - ${endItem}</span> dari <span class="font-medium text-gray-900">${totalItems}</span> data`;
-        paginationContainer.innerHTML = '';
-
-        if (totalPages <= 1) return;
-
-        if (currentPage > 1) {
-            paginationContainer.innerHTML += `<button onclick="changePage(${currentPage - 1})" class="rounded border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors shadow-sm bg-white">Prev</button>`;
-        }
-
-        for (let i = 1; i <= totalPages; i++) {
-            if (i === currentPage) {
-                paginationContainer.innerHTML += `<button class="rounded border border-blue-600 bg-blue-600 text-white shadow-sm px-3 py-1.5 text-sm font-bold">${i}</button>`;
-            } else {
-                paginationContainer.innerHTML += `<button onclick="changePage(${i})" class="rounded border border-gray-200 text-gray-600 hover:bg-gray-50 px-3 py-1.5 text-sm bg-white font-medium">${i}</button>`;
-            }
-        }
-
-        if (currentPage < totalPages) {
-            paginationContainer.innerHTML += `<button onclick="changePage(${currentPage + 1})" class="rounded border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors shadow-sm bg-white">Next</button>`;
-        }
-    }
-
-    function changePage(page) {
-        currentPage = page;
-        renderTable();
-    }
-
-    function openEditModal(id, name, rate) {
+    // 1. Fungsi Kirim Data ke Modal Edit
+    function openEditModal(id, name, amount) {
         document.getElementById('edit_id').value = id;
         document.getElementById('edit_name').value = name;
-        document.getElementById('edit_rate').value = rate;
+        document.getElementById('edit_amount').value = amount;
         document.getElementById('trigger-edit-modal').click();
     }
 
+    // 2. Fungsi Responsive Sidebar (Standar)
     document.addEventListener('DOMContentLoaded', () => {
-        renderTable();
-
         const sidebar = document.querySelector('.pc-sidebar');
         const header = document.querySelector('header');
         const mainContent = document.querySelector('main');
