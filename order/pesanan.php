@@ -21,7 +21,7 @@ try {
 
 <?php
 $title = "Pesanan";
-include 'layout/header.php';
+include __DIR__ . '/layout/header.php';
 ?>
 
 <main class="w-full max-w-[480px] mx-auto bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-x-hidden">
@@ -344,4 +344,4 @@ include 'layout/header.php';
                 });
 </script>
 
-<?php include 'layout/footer.php'; ?>
+<?php include __DIR__ . '/layout/footer.php'; ?>

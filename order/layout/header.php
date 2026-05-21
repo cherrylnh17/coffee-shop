@@ -50,11 +50,23 @@ require_once __DIR__ . '/../../path.php';
                                 transform: 'translateY(0)',
                             },
                         },
+
+                        pulseSlow: {
+                            '0%, 100%': {
+                                opacity: '1',
+                                transform: 'scale(1)',
+                            },
+                            '50%': {
+                                opacity: '0.6',
+                                transform: 'scale(1.05)',
+                            },
+                        },
                     },
 
                     animation: {
                         'slide-up': 'slideUp 0.3s ease-out forwards',
                         'fade-in': 'fadeIn 0.25s ease-out forwards',
+                        'pulse-slow': 'pulseSlow 3s ease-in-out infinite',
                     },
                 },
             },

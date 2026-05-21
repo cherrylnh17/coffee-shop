@@ -22,8 +22,8 @@ try {
 
 <?php
 $title = "Identitas";
-include 'layout/header.php';
-?> 
+include __DIR__ . '/layout/header.php';
+?>
 
 <main class="w-full max-w-[480px] mx-auto bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-x-hidden">
 
@@ -97,19 +97,21 @@ include 'layout/header.php';
                 </div>
 
                 <!-- Ringkasan pesanan -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-                    <h2 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <div class="mt-5 rounded-2xl border border-gray-100 overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 flex items-center gap-2 border-b border-gray-100">
                         <span class="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center text-sm">🛍️</span>
-                        Ringkasan Pesanan
-                    </h2>
-                    <div id="order-summary" class="space-y-2 text-sm mb-3 divide-y divide-gray-50"></div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-500">Pajak (12%)</span>
-                        <span class="font-semibold text-gray-800" id="tax-price">Rp 0</span>
+                        <h2 class="font-bold text-gray-900 text-sm">Ringkasan Pesanan</h2>
                     </div>
-                    <div class="border-t border-dashed border-gray-200 pt-3 flex justify-between items-center">
-                        <span class="font-bold text-gray-900">Total</span>
-                        <span class="font-black text-blue-600 text-base" id="summary-total">Rp 0</span>
+                    <div id="order-summary" class="divide-y divide-gray-100 bg-white"></div>
+                    <div class="bg-gray-50 px-4 py-3 space-y-2 border-t border-gray-100">
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>Pajak (12%)</span>
+                            <span id="tax-price" class="font-semibold">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between items-center pt-1 border-t border-dashed border-gray-200">
+                            <span class="font-bold text-gray-900 text-sm">Total</span>
+                            <span class="font-black text-blue-600 text-base" id="summary-total">Rp 0</span>
+                        </div>
                     </div>
                 </div>
 
@@ -123,7 +125,8 @@ include 'layout/header.php';
     </form>
 
     <div class="fixed bottom-0 w-full max-w-[480px] left-1/2 -translate-x-1/2 p-4 bg-white border-t border-gray-200 z-30">
-        <button onclick="submitPesanan()" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-3.5 font-bold text-base shadow-lg transition-transform active:scale-[0.98] flex items-center justify-center gap-2">
+        <button id="btnCheckout" onclick="submitPesanan()" disabled
+            class="w-full bg-gray-300 text-gray-400 cursor-not-allowed rounded-xl py-3.5 font-bold text-base shadow-lg transition-all duration-200 flex items-center justify-center gap-2">
             <span>Lanjut ke Checkout</span>
             <i class="ph-bold ph-caret-right"></i>
         </button>
@@ -161,15 +164,25 @@ include 'layout/header.php';
             if (!menu) return;
             const sub = menu.price * ci.qty;
             total += sub;
+            const hasNote = ci.note && ci.note.trim() !== '';
             const row = document.createElement('div');
-            row.className = 'flex justify-between items-center py-1.5 text-sm';
+            row.className = 'px-4 py-3';
             row.innerHTML = `
-                <span class="text-gray-600 flex items-center gap-1.5">
-                    <span class="w-5 h-5 bg-blue-100 text-blue-600 rounded-full text-[10px] font-bold flex items-center justify-center">${ci.qty}</span>
-                    ${menu.name}
-                </span>
-                <span class="font-semibold text-gray-800">${formatRupiah(sub)}</span>
-                `;
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex items-center justify-center w-5 h-5 rounded-md bg-blue-600 text-white text-[10px] font-black flex-shrink-0">${ci.qty}</span>
+                            <span class="font-semibold text-sm text-gray-800 truncate">${menu.name}</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400 mt-0.5 ml-7">${formatRupiah(menu.price)} / item</p>
+                        ${hasNote ? `<div class="ml-7 mt-1.5 flex items-start gap-1.5">
+                            <i class="ph ph-note-pencil text-amber-400 text-xs mt-0.5 flex-shrink-0"></i>
+                            <span class="text-[11px] text-amber-600 leading-relaxed italic">${ci.note}</span>
+                        </div>` : ''}
+                    </div>
+                    <span class="font-bold text-sm text-gray-900 flex-shrink-0 pt-0.5">${formatRupiah(sub)}</span>
+                </div>
+            `;
             listEl.appendChild(row);
         });
         const tax = total * 0.12;
@@ -214,6 +227,26 @@ include 'layout/header.php';
         form.submit();
     }
 
+    // Toggle button checkout berdasarkan isian nama
+    const nameInput = document.getElementById('name');
+    const btnCheckout = document.getElementById('btnCheckout');
+
+    function toggleCheckoutButton() {
+        const filled = nameInput.value.trim() !== '';
+        btnCheckout.disabled = !filled;
+        if (filled) {
+            btnCheckout.classList.remove('bg-gray-300', 'text-gray-400', 'cursor-not-allowed');
+            btnCheckout.classList.add('bg-blue-600', 'hover:bg-blue-700', 'text-white', 'active:scale-[0.98]');
+        } else {
+            btnCheckout.classList.add('bg-gray-300', 'text-gray-400', 'cursor-not-allowed');
+            btnCheckout.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'text-white', 'active:scale-[0.98]');
+        }
+    }
+
+    nameInput.addEventListener('input', toggleCheckoutButton);
+    // Jalankan sekali saat load (jika ada pre-fill dari localStorage)
+    toggleCheckoutButton();
+
     const urlParams = new URLSearchParams(window.location.search);
     const errorMessage = urlParams.get('m');
 
@@ -230,5 +263,4 @@ include 'layout/header.php';
     }
 </script>
 
-
-<?php include 'layout/footer.php'; ?>
+<?php include __DIR__ . '/layout/footer.php'; ?>

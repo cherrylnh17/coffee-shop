@@ -20,24 +20,14 @@ Untuk konfigurasi di linux perlu memberikan izin untuk pengubahan folder, beriku
 # Berikan izin tulis
 ```sudo chmod -R 775 assets```
 
-order/table/1/checkout
 
-
-bagian check out dibuat disabled dulu warna abu abu
-
-penambahan input order code
 
 bagian sweetalert di bagian print perbaiki 
 
-tabel baru graduity
-untuk menambahkan pajak pajak
 
 nasi goreng terbeli berapa??
 
 tambaahan tabel report dimana bisa tau tanggal itu user beli berapa aja
-
-
-infinity scroll 
 
 
 tambahan tabel printer dimana user bisa langsung komfigurasi di dalam laptop nya langsung
