@@ -137,7 +137,7 @@ include __DIR__ . '/layout/header.php';
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
     let currentCategory = "Semua";
     let currentPage = 0;
-    const PER_PAGE = 5;
+    const PER_PAGE = 10;
     let isLoading = false;
     let hasMore = true;
     let loadedMenuData = {}; // cache { id: itemObj } semua item yang sudah masuk DOM

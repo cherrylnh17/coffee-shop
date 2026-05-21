@@ -1,21 +1,4 @@
 <?php
-/**
- * menu_load.php
- * Endpoint AJAX untuk infinity scroll di halaman index.
- *
- * GET params:
- *   table    (wajib) — kode meja, divalidasi seperti biasa
- *   offset   (int)   — mulai dari index ke-berapa, default 0
- *   limit    (int)   — jumlah item per batch, default 10, max 50
- *   category (string) — "" / "1" / "2", kosong = Semua
- *
- * Response JSON:
- * {
- *   "success"  : true,
- *   "items"    : [...],   // array menu
- *   "has_more" : true     // masih ada data lagi?
- * }
- */
 
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../path.php';
