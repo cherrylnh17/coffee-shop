@@ -1,17 +1,18 @@
 <?php
-require_once 'path.php';
+
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 function loadPage($file, $fallback = '404.php')
 {
     if (file_exists($file)) {
-        include ROOT_PATH . $file;
+        include $file;
     } else {
-        include ROOT_PATH . $fallback;
+        include $fallback;
     }
 
     exit;
 }
+
 /*
 order server
 */
@@ -52,12 +53,11 @@ if (preg_match('~^/coffee-shop/order/(\d+)/(\w+)$~', $request_uri, $matches)) {
 /*
 kasir
 */
-
 if (preg_match('~^/coffee-shop/kasir/([a-zA-Z0-9_-]+)$~', $request_uri, $matches)) {
 
     loadPage(
-        '/kasir/' . $matches[1] . '.php',
-        '/kasir/index.php'
+        'kasir/' . $matches[1] . '.php',
+        'kasir/index.php'
     );
 }
 
@@ -69,8 +69,8 @@ admin
 if (preg_match('~^/coffee-shop/admin/([a-zA-Z0-9_-]+)$~', $request_uri, $matches)) {
 
     loadPage(
-        '/admin/' . $matches[1] . '.php',
-        '/admin/index.php'
+        'admin/' . $matches[1] . '.php',
+        'admin/index.php'
     );
 }
 
