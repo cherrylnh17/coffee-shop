@@ -4,10 +4,10 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../path.php';
 require_once __DIR__ . '/../../helper/validateTable.php';
 
-// ── Header JSON ──────────────────────────────────────────────────────────────
+//  Header JSON 
 header('Content-Type: application/json');
 
-// ── Helper respond ───────────────────────────────────────────────────────────
+//  Helper respond 
 function respond(bool $success, array $payload = [], int $httpCode = 200): void
 {
     http_response_code($httpCode);
@@ -15,12 +15,12 @@ function respond(bool $success, array $payload = [], int $httpCode = 200): void
     exit;
 }
 
-// ── Validasi method ──────────────────────────────────────────────────────────
+//  Validasi method 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     respond(false, ['message' => 'Method not allowed'], 405);
 }
 
-// ── Sanitasi & validasi param ────────────────────────────────────────────────
+//  Sanitasi & validasi param 
 $table_code = isset($_GET['table']) ? htmlspecialchars(trim($_GET['table'])) : '';
 if ($table_code === '') {
     respond(false, ['message' => 'Parameter table wajib diisi'], 400);
@@ -33,7 +33,7 @@ $offset   = max(0, (int)($_GET['offset']   ?? 0));
 $limit    = min(50, max(1, (int)($_GET['limit'] ?? 5)));
 $category = isset($_GET['category']) ? trim($_GET['category']) : '';
 
-// ── Query ─────────────────────────────────────────────────────────────────────
+//  Query 
 try {
     // Ambil limit+1 agar tahu apakah masih ada halaman berikutnya
     $fetchLimit = $limit + 1;
@@ -67,11 +67,11 @@ try {
     respond(false, ['message' => 'Database error: ' . $e->getMessage()], 500);
 }
 
-// ── Tentukan has_more ─────────────────────────────────────────────────────────
+//  Tentukan has_more 
 $has_more = count($rows) > $limit;
 $items    = $has_more ? array_slice($rows, 0, $limit) : $rows;
 
-// ── Response ──────────────────────────────────────────────────────────────────
+//  Response 
 respond(true, [
     'items'    => $items,
     'has_more' => $has_more,
