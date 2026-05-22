@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: May 22, 2026 at 08:05 AM
+-- Generation Time: May 22, 2026 at 08:14 AM
 -- Server version: 8.0.45-0ubuntu0.24.04.1
 -- PHP Version: 8.4.19
 
@@ -27,6 +27,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `menu`
 --
 
+DROP TABLE IF EXISTS `menu`;
 CREATE TABLE `menu` (
   `id` int UNSIGNED NOT NULL,
   `name` varchar(50) NOT NULL,
@@ -67,6 +68,7 @@ INSERT INTO `menu` (`id`, `name`, `image`, `category`, `price`, `description`, `
 -- Table structure for table `order`
 --
 
+DROP TABLE IF EXISTS `order`;
 CREATE TABLE `order` (
   `id` int UNSIGNED NOT NULL,
   `code` varchar(50) NOT NULL,
@@ -107,6 +109,7 @@ INSERT INTO `order` (`id`, `code`, `user_id`, `user_name`, `table_id`, `table_na
 -- Table structure for table `order_item`
 --
 
+DROP TABLE IF EXISTS `order_item`;
 CREATE TABLE `order_item` (
   `id` int UNSIGNED NOT NULL,
   `order_id` int UNSIGNED NOT NULL,
@@ -139,6 +142,7 @@ INSERT INTO `order_item` (`id`, `order_id`, `menu_id`, `menu_name`, `qty`, `subt
 -- Table structure for table `printer`
 --
 
+DROP TABLE IF EXISTS `printer`;
 CREATE TABLE `printer` (
   `id` int NOT NULL,
   `name` varchar(100) NOT NULL,
@@ -168,6 +172,7 @@ INSERT INTO `printer` (`id`, `name`, `type`, `bt_mac`, `bt_channel`, `rfcomm_dev
 -- Table structure for table `table`
 --
 
+DROP TABLE IF EXISTS `table`;
 CREATE TABLE `table` (
   `id` int UNSIGNED NOT NULL,
   `name` varchar(50) NOT NULL,
@@ -191,6 +196,7 @@ INSERT INTO `table` (`id`, `name`, `created_at`, `updated_at`) VALUES
 -- Table structure for table `tax`
 --
 
+DROP TABLE IF EXISTS `tax`;
 CREATE TABLE `tax` (
   `id` int NOT NULL,
   `name` varchar(50) NOT NULL,
@@ -212,6 +218,7 @@ INSERT INTO `tax` (`id`, `name`, `amount`, `created_at`) VALUES
 -- Table structure for table `user`
 --
 
+DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `id` int UNSIGNED NOT NULL,
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -341,9 +348,11 @@ DELIMITER $$
 --
 -- Events
 --
+DROP EVENT IF EXISTS `delete_status_expired`$$
 CREATE DEFINER=`admin`@`localhost` EVENT `delete_status_expired` ON SCHEDULE EVERY 1 HOUR STARTS '2026-04-20 12:36:14' ON COMPLETION NOT PRESERVE ENABLE DO DELETE FROM `order` 
    WHERE status = 3$$
 
+DROP EVENT IF EXISTS `set_status_expired`$$
 CREATE DEFINER=`admin`@`localhost` EVENT `set_status_expired` ON SCHEDULE EVERY 1 SECOND STARTS '2026-04-20 12:35:20' ON COMPLETION NOT PRESERVE ENABLE DO UPDATE `order` 
    SET status = 3 
    WHERE status = 2 
