@@ -42,3 +42,8 @@ tambahan tabel printer dimana user bisa langsung komfigurasi di dalam laptop nya
 | `usb_device` | Misal `/dev/usb/lp0`   |
 | `timeout`    | Timeout koneksi        |
 | `is_active`  | Aktif/nonaktif         |
+
+
+perintah dump isinya 
+
+drop if exist dan isinya foreign key foreign key
