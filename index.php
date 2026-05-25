@@ -602,6 +602,7 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 <script>
   var BASE_URL = "<?= rtrim(BASE_URL, '/') ?>";
   window.TRAFA_MENU_DATA = <?= $menuJson ?>;
+  var APP_REDIRECT = "<?= APP_REDIRECT_SCAN ?>";
 </script> 
 
 <script src="assets/js/helperUrl.js"></script>
@@ -707,6 +708,7 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 
 <!-- Main app -->
 <script src="assets/js/app.js"></script>
+
 
 </body>
 </html>
