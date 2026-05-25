@@ -143,7 +143,7 @@ include 'layout/sidebar.php';
                   <div class="relative w-1/2">
                      <span class="absolute left-3 top-2 text-gray-500 font-medium text-sm">Rp</span>
                      <!-- atribut form="checkout-form" mengaitkan input ini ke form di sisi kiri -->
-                     <input type="number" name="paid" id="paid-input" form="checkout-form" required min="<?= $order['total'] ?>" placeholder="0"
+                     <input type="text" name="paid" id="paid-input" inputmode="numeric" form="checkout-form" required placeholder="0"
                             class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-right font-bold text-gray-900 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
                   </div>
                 </div>
@@ -203,9 +203,15 @@ include 'layout/sidebar.php';
 
         if (paidInput) {
             paidInput.addEventListener('input', function() {
-                let paid = parseInt(this.value) || 0;
-                let change = paid - totalAmount; 
-                
+                // Ambil angka murni tanpa titik
+                let raw = this.value.replace(/\./g, '');
+                let paid = parseInt(raw) || 0;
+
+                // Format tampilan dengan titik pemisah ribuan
+                this.value = paid === 0 ? '' : paid.toLocaleString('id-ID');
+
+                let change = paid - totalAmount;
+
                 if (change < 0) {
                     changeDisplay.innerText = "Uang Kurang!";
                     changeDisplay.classList.remove('text-green-600');
@@ -217,6 +223,11 @@ include 'layout/sidebar.php';
                     changeDisplay.classList.add('text-green-600');
                     changeInput.value = change;
                 }
+            });
+
+            document.getElementById('checkout-form').addEventListener('submit', function() {
+                let raw = paidInput.value.replace(/\./g, '');
+                paidInput.value = raw;
             });
         }
     });
