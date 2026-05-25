@@ -80,10 +80,10 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 
     <!-- PERBAIKAN: Menghapus backdrop-blur-md dari ul untuk mencegah bug render browser saat discroll -->
     <ul class="hidden md:flex items-center gap-1 bg-white px-2 py-1.5 rounded-full border border-slate-200 shadow-sm shrink-0">
-      <li><a href="#hero" class="desktop-nav-link whitespace-nowrap block px-5 py-2 rounded-full text-sm transition-colors duration-200 font-bold bg-blue-600 text-white shadow-sm shadow-blue-600/30">Home</a></li>
-      <li><a href="#about" class="desktop-nav-link whitespace-nowrap block px-5 py-2 rounded-full text-sm transition-colors duration-200 font-semibold text-slate-800 hover:text-blue-600 hover:bg-blue-50">Tentang</a></li>
-      <li><a href="#menu" class="desktop-nav-link whitespace-nowrap block px-5 py-2 rounded-full text-sm transition-colors duration-200 font-semibold text-slate-800 hover:text-blue-600 hover:bg-blue-50">Menu</a></li>
-      <li><a href="#steps" class="desktop-nav-link whitespace-nowrap block px-5 py-2 rounded-full text-sm transition-colors duration-200 font-semibold text-slate-800 hover:text-blue-600 hover:bg-blue-50">Cara Pesan</a></li>
+      <li><a href="#hero" class="whitespace-nowrap block px-5 py-2 rounded-full bg-blue-600 text-white text-sm font-bold shadow-sm shadow-blue-600/30 transition-colors duration-200">Home</a></li>
+      <li><a href="#about" class="whitespace-nowrap block px-5 py-2 rounded-full text-slate-800 hover:text-blue-600 hover:bg-blue-50 text-sm font-semibold transition-colors duration-200">Tentang</a></li>
+      <li><a href="#menu" class="whitespace-nowrap block px-5 py-2 rounded-full text-slate-800 hover:text-blue-600 hover:bg-blue-50 text-sm font-semibold transition-colors duration-200">Menu</a></li>
+      <li><a href="#steps" class="whitespace-nowrap block px-5 py-2 rounded-full text-slate-800 hover:text-blue-600 hover:bg-blue-50 text-sm font-semibold transition-colors duration-200">Cara Pesan</a></li>
     </ul>
 
     <!-- CTA Button -->
@@ -132,10 +132,10 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 
   <!-- Sidebar Links -->
   <div class="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-3">
-    <a href="#hero" class="mobile-nav-link nav-sidebar-link block px-4 py-3.5 rounded-xl border border-transparent transition-all duration-200 text-base font-bold text-blue-600 bg-blue-50">Home</a>
-    <a href="#about" class="mobile-nav-link nav-sidebar-link block px-4 py-3.5 rounded-xl border border-transparent transition-all duration-200 text-base font-semibold text-slate-800 hover:text-blue-600 hover:border-slate-100 hover:bg-slate-50">Tentang</a>
-    <a href="#menu" class="mobile-nav-link nav-sidebar-link block px-4 py-3.5 rounded-xl border border-transparent transition-all duration-200 text-base font-semibold text-slate-800 hover:text-blue-600 hover:border-slate-100 hover:bg-slate-50">Menu</a>
-    <a href="#steps" class="mobile-nav-link nav-sidebar-link block px-4 py-3.5 rounded-xl border border-transparent transition-all duration-200 text-base font-semibold text-slate-800 hover:text-blue-600 hover:border-slate-100 hover:bg-slate-50">Cara Pesan</a>
+    <a href="#hero" class="nav-sidebar-link block text-blue-600 bg-blue-50 text-base font-bold px-4 py-3.5 rounded-xl transition-all duration-200">Home</a>
+    <a href="#about" class="nav-sidebar-link block text-slate-800 hover:text-blue-600 text-base font-semibold px-4 py-3.5 rounded-xl border border-transparent hover:border-slate-100 hover:bg-slate-50 transition-all duration-200">Tentang</a>
+    <a href="#menu" class="nav-sidebar-link block text-slate-800 hover:text-blue-600 text-base font-semibold px-4 py-3.5 rounded-xl border border-transparent hover:border-slate-100 hover:bg-slate-50 transition-all duration-200">Menu</a>
+    <a href="#steps" class="nav-sidebar-link block text-slate-800 hover:text-blue-600 text-base font-semibold px-4 py-3.5 rounded-xl border border-transparent hover:border-slate-100 hover:bg-slate-50 transition-all duration-200">Cara Pesan</a>
     
     <div class="mt-6 pt-6 border-t border-slate-100">
       <button id="open-qr-scanner-mobile"
@@ -649,51 +649,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
       });
       menuGridOverride.innerHTML = menuHTML;
     }
-
-    // 6. SCROLLSPY: UPDATE MENU AKTIF SAAT SCROLL
-    const sections = document.querySelectorAll('section[id]');
-    const desktopLinks = document.querySelectorAll('.desktop-nav-link');
-    const mobileLinks = document.querySelectorAll('.mobile-nav-link');
-
-    function highlightNavigation() {
-      let scrollY = window.scrollY;
-
-      sections.forEach(current => {
-        const sectionHeight = current.offsetHeight;
-        const sectionTop = current.offsetTop - 150; // Offset untuk navbar & spasi
-        const sectionId = current.getAttribute('id');
-
-        if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-          
-          // Update visual menu Desktop
-          desktopLinks.forEach(link => {
-            link.classList.remove('bg-blue-600', 'text-white', 'shadow-sm', 'shadow-blue-600/30', 'font-bold');
-            link.classList.add('text-slate-800', 'hover:text-blue-600', 'hover:bg-blue-50', 'font-semibold');
-            
-            if(link.getAttribute('href') === '#' + sectionId) {
-              link.classList.add('bg-blue-600', 'text-white', 'shadow-sm', 'shadow-blue-600/30', 'font-bold');
-              link.classList.remove('text-slate-800', 'hover:text-blue-600', 'hover:bg-blue-50', 'font-semibold');
-            }
-          });
-
-          // Update visual menu Mobile Sidebar
-          mobileLinks.forEach(link => {
-            link.classList.remove('text-blue-600', 'bg-blue-50', 'font-bold');
-            link.classList.add('text-slate-800', 'hover:text-blue-600', 'hover:border-slate-100', 'hover:bg-slate-50', 'font-semibold');
-            
-            if(link.getAttribute('href') === '#' + sectionId) {
-              link.classList.add('text-blue-600', 'bg-blue-50', 'font-bold');
-              link.classList.remove('text-slate-800', 'hover:text-blue-600', 'hover:border-slate-100', 'hover:bg-slate-50', 'font-semibold');
-            }
-          });
-        }
-      });
-    }
-
-    // Tambahkan event listener & trigger pertama kali
-    window.addEventListener('scroll', highlightNavigation);
-    highlightNavigation(); 
-
   });
 </script>
 

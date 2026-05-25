@@ -99,7 +99,13 @@ function renderMenuCards(menuData) {
 
 // ─── QR Scanner Modal ───────────────────────────────────────────────────────
 function initQRScanner() {
-  var openBtn = document.getElementById("open-qr-scanner");
+  var ids = [
+    "open-qr-scanner",
+    "open-qr-scanner-mobile",
+    "open-qr-scanner-menu",
+    "hero-order-btn",
+    "cta-order-btn",
+  ];
   var modal = document.getElementById("qr-modal");
   var closeBtn = document.getElementById("close-qr-modal");
   var statusEl = document.getElementById("qr-status");
@@ -170,7 +176,13 @@ function initQRScanner() {
     }
   }
 
-  if (openBtn) openBtn.addEventListener("click", openModal);
+  ids.forEach(function (id) {
+    var btn = document.getElementById(id);
+
+    if (btn) {
+      btn.addEventListener("click", openModal);
+    }
+  });
   if (closeBtn) closeBtn.addEventListener("click", closeModal);
 
   if (modal) {
