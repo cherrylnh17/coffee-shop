@@ -22,12 +22,10 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
   <meta name="description" content="Trafa Coffee  Nikmati kopi favoritmu dengan pemesanan digital cepat dan praktis." />
   <title>Trafa Coffee  Digital Coffee Experience</title>
 
-  <!-- Google Fonts: Playfair Display + DM Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -57,7 +55,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
     }
   </script>
 
-  <!-- html5-qrcode CDN -->
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
   
@@ -68,7 +65,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 <header id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-transparent py-4 transition-all duration-300">
   <nav class="max-w-7xl mx-auto px-5 lg:px-8 h-16 flex items-center justify-between gap-4">
 
-    <!-- Logo -->
     <a href="#hero" class="flex items-center gap-2.5 group shrink-0">
       <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center group-hover:bg-blue-700 transition-colors duration-200 shadow-md shadow-blue-600/20">
         <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
@@ -78,7 +74,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
       <span class="font-display font-bold text-xl text-slate-900 tracking-tight">Trafa <span class="text-blue-600">Coffee</span></span>
     </a>
 
-    <!-- PERBAIKAN: Menghapus backdrop-blur-md dari ul untuk mencegah bug render browser saat discroll -->
     <ul class="hidden md:flex items-center gap-1 bg-white px-2 py-1.5 rounded-full border border-slate-200 shadow-sm shrink-0">
       <li><a href="#hero" class="desktop-nav-link whitespace-nowrap block px-5 py-2 rounded-full text-sm transition-colors duration-200 font-bold bg-blue-600 text-white shadow-sm shadow-blue-600/30">Home</a></li>
       <li><a href="#about" class="desktop-nav-link whitespace-nowrap block px-5 py-2 rounded-full text-sm transition-colors duration-200 font-semibold text-slate-800 hover:text-blue-600 hover:bg-blue-50">Tentang</a></li>
@@ -94,9 +89,7 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
       </button>
     </div>
 
-    <!-- Mobile hamburger -->
     <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-slate-800 hover:text-blue-600 hover:bg-slate-100 transition-colors duration-200 bg-white shadow-sm border border-slate-200 shrink-0" aria-label="Toggle Menu">
-      <!-- Hamburger icon -->
       <svg class="w-6 h-6 block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
       </svg>
@@ -104,14 +97,10 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
   </nav>
 </header>
 
-<!-- Mobile Sidebar Menu & Overlay -->
-<!-- Overlay Gelap -->
 <div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] hidden opacity-0 transition-opacity duration-300"></div>
 
-<!-- Sidebar Container -->
 <div id="mobile-sidebar" class="fixed top-0 right-0 h-full w-[80%] max-w-sm bg-white z-[70] transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
   
-  <!-- Sidebar Header (Logo & Close Button) -->
   <div class="flex items-center justify-between px-6 py-5 border-b border-slate-100">
     <div class="flex items-center gap-2.5 group">
       <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -122,7 +111,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
       <span class="font-display font-bold text-lg text-slate-900">Trafa <span class="text-blue-600">Coffee</span></span>
     </div>
     
-    <!-- Close Button -->
     <button id="close-sidebar-btn" class="p-2 bg-slate-50 text-slate-500 rounded-full hover:bg-red-50 hover:text-red-500 transition-colors">
       <svg class="w-5 h-5 block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -130,7 +118,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
     </button>
   </div>
 
-  <!-- Sidebar Links -->
   <div class="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-3">
     <a href="#hero" class="mobile-nav-link nav-sidebar-link block px-4 py-3.5 rounded-xl border border-transparent transition-all duration-200 text-base font-bold text-blue-600 bg-blue-50">Home</a>
     <a href="#about" class="mobile-nav-link nav-sidebar-link block px-4 py-3.5 rounded-xl border border-transparent transition-all duration-200 text-base font-semibold text-slate-800 hover:text-blue-600 hover:border-slate-100 hover:bg-slate-50">Tentang</a>
@@ -154,7 +141,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 
   <div class="relative max-w-7xl mx-auto px-5 lg:px-8 w-full">
     <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center min-h-[85vh]">
-      <!-- Text Content -->
       <div class="order-2 lg:order-1 space-y-8 text-center lg:text-left relative z-10">
         <div class="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-600 text-xs font-bold px-4 py-2 rounded-full">
           <span class="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></span>
@@ -206,7 +192,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
         </div>
       </div>
 
-      <!-- Hero Visual -->
       <div class="order-1 lg:order-2 flex items-center justify-center relative mt-10 lg:mt-0">
         <div class="relative w-full max-w-sm mx-auto">
           <div class="relative w-72 h-72 sm:w-96 sm:h-96 mx-auto">
@@ -266,7 +251,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
     </div>
 
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-      <!-- Card 1 -->
       <div class="scroll-reveal glass-card p-8 hover:-translate-y-2 group">
         <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-colors duration-300">
           <svg class="w-7 h-7 text-blue-600 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -276,7 +260,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
         <h3 class="text-slate-900 font-bold text-xl mb-3">Cafe Modern</h3>
         <p class="text-slate-700 text-sm leading-relaxed">Desain interior elegan dengan suasana nyaman yang menginspirasi kreativitasmu.</p>
       </div>
-      <!-- Card 2 -->
       <div class="scroll-reveal glass-card p-8 hover:-translate-y-2 group" style="transition-delay: 100ms;">
         <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-colors duration-300">
           <svg class="w-7 h-7 text-blue-600 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -286,7 +269,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
         <h3 class="text-slate-900 font-bold text-xl mb-3">Pesan Digital</h3>
         <p class="text-slate-700 text-sm leading-relaxed">Scan QR di mejamu, pilih menu, dan bayar  semua dalam genggamanmu.</p>
       </div>
-      <!-- Card 3 -->
       <div class="scroll-reveal glass-card p-8 hover:-translate-y-2 group" style="transition-delay: 200ms;">
         <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-colors duration-300">
           <svg class="w-7 h-7 text-blue-600 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -296,7 +278,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
         <h3 class="text-slate-900 font-bold text-xl mb-3">Cepat & Praktis</h3>
         <p class="text-slate-700 text-sm leading-relaxed">Proses order hanya hitungan detik. Tanpa antre, tanpa ribet.</p>
       </div>
-      <!-- Card 4 -->
       <div class="scroll-reveal glass-card p-8 hover:-translate-y-2 group" style="transition-delay: 300ms;">
         <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-colors duration-300">
           <svg class="w-7 h-7 text-blue-600 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -308,7 +289,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
       </div>
     </div>
 
-    <!-- Bottom visual strip -->
     <div class="mt-16 scroll-reveal">
       <div class="bg-blue-600 rounded-3xl p-8 lg:p-12 flex flex-col lg:flex-row items-center gap-8 overflow-hidden relative shadow-2xl shadow-blue-600/20">
         <div class="absolute inset-0 opacity-[0.1]" style="background-image: radial-gradient(circle, white 2px, transparent 2px); background-size: 30px 30px;"></div>
@@ -345,10 +325,7 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
       <p class="text-slate-700 text-lg max-w-md mx-auto">Dibuat dengan biji kopi premium pilihan dan cinta dari barista kami.</p>
     </div>
 
-    <!-- ID diubah menjadi menu-grid-override agar app.js tidak menimpanya -->
-    <!-- Saya menyuntikkan script khusus di bawah untuk merender secara statis dan solid -->
     <div id="menu-grid-override" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-      <!-- Loading skeleton -->
       <?php for ($i = 0; $i < 6; $i++): ?>
       <div class="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm animate-pulse">
         <div class="h-56 bg-slate-200"></div>
@@ -390,7 +367,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
     <div class="grid md:grid-cols-3 gap-12 relative">
       <div class="hidden md:block absolute top-[3.5rem] left-[15%] right-[15%] h-0.5 bg-gradient-to-r from-blue-100 via-blue-300 to-blue-100 pointer-events-none"></div>
 
-      <!-- Step 1 -->
       <div class="scroll-reveal flex flex-col items-center text-center group">
         <div class="relative mb-8 bg-white z-10 px-4">
           <div class="w-24 h-24 bg-white border-2 border-blue-100 rounded-3xl flex items-center justify-center group-hover:border-blue-600 group-hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-slate-200">
@@ -404,7 +380,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
         <p class="text-slate-700 text-base leading-relaxed max-w-[16rem]">Buka kamera HP dan scan QR code yang tersedia di mejamu untuk membuka menu digital.</p>
       </div>
 
-      <!-- Step 2 -->
       <div class="scroll-reveal flex flex-col items-center text-center group" style="transition-delay: 150ms;">
         <div class="relative mb-8 bg-white z-10 px-4">
           <div class="w-24 h-24 bg-white border-2 border-blue-100 rounded-3xl flex items-center justify-center group-hover:border-blue-600 group-hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-slate-200">
@@ -418,7 +393,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
         <p class="text-slate-700 text-base leading-relaxed max-w-[16rem]">Jelajahi menu lengkap, pilih favoritmu, dan tambahkan ke keranjang dengan mudah.</p>
       </div>
 
-      <!-- Step 3 -->
       <div class="scroll-reveal flex flex-col items-center text-center group" style="transition-delay: 300ms;">
         <div class="relative mb-8 bg-white z-10 px-4">
           <div class="w-24 h-24 bg-white border-2 border-blue-100 rounded-3xl flex items-center justify-center group-hover:border-blue-600 group-hover:-translate-y-2 transition-all duration-300 shadow-xl shadow-slate-200">
@@ -503,7 +477,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
         <h4 class="text-slate-900 font-bold text-sm mb-6 tracking-wider uppercase">Ikuti Kami</h4>
         <div class="flex gap-4">
           <a href="#" class="w-10 h-10 bg-white border border-slate-200 hover:border-blue-600 hover:bg-blue-600 rounded-xl flex items-center justify-center text-slate-500 hover:text-white transition-all duration-300 shadow-sm" aria-label="Sosmed">
-             <!-- Icon Placeholders -->
              <span class="font-bold">IG</span>
           </a>
         </div>
@@ -571,8 +544,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
       observer.observe(el);
     });
 
-    // 2. PERBAIKAN: SCRIPT SCROLL NAVBAR 
-    // Menggunakan kelas Tailwind langsung agar terhindar dari bug @layer CDN
     const navbar = document.getElementById('navbar');
     window.addEventListener('scroll', () => {
       if (window.scrollY > 20) {
@@ -584,7 +555,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
       }
     });
 
-    // 3. MOBILE SIDEBAR TOGGLE
     const mobileBtn = document.getElementById('mobile-menu-btn');
     const closeSidebarBtn = document.getElementById('close-sidebar-btn');
     const sidebar = document.getElementById('mobile-sidebar');
@@ -606,18 +576,16 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
     if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
     if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
 
-    // Tutup menu saat link di sidebar diklik
     document.querySelectorAll('.nav-sidebar-link').forEach(link => {
       link.addEventListener('click', closeSidebar);
     });
 
-    // 4. QR SCANNER TRIGGERS
     const qrModal = document.getElementById('qr-modal');
     function openQrModal() {
       if (qrModal) {
         qrModal.classList.remove('hidden');
         qrModal.classList.add('flex');
-        if(typeof closeSidebar === 'function') closeSidebar(); // tutup sidebar jika qr dibuka dr HP
+        if(typeof closeSidebar === 'function') closeSidebar();
       }
     }
     
@@ -627,7 +595,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
       if (el) el.addEventListener('click', openQrModal);
     });
 
-    // 5. RENDER MENU STATIS LOKAL
     const menuGridOverride = document.getElementById('menu-grid-override');
     if (menuGridOverride && window.TRAFA_MENU_DATA && window.TRAFA_MENU_DATA.length > 0) {
       let menuHTML = '';
@@ -660,12 +627,11 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 
       sections.forEach(current => {
         const sectionHeight = current.offsetHeight;
-        const sectionTop = current.offsetTop - 150; // Offset untuk navbar & spasi
+        const sectionTop = current.offsetTop - 150;
         const sectionId = current.getAttribute('id');
 
         if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
           
-          // Update visual menu Desktop
           desktopLinks.forEach(link => {
             link.classList.remove('bg-blue-600', 'text-white', 'shadow-sm', 'shadow-blue-600/30', 'font-bold');
             link.classList.add('text-slate-800', 'hover:text-blue-600', 'hover:bg-blue-50', 'font-semibold');
@@ -676,7 +642,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
             }
           });
 
-          // Update visual menu Mobile Sidebar
           mobileLinks.forEach(link => {
             link.classList.remove('text-blue-600', 'bg-blue-50', 'font-bold');
             link.classList.add('text-slate-800', 'hover:text-blue-600', 'hover:border-slate-100', 'hover:bg-slate-50', 'font-semibold');
@@ -690,13 +655,11 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
       });
     }
 
-    // Tambahkan event listener & trigger pertama kali
     window.addEventListener('scroll', highlightNavigation);
     highlightNavigation(); 
 
 </script>
 
-<!-- Main app -->
 <script src="assets/js/app.js"></script>
 
 </body>

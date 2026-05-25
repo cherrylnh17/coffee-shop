@@ -203,11 +203,9 @@ include 'layout/sidebar.php';
 
         if (paidInput) {
             paidInput.addEventListener('input', function() {
-                // Ambil angka murni tanpa titik
                 let raw = this.value.replace(/\./g, '');
                 let paid = parseInt(raw) || 0;
 
-                // Format tampilan dengan titik pemisah ribuan
                 this.value = paid === 0 ? '' : paid.toLocaleString('id-ID');
 
                 let change = paid - totalAmount;
