@@ -601,7 +601,7 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 ════════════════════════════════════════════════════════════════ -->
 <script>
   var BASE_URL = "<?= rtrim(BASE_URL, '/') ?>";
-  var APP_REDIRECT = "<?= APP_REDIRECT ?>";
+  var APP_REDIRECT = "<?= APP_REDIRECT_SCAN ?>";
   window.TRAFA_MENU_DATA = <?= $menuJson ?>;
 </script> 
 

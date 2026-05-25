@@ -3,6 +3,7 @@
 define('APP_NAME', 'Trafa Coffe');
 define('APP_URL', 'http://localhost/coffee-shop/');
 define('APP_LOCATION', 'Asia/Jakarta');
+define('APP_REDIRECT_SCAN', 'order');
 
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'coffee');
