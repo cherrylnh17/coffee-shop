@@ -1,13 +1,9 @@
 <?php
-/**
- * index.php
- * Trafa Coffee — Landing Page
- */
 
-require_once 'path.php';   // defines BASE_URL constant
-require_once 'config.php'; // defines $pdo (PDO connection)
 
-// ─── Fetch menu from database ───────────────────────────────────────────────
+require_once 'path.php'; 
+require_once 'config.php'; 
+
 $menuItems = [];
 try {
     $stmt = $pdo->query("SELECT name, image, description FROM menu LIMIT 6");
@@ -23,8 +19,8 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Trafa Coffee — Nikmati kopi favoritmu dengan pemesanan digital cepat dan praktis." />
-  <title>Trafa Coffee — Digital Coffee Experience</title>
+  <meta name="description" content="Trafa Coffee  Nikmati kopi favoritmu dengan pemesanan digital cepat dan praktis." />
+  <title>Trafa Coffee  Digital Coffee Experience</title>
 
   <!-- Google Fonts: Playfair Display + DM Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -49,7 +45,7 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
               300: '#93c5fd',
               400: '#60a5fa',
               500: '#3b82f6',
-              600: '#2563eb', // Primary Blue 600
+              600: '#2563eb', 
               700: '#1d4ed8',
               800: '#1e3a8a',
               900: '#0f172a',
@@ -64,37 +60,11 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
   <!-- html5-qrcode CDN -->
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
-  <!-- Inline-free custom Tailwind utilities via @layer -->
-  <style type="text/tailwindcss">
-    @layer base {
-      html { font-family: 'DM Sans', sans-serif; }
-      body { @apply bg-slate-50 text-slate-800 antialiased overflow-x-hidden; }
-    }
-    @layer utilities {
-      .font-display { font-family: 'Playfair Display', Georgia, serif; }
-      
-      .scroll-reveal { @apply opacity-0 translate-y-8 transition-all duration-700 ease-out; }
-      .scroll-reveal.animate-in { @apply opacity-100 translate-y-0; }
-      
-      .line-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
-      .glass-card {
-        @apply bg-white border border-slate-100 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300;
-      }
-    }
-  </style>
+  
 </head>
 
 <body>
 
-<!-- ═══════════════════════════════════════════════════════════════
-     NAVBAR
-════════════════════════════════════════════════════════════════ -->
-<!-- Menghapus custom class nav-top & nav-scrolled, menggunakan class bawaan Tailwind secara dinamis -->
 <header id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-transparent py-4 transition-all duration-300">
   <nav class="max-w-7xl mx-auto px-5 lg:px-8 h-16 flex items-center justify-between gap-4">
 
@@ -177,9 +147,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 </div>
 
 
-<!-- ═══════════════════════════════════════════════════════════════
-     HERO SECTION
-════════════════════════════════════════════════════════════════ -->
 <section id="hero" class="relative min-h-screen flex items-center overflow-hidden bg-slate-50 pt-20 pb-12 lg:py-0">
   <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-100 rounded-full blur-[100px] opacity-60 pointer-events-none -translate-y-1/2 translate-x-1/3"></div>
   <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-50 rounded-full blur-[80px] pointer-events-none translate-y-1/3 -translate-x-1/4"></div>
@@ -285,9 +252,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 </section>
 
 
-<!-- ═══════════════════════════════════════════════════════════════
-     TENTANG KAMI
-════════════════════════════════════════════════════════════════ -->
 <section id="about" class="relative py-24 lg:py-32 bg-white">
   <div class="relative max-w-7xl mx-auto px-5 lg:px-8">
     <div class="text-center mb-16 scroll-reveal">
@@ -320,7 +284,7 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
           </svg>
         </div>
         <h3 class="text-slate-900 font-bold text-xl mb-3">Pesan Digital</h3>
-        <p class="text-slate-700 text-sm leading-relaxed">Scan QR di mejamu, pilih menu, dan bayar — semua dalam genggamanmu.</p>
+        <p class="text-slate-700 text-sm leading-relaxed">Scan QR di mejamu, pilih menu, dan bayar  semua dalam genggamanmu.</p>
       </div>
       <!-- Card 3 -->
       <div class="scroll-reveal glass-card p-8 hover:-translate-y-2 group" style="transition-delay: 200ms;">
@@ -370,9 +334,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 </section>
 
 
-<!-- ═══════════════════════════════════════════════════════════════
-     SAMPLE MENU
-════════════════════════════════════════════════════════════════ -->
 <section id="menu" class="relative py-24 lg:py-32 bg-slate-50 border-y border-slate-200/60">
   <div class="relative max-w-7xl mx-auto px-5 lg:px-8">
     <div class="text-center mb-16 scroll-reveal">
@@ -415,9 +376,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 </section>
 
 
-<!-- ═══════════════════════════════════════════════════════════════
-     CARA PEMESANAN
-════════════════════════════════════════════════════════════════ -->
 <section id="steps" class="relative py-24 lg:py-32 bg-white overflow-hidden">
   <div class="relative max-w-7xl mx-auto px-5 lg:px-8">
     <div class="text-center mb-20 scroll-reveal">
@@ -478,9 +436,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 </section>
 
 
-<!-- ═══════════════════════════════════════════════════════════════
-     CTA ORDER
-════════════════════════════════════════════════════════════════ -->
 <section class="relative py-24 lg:py-32 overflow-hidden bg-blue-600">
   <div class="absolute top-0 right-0 w-96 h-96 bg-blue-500 rounded-full blur-[80px] opacity-60"></div>
   <div class="absolute bottom-0 left-0 w-80 h-80 bg-blue-700 rounded-full blur-[80px] opacity-60"></div>
@@ -500,7 +455,7 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
         Hanya Satu Scan
       </h2>
       <p class="text-blue-100 text-lg sm:text-xl mb-12 max-w-2xl mx-auto leading-relaxed">
-        Scan QR code di mejamu sekarang dan nikmati pengalaman memesan kopi yang berbeda — cepat, mudah, dan menyenangkan.
+        Scan QR code di mejamu sekarang dan nikmati pengalaman memesan kopi yang berbeda  cepat, mudah, dan menyenangkan.
       </p>
       <button id="cta-order-btn"
         class="group relative inline-flex items-center gap-3 bg-white hover:bg-slate-50 text-blue-600 font-bold text-lg px-10 py-5 rounded-full transition-all duration-300 shadow-2xl hover:shadow-white/20 hover:-translate-y-1 active:scale-95 overflow-hidden">
@@ -519,9 +474,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 </section>
 
 
-<!-- ═══════════════════════════════════════════════════════════════
-     FOOTER
-════════════════════════════════════════════════════════════════ -->
 <footer class="relative bg-white border-t border-slate-200">
   <div class="max-w-7xl mx-auto px-5 lg:px-8 py-16">
     <div class="grid md:grid-cols-3 gap-12 mb-12">
@@ -567,9 +519,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 </footer>
 
 
-<!-- ═══════════════════════════════════════════════════════════════
-     QR SCANNER MODAL
-════════════════════════════════════════════════════════════════ -->
 <div id="qr-modal"
      class="hidden fixed inset-0 z-[999] bg-slate-900/60 backdrop-blur-sm items-center justify-center p-5">
   <div class="relative w-full max-w-sm bg-white rounded-3xl p-6 lg:p-8 shadow-2xl">
@@ -596,9 +545,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 </div>
 
 
-<!-- ═══════════════════════════════════════════════════════════════
-     INJECT MENU DATA + SCRIPTS + INTERACTION LOGIC
-════════════════════════════════════════════════════════════════ -->
 <script>
   var BASE_URL = "<?= rtrim(BASE_URL, '/') ?>";
   var APP_REDIRECT = "<?= APP_REDIRECT_SCAN ?>";
