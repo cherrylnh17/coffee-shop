@@ -23,22 +23,6 @@ function initNavbar() {
   });
 }
 
-// ─── Mobile Menu Toggle ─────────────────────────────────────────────────────
-function initMobileMenu() {
-  var btn  = document.getElementById('mobile-menu-btn');
-  var menu = document.getElementById('mobile-menu');
-  if (!btn || !menu) return;
-
-  btn.addEventListener('click', function () {
-    menu.classList.toggle('hidden');
-  });
-
-  menu.querySelectorAll('a').forEach(function (link) {
-    link.addEventListener('click', function () {
-      menu.classList.add('hidden');
-    });
-  });
-}
 
 // ─── Smooth Scroll ──────────────────────────────────────────────────────────
 function initSmoothScroll() {
@@ -192,37 +176,12 @@ function initScrollAnimations() {
   });
 }
 
-// ─── Active Nav Link ────────────────────────────────────────────────────────
-function initActiveNav() {
-  var sections  = document.querySelectorAll('section[id]');
-  var navLinks  = document.querySelectorAll('.nav-link');
-
-  window.addEventListener('scroll', function () {
-    var current = '';
-    sections.forEach(function (section) {
-      if (window.scrollY >= section.offsetTop - 100) {
-        current = section.getAttribute('id');
-      }
-    });
-
-    navLinks.forEach(function (link) {
-      link.classList.remove('text-blue-400');
-      link.classList.add('text-white/70');
-      if (link.getAttribute('href') === '#' + current) {
-        link.classList.add('text-blue-400');
-        link.classList.remove('text-white/70');
-      }
-    });
-  });
-}
 
 // ─── Init All ───────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function () {
   initNavbar();
-  initMobileMenu();
   initSmoothScroll();
   initScrollAnimations();
-  initActiveNav();
   initQRScanner();
 
   // Render menu dari data yang di-inject PHP
