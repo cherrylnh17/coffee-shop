@@ -662,7 +662,7 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 
   // Inject PHP menu data ke JS global
   window.TRAFA_MENU_DATA = <?= $menuJson ?>;
-</script>
+</script> 
 
 <!-- Helper URL (file milik project, mendefinisikan getImageUrl secara global) -->
 <script src="assets/js/helperUrl.js"></script>
