@@ -125,8 +125,8 @@ function initQRScanner() {
     var tableNumber = decodedText.trim();
 
     // Bangun URL dari env yang sudah di-inject PHP
-    var baseUrl       = (window.APP_URL || '').replace(/\/$/, '');
-    var redirectOrder = (window.APP_REDIRECT_SCAN || 'order').replace(/^\/|\/$/g, '');
+    var baseUrl       = (window.BASE_URL || '').replace(/\/$/, '');
+    var redirectOrder = (window.APP_REDIRECT || 'order').replace(/^\/|\/$/g, '');
     var redirectUrl   = baseUrl + '/' + redirectOrder + '/' + tableNumber + '/index';
 
     stopScanner();
