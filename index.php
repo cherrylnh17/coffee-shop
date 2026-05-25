@@ -73,11 +73,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
     @layer utilities {
       .font-display { font-family: 'Playfair Display', Georgia, serif; }
       
-      /* PERBAIKAN NAVBAR: Transisi yang lebih jelas antara posisi atas dan saat discroll */
-      .nav-top { @apply bg-transparent py-4; }
-      .nav-scrolled { @apply bg-white/95 backdrop-blur-lg border-b border-slate-200 shadow-md py-2; }
-      .nav-link { @apply transition-colors duration-200; }
-      
       .scroll-reveal { @apply opacity-0 translate-y-8 transition-all duration-700 ease-out; }
       .scroll-reveal.animate-in { @apply opacity-100 translate-y-0; }
       
@@ -99,11 +94,12 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 <!-- ═══════════════════════════════════════════════════════════════
      NAVBAR
 ════════════════════════════════════════════════════════════════ -->
-<header id="navbar" class="fixed top-0 left-0 right-0 z-50 nav-top transition-all duration-500">
-  <nav class="max-w-7xl mx-auto px-5 lg:px-8 h-16 flex items-center justify-between">
+<!-- Menghapus custom class nav-top & nav-scrolled, menggunakan class bawaan Tailwind secara dinamis -->
+<header id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-transparent py-4 transition-all duration-300">
+  <nav class="max-w-7xl mx-auto px-5 lg:px-8 h-16 flex items-center justify-between gap-4">
 
     <!-- Logo -->
-    <a href="#hero" class="flex items-center gap-2.5 group">
+    <a href="#hero" class="flex items-center gap-2.5 group shrink-0">
       <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center group-hover:bg-blue-700 transition-colors duration-200 shadow-md shadow-blue-600/20">
         <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
           <path d="M2 21V19H20V21H2ZM20 8C20 8 18 10 12 10C6 10 4 8 4 8V3H20V8ZM6 5V7.5C7.2 7.83 9.33 8 12 8C14.67 8 16.8 7.83 18 7.5V5H6Z"/>
@@ -112,16 +108,16 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
       <span class="font-display font-bold text-xl text-slate-900 tracking-tight">Trafa <span class="text-blue-600">Coffee</span></span>
     </a>
 
-    <!-- Desktop Nav Links -->
-    <ul class="hidden md:flex items-center bg-white px-2 py-1.5 rounded-full border border-slate-200 shadow-sm shadow-slate-200/50">
-      <li><a href="#hero" class="nav-link block px-6 py-2 rounded-full text-blue-600 text-sm font-bold bg-blue-50/50">Home</a></li>
-      <li><a href="#about" class="nav-link block px-6 py-2 rounded-full text-slate-800 hover:text-blue-600 hover:bg-slate-50 text-sm font-semibold transition-all">Tentang</a></li>
-      <li><a href="#menu" class="nav-link block px-6 py-2 rounded-full text-slate-800 hover:text-blue-600 hover:bg-slate-50 text-sm font-semibold transition-all">Menu</a></li>
-      <li><a href="#steps" class="nav-link block px-6 py-2 rounded-full text-slate-800 hover:text-blue-600 hover:bg-slate-50 text-sm font-semibold transition-all">Cara Pesan</a></li>
+    <!-- PERBAIKAN: Menghapus backdrop-blur-md dari ul untuk mencegah bug render browser saat discroll -->
+    <ul class="hidden md:flex items-center gap-1 bg-white px-2 py-1.5 rounded-full border border-slate-200 shadow-sm shrink-0">
+      <li><a href="#hero" class="whitespace-nowrap block px-5 py-2 rounded-full bg-blue-600 text-white text-sm font-bold shadow-sm shadow-blue-600/30 transition-colors duration-200">Home</a></li>
+      <li><a href="#about" class="whitespace-nowrap block px-5 py-2 rounded-full text-slate-800 hover:text-blue-600 hover:bg-blue-50 text-sm font-semibold transition-colors duration-200">Tentang</a></li>
+      <li><a href="#menu" class="whitespace-nowrap block px-5 py-2 rounded-full text-slate-800 hover:text-blue-600 hover:bg-blue-50 text-sm font-semibold transition-colors duration-200">Menu</a></li>
+      <li><a href="#steps" class="whitespace-nowrap block px-5 py-2 rounded-full text-slate-800 hover:text-blue-600 hover:bg-blue-50 text-sm font-semibold transition-colors duration-200">Cara Pesan</a></li>
     </ul>
 
     <!-- CTA Button -->
-    <div class="hidden md:flex items-center gap-3">
+    <div class="hidden md:flex items-center gap-3 shrink-0">
       <button id="open-qr-scanner"
         class="bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-sm font-semibold px-6 py-2.5 rounded-full transition-all duration-200 shadow-lg shadow-blue-600/30">
         Order Sekarang
@@ -129,7 +125,7 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
     </div>
 
     <!-- Mobile hamburger -->
-    <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-slate-800 hover:text-blue-600 hover:bg-slate-100 transition-colors duration-200 bg-white shadow-sm border border-slate-200" aria-label="Toggle Menu">
+    <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg text-slate-800 hover:text-blue-600 hover:bg-slate-100 transition-colors duration-200 bg-white shadow-sm border border-slate-200 shrink-0" aria-label="Toggle Menu">
       <!-- Hamburger icon -->
       <svg class="w-6 h-6 block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
@@ -138,7 +134,7 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
   </nav>
 </header>
 
-<!-- PERBAIKAN: Mobile Sidebar Menu & Overlay -->
+<!-- Mobile Sidebar Menu & Overlay -->
 <!-- Overlay Gelap -->
 <div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] hidden opacity-0 transition-opacity duration-300"></div>
 
@@ -375,7 +371,7 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 
 
 <!-- ═══════════════════════════════════════════════════════════════
-     SAMPLE MENU (PERBAIKAN: Teks Solid & Hapus Tombol Detail)
+     SAMPLE MENU
 ════════════════════════════════════════════════════════════════ -->
 <section id="menu" class="relative py-24 lg:py-32 bg-slate-50 border-y border-slate-200/60">
   <div class="relative max-w-7xl mx-auto px-5 lg:px-8">
@@ -629,19 +625,20 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
       observer.observe(el);
     });
 
-    // 2. NAVBAR SCROLL EFFECT
+    // 2. PERBAIKAN: SCRIPT SCROLL NAVBAR 
+    // Menggunakan kelas Tailwind langsung agar terhindar dari bug @layer CDN
     const navbar = document.getElementById('navbar');
     window.addEventListener('scroll', () => {
       if (window.scrollY > 20) {
-        navbar.classList.remove('nav-top');
-        navbar.classList.add('nav-scrolled');
+        navbar.classList.add('bg-white/95', 'backdrop-blur-md', 'border-b', 'border-slate-200', 'shadow-sm', 'py-2');
+        navbar.classList.remove('bg-transparent', 'py-4');
       } else {
-        navbar.classList.add('nav-top');
-        navbar.classList.remove('nav-scrolled');
+        navbar.classList.add('bg-transparent', 'py-4');
+        navbar.classList.remove('bg-white/95', 'backdrop-blur-md', 'border-b', 'border-slate-200', 'shadow-sm', 'py-2');
       }
     });
 
-    // 3. MOBILE SIDEBAR TOGGLE (PERBAIKAN)
+    // 3. MOBILE SIDEBAR TOGGLE
     const mobileBtn = document.getElementById('mobile-menu-btn');
     const closeSidebarBtn = document.getElementById('close-sidebar-btn');
     const sidebar = document.getElementById('mobile-sidebar');
@@ -684,17 +681,13 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
       if (el) el.addEventListener('click', openQrModal);
     });
 
-    // 5. RENDER MENU STATIS LOKAL (PERBAIKAN TAMPILAN KARTU)
-    // Script ini menimpa/mengganti app.js hanya untuk section card di index.php
-    // Membuat font/teks menjadi warna solid gelap tanpa opacity dan menghilangkan "Lihat Detail"
+    // 5. RENDER MENU STATIS LOKAL
     const menuGridOverride = document.getElementById('menu-grid-override');
     if (menuGridOverride && window.TRAFA_MENU_DATA && window.TRAFA_MENU_DATA.length > 0) {
       let menuHTML = '';
       window.TRAFA_MENU_DATA.forEach(item => {
-        // Tentukan path gambar
         let imgSrc = (typeof getImageUrl === 'function') ? getImageUrl(item.image) : (BASE_URL + '/assets/img/menu/' + item.image);
         
-        // Tampilan card HTML baru (Teks hitam solid dan tanpa link lihat detail)
         menuHTML += `
         <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all duration-300 flex flex-col group">
           <div class="h-56 bg-slate-100 overflow-hidden relative">
@@ -713,7 +706,7 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
   });
 </script>
 
-<!-- Main app (Tetap dibiarkan namun bagian menu-grid sudah di-handle script di atas) -->
+<!-- Main app -->
 <script src="assets/js/app.js"></script>
 
 
