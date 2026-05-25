@@ -135,19 +135,22 @@ function initQRScanner() {
     var config = { fps: 10, qrbox: { width: 220, height: 220 }, aspectRatio: 1.0 };
 
     scanner.start(
-      { facingMode: 'environment' },
-      config,
-      function (decodedText) {
-        stopScanner();
-        statusEl.textContent = '✅ QR berhasil dibaca! Mengalihkan...';
-        setTimeout(function () {
-          window.location.href = decodedText;
-        }, 800);
-      },
-      function () { /* frame error — abaikan */ }
-    ).catch(function () {
-      statusEl.textContent = '⚠️ Tidak dapat mengakses kamera. Pastikan izin kamera diaktifkan.';
-    });
+  { facingMode: 'environment' },
+  config,
+  function (decodedText) {
+    var tableNumber = decodedText.trim();
+
+    // Bangun URL dari env yang sudah di-inject PHP
+    var baseUrl       = (window.APP_URL || '').replace(/\/$/, '');
+    var redirectOrder = (window.APP_REDIRECT_SCAN || 'order').replace(/^\/|\/$/g, '');
+    var redirectUrl   = baseUrl + '/' + redirectOrder + '/' + tableNumber + '/index';
+
+    stopScanner();
+    statusEl.textContent = '✅ QR berhasil dibaca! Mengalihkan ke Meja ' + tableNumber + '...';
+    setTimeout(function () {
+      window.location.href = redirectUrl;
+    }, 800);
+  });
   }
 
   function stopScanner() {
