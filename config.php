@@ -20,3 +20,14 @@ try {
 
 // set waktu wib
 date_default_timezone_set(APP_LOCATION);
+
+
+
+// $_DB = [
+//   [
+//     'SERVER'   => DB_HOST,
+//     'USERNAME' => DB_USER,
+//     'PASSWORD' => DB_PASS,
+//     'DATABASE' => DB_NAME,
+//   ]
+// ];

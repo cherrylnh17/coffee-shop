@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: May 21, 2026 at 05:23 AM
+-- Generation Time: May 22, 2026 at 08:53 AM
 -- Server version: 8.0.45-0ubuntu0.24.04.1
 -- PHP Version: 8.4.19
 
@@ -27,6 +27,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `menu`
 --
 
+DROP TABLE IF EXISTS `menu`;
 CREATE TABLE `menu` (
   `id` int UNSIGNED NOT NULL,
   `name` varchar(50) NOT NULL,
@@ -67,6 +68,7 @@ INSERT INTO `menu` (`id`, `name`, `image`, `category`, `price`, `description`, `
 -- Table structure for table `order`
 --
 
+DROP TABLE IF EXISTS `order`;
 CREATE TABLE `order` (
   `id` int UNSIGNED NOT NULL,
   `code` varchar(50) NOT NULL,
@@ -96,11 +98,10 @@ CREATE TABLE `order` (
 
 INSERT INTO `order` (`id`, `code`, `user_id`, `user_name`, `table_id`, `table_name`, `customer_name`, `customer_email`, `qty`, `subtotal`, `tax`, `paid`, `change`, `total`, `payment`, `detail`, `status`, `created_at`, `updated_at`, `expired_at`) VALUES
 (67, 'ORD-tsvdt9Rt', NULL, NULL, 2, '7', '122', '', 1, 18000, 2160, 0, 0, 20160, 1, '1 Avocado Juice', 1, '2026-05-20 11:15:53', NULL, '2026-05-20 11:25:53'),
-(68, 'ORD-rKY2hJ3G', NULL, NULL, 2, '7', 'aa', '', 1, 12000, 1440, 0, 0, 13440, 1, '1 Lemon Tea Ice', 3, '2026-05-20 11:35:56', NULL, '2026-05-20 11:45:56'),
-(69, 'ORD-PjKTYqkU', NULL, NULL, 1, '1', 'aa', '', 6, 132000, 15840, 0, 0, 147840, 1, '1 Lemon Tea Ice, 1 Sate Ayam Madura, 1 Pasta Carbonara, 1 Kentang Goreng (Fries), 1 Mie Goreng Jawa, 1 Avocado Juice', 3, '2026-05-20 13:49:51', NULL, '2026-05-20 13:59:51'),
-(70, 'ORD-32vKUJ9U', NULL, NULL, 1, '1', 'q', '', 1, 12000, 1440, 0, 0, 13440, 1, '1 Lemon Tea Ice', 3, '2026-05-20 13:59:23', NULL, '2026-05-20 14:09:23'),
-(71, 'ORD-oZMglwzh', NULL, NULL, 1, '1', 'qa', '', 1, 12000, 1440, 0, 0, 13440, 1, '1 Lemon Tea Ice', 3, '2026-05-20 13:59:32', NULL, '2026-05-20 14:09:32'),
-(72, 'ORD-wJhBPDAv', 1, 'q', 1, '1', 'qal', '', 4, 34888, 4187, 40000, 925, 39075, 1, '1 Lemon Tea Ice, 1 Es Kopi Susu Gula Aren, 2 sfsdfsfd', 1, '2026-05-21 10:57:25', NULL, '2026-05-21 11:07:25');
+(72, 'ORD-wJhBPDAv', 1, 'q', 1, '1', 'qal', '', 4, 34888, 4187, 40000, 925, 39075, 1, '1 Lemon Tea Ice, 1 Es Kopi Susu Gula Aren, 2 sfsdfsfd', 1, '2026-05-21 10:57:25', NULL, '2026-05-21 11:07:25'),
+(73, 'ORD-1wCeCCTn', 1, 'q', 1, '1', 'a', '', 1, 12000, 1440, 15000, 1560, 13440, 1, '1 Lemon Tea Ice', 1, '2026-05-21 12:44:40', NULL, '2026-05-21 12:54:40'),
+(74, 'ORD-nVREaVZD', 1, 'q', 1, '1', 'aa', '', 1, 12000, 1440, 1000000000, 999986560, 13440, 1, '1 Lemon Tea Ice', 1, '2026-05-21 13:37:19', NULL, '2026-05-21 13:47:19'),
+(75, 'ORD-cgEFKT8f', 1, 'q', 1, '1', 'sss', '', 2, 40000, 4800, 50000, 5200, 44800, 1, '1 Mie Goreng Jawa, 1 Avocado Juice', 1, '2026-05-22 10:14:04', NULL, '2026-05-22 10:24:04');
 
 -- --------------------------------------------------------
 
@@ -108,6 +109,7 @@ INSERT INTO `order` (`id`, `code`, `user_id`, `user_name`, `table_id`, `table_na
 -- Table structure for table `order_item`
 --
 
+DROP TABLE IF EXISTS `order_item`;
 CREATE TABLE `order_item` (
   `id` int UNSIGNED NOT NULL,
   `order_id` int UNSIGNED NOT NULL,
@@ -126,18 +128,13 @@ CREATE TABLE `order_item` (
 
 INSERT INTO `order_item` (`id`, `order_id`, `menu_id`, `menu_name`, `qty`, `subtotal`, `notes`, `created_at`, `updated_at`) VALUES
 (99, 67, 15, 'Avocado Juice', 1, 18000, '', '2026-05-20 11:15:53', NULL),
-(100, 68, 12, 'Lemon Tea Ice', 1, 12000, '', '2026-05-20 11:35:56', NULL),
-(101, 69, 12, 'Lemon Tea Ice', 1, 12000, '', '2026-05-20 13:49:51', NULL),
-(102, 69, 8, 'Sate Ayam Madura', 1, 30000, '', '2026-05-20 13:49:51', NULL),
-(103, 69, 5, 'Pasta Carbonara', 1, 35000, '', '2026-05-20 13:49:51', NULL),
-(104, 69, 6, 'Kentang Goreng (Fries)', 1, 15000, '', '2026-05-20 13:49:51', NULL),
-(105, 69, 2, 'Mie Goreng Jawa', 1, 22000, '', '2026-05-20 13:49:51', NULL),
-(106, 69, 15, 'Avocado Juice', 1, 18000, '', '2026-05-20 13:49:51', NULL),
-(107, 70, 12, 'Lemon Tea Ice', 1, 12000, '', '2026-05-20 13:59:23', NULL),
-(108, 71, 12, 'Lemon Tea Ice', 1, 12000, '', '2026-05-20 13:59:32', NULL),
 (109, 72, 12, 'Lemon Tea Ice', 1, 12000, '', '2026-05-21 10:57:25', NULL),
 (110, 72, 9, 'Es Kopi Susu Gula Aren', 1, 18000, '', '2026-05-21 10:57:25', NULL),
-(111, 72, 17, 'sfsdfsfd', 2, 4888, '', '2026-05-21 10:57:25', NULL);
+(111, 72, 17, 'sfsdfsfd', 2, 4888, '', '2026-05-21 10:57:25', NULL),
+(112, 73, 12, 'Lemon Tea Ice', 1, 12000, 'cihuy', '2026-05-21 12:44:40', NULL),
+(113, 74, 12, 'Lemon Tea Ice', 1, 12000, '', '2026-05-21 13:37:19', NULL),
+(114, 75, 2, 'Mie Goreng Jawa', 1, 22000, '', '2026-05-22 10:14:04', NULL),
+(115, 75, 15, 'Avocado Juice', 1, 18000, '', '2026-05-22 10:14:04', NULL);
 
 -- --------------------------------------------------------
 
@@ -145,6 +142,7 @@ INSERT INTO `order_item` (`id`, `order_id`, `menu_id`, `menu_name`, `qty`, `subt
 -- Table structure for table `printer`
 --
 
+DROP TABLE IF EXISTS `printer`;
 CREATE TABLE `printer` (
   `id` int NOT NULL,
   `name` varchar(100) NOT NULL,
@@ -174,6 +172,7 @@ INSERT INTO `printer` (`id`, `name`, `type`, `bt_mac`, `bt_channel`, `rfcomm_dev
 -- Table structure for table `table`
 --
 
+DROP TABLE IF EXISTS `table`;
 CREATE TABLE `table` (
   `id` int UNSIGNED NOT NULL,
   `name` varchar(50) NOT NULL,
@@ -197,6 +196,7 @@ INSERT INTO `table` (`id`, `name`, `created_at`, `updated_at`) VALUES
 -- Table structure for table `tax`
 --
 
+DROP TABLE IF EXISTS `tax`;
 CREATE TABLE `tax` (
   `id` int NOT NULL,
   `name` varchar(50) NOT NULL,
@@ -209,7 +209,8 @@ CREATE TABLE `tax` (
 --
 
 INSERT INTO `tax` (`id`, `name`, `amount`, `created_at`) VALUES
-(1, 'pajak ppn', 12, '2026-05-20 06:02:30');
+(1, 'pajak ppn', 12, '2026-05-20 06:02:30'),
+(4, 'asuransi', 8, '2026-05-22 10:34:01');
 
 -- --------------------------------------------------------
 
@@ -217,6 +218,7 @@ INSERT INTO `tax` (`id`, `name`, `amount`, `created_at`) VALUES
 -- Table structure for table `user`
 --
 
+DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `id` int UNSIGNED NOT NULL,
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
@@ -300,13 +302,13 @@ ALTER TABLE `menu`
 -- AUTO_INCREMENT for table `order`
 --
 ALTER TABLE `order`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
 -- AUTO_INCREMENT for table `order_item`
 --
 ALTER TABLE `order_item`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=112;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=116;
 
 --
 -- AUTO_INCREMENT for table `printer`
@@ -324,7 +326,7 @@ ALTER TABLE `table`
 -- AUTO_INCREMENT for table `tax`
 --
 ALTER TABLE `tax`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `user`
@@ -346,9 +348,11 @@ DELIMITER $$
 --
 -- Events
 --
+DROP EVENT IF EXISTS `delete_status_expired`$$
 CREATE DEFINER=`admin`@`localhost` EVENT `delete_status_expired` ON SCHEDULE EVERY 1 HOUR STARTS '2026-04-20 12:36:14' ON COMPLETION NOT PRESERVE ENABLE DO DELETE FROM `order` 
    WHERE status = 3$$
 
+DROP EVENT IF EXISTS `set_status_expired`$$
 CREATE DEFINER=`admin`@`localhost` EVENT `set_status_expired` ON SCHEDULE EVERY 1 SECOND STARTS '2026-04-20 12:35:20' ON COMPLETION NOT PRESERVE ENABLE DO UPDATE `order` 
    SET status = 3 
    WHERE status = 2 

@@ -3,6 +3,8 @@ RewriteEngine On
 RewriteRule ^(env\.php|coffee\.sql|path\.php|config\.php)$ - [F,L,NC]
 
 
+RewriteRule ^$ index.php [L]
+
 # Menghilangkan ekstensi .php
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}\.php -f
