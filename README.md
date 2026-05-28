@@ -112,10 +112,10 @@ lewati, ganti menjadi lihat daftar pesanan -->
 
 <!-- tombol kamera atau scanner ada di kanan -->
 
-
+<!-- 
 alert ganti 
 Printer Gagal
-Struk gagal di print di karenakan printer belum dikonfigurasi
+Struk gagal di print di karenakan printer belum dikonfigurasi -->
 
 
 di modal detail transaksi untuk lokasinya di buat di tengah waktu sidebar di buka

@@ -11,7 +11,10 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
 $limit         = 10;
 $page          = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $filter_status = isset($_GET['status']) ? $_GET['status'] : 'all';
-$sort          = isset($_GET['sort'])   ? $_GET['sort']   : 'terbaru';
+
+// Menangkap parameter rentang tanggal
+$start_date    = isset($_GET['start_date']) ? $_GET['start_date'] : '';
+$end_date      = isset($_GET['end_date']) ? $_GET['end_date'] : '';
 
 // WHERE
 $where_conditions = [];
@@ -22,15 +25,20 @@ if ($filter_status === 'success') {
 } elseif ($filter_status === 'expired') {
   $where_conditions[] = "o.status = 3";
 }
+
+// Menambahkan filter tanggal jika diisi
+if (!empty($start_date) && !empty($end_date)) {
+  $sd = date('Y-m-d', strtotime($start_date));
+  $ed = date('Y-m-d', strtotime($end_date));
+  $where_conditions[] = "DATE(o.created_at) BETWEEN '$sd' AND '$ed'";
+}
+
 $where_sql = $where_conditions ? "WHERE " . implode(" AND ", $where_conditions) : "";
 
-// ORDER BY
+// ORDER BY dipatenkan ke yang paling baru
 $order_sql = "ORDER BY o.created_at DESC";
-if ($sort === 'terlama')  $order_sql = "ORDER BY o.created_at ASC";
-elseif ($sort === 'termahal') $order_sql = "ORDER BY o.total DESC";
-elseif ($sort === 'termurah') $order_sql = "ORDER BY o.total ASC";
 
-// Query langsung ke tabel order — user_name & table_name sudah tersimpan di kolom
+// Query langsung ke tabel order
 $from_sql  = "FROM `order` o";
 
 try {
@@ -55,8 +63,10 @@ try {
   $offset        = 0;
 }
 
-$query_string = "&status=$filter_status&sort=$sort";
+// Untuk mempertahankan query saat berpindah halaman
+$query_string = "&status=$filter_status&start_date=$start_date&end_date=$end_date";
 ?>
+
 <?php
 $pageTitle   = "History Pesanan";
 $currentPage = "riwayat";
@@ -64,11 +74,9 @@ include '../layout/header.php';
 include '../layout/sidebar.php';
 ?>
 
-<!-- [ Main Content ] start -->
-<div class="relative ml-0 min-h-[calc(100vh-135px)] top-[74px] transition-all duration-200 ease-in-out lg:ml-[280px]">
+<main class="relative min-h-screen pt-[74px] transition-all duration-300 lg:ml-[280px] pc-main">
   <div class="p-4 sm:p-6 lg:p-8">
 
-    <!-- [ breadcrumb ] start -->
     <div class="mb-6">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -82,12 +90,10 @@ include '../layout/sidebar.php';
         </ul>
       </div>
     </div>
-    <!-- [ breadcrumb ] end -->
-
     <div class="gap-x-6">
       <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100">
 
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-100">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
           <div class="flex items-center gap-2">
             <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
               <i class="fa-solid fa-list-check"></i>
@@ -97,53 +103,82 @@ include '../layout/sidebar.php';
             </div>
           </div>
 
-          <!-- Filter dan Sort -->
-          <form method="GET" id="filter-form" class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto items-center">
-            <input type="hidden" name="page" id="page-input" value="<?php echo $page; ?>">
-
-            <div class="relative w-full sm:w-auto">
-              <select name="status" onchange="document.getElementById('page-input').value=1;this.form.submit()"
-                class="appearance-none w-full sm:w-44 bg-white border border-gray-300 text-gray-700 py-2.5 pl-4 pr-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-medium transition-all cursor-pointer">
-                <option value="all" <?php echo $filter_status == 'all'     ? 'selected' : ''; ?>>Semua Status</option>
-                <option value="success" <?php echo $filter_status == 'success' ? 'selected' : ''; ?>>Sukses</option>
-                <option value="pending" <?php echo $filter_status == 'pending' ? 'selected' : ''; ?>>Pending</option>
-                <option value="expired" <?php echo $filter_status == 'expired' ? 'selected' : ''; ?>>Expired</option>
-              </select>
-              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
-                <i class="fa-solid fa-chevron-down text-xs"></i>
-              </div>
-            </div>
-
-            <div class="relative w-full sm:w-auto">
-              <select name="sort" onchange="document.getElementById('page-input').value=1;this.form.submit()"
-                class="appearance-none w-full sm:w-44 bg-white border border-gray-300 text-gray-700 py-2.5 pl-4 pr-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-medium transition-all cursor-pointer">
-                <option value="terbaru" <?php echo $sort == 'terbaru'  ? 'selected' : ''; ?>>Paling Baru</option>
-                <option value="terlama" <?php echo $sort == 'terlama'  ? 'selected' : ''; ?>>Paling Lama</option>
-                <option value="termahal" <?php echo $sort == 'termahal' ? 'selected' : ''; ?>>Total Termahal</option>
-                <option value="termurah" <?php echo $sort == 'termurah' ? 'selected' : ''; ?>>Total Termurah</option>
-              </select>
-              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
-                <i class="fa-solid fa-arrow-up-short-wide text-xs"></i>
-              </div>
-            </div>
-          </form>
+          <div class="flex flex-wrap items-center gap-3">
+             <div class="relative w-full sm:w-auto">
+                 <input type="text" disabled placeholder="Cari pesanan..." 
+                        class="w-full sm:w-64 bg-gray-50 border border-gray-200 text-gray-400 py-2.5 pl-10 pr-4 rounded-xl cursor-not-allowed text-sm focus:outline-none">
+                 <i class="fa-solid fa-search absolute left-3.5 top-3 text-gray-400"></i>
+             </div>
+             <button disabled type="button" class="w-full sm:w-auto px-4 py-2.5 bg-gray-50 text-gray-400 border border-gray-200 rounded-xl cursor-not-allowed font-semibold text-sm flex items-center justify-center gap-2">
+                 <i class="fa-solid fa-file-export"></i> Export
+             </button>
+          </div>
         </div>
 
+        <form method="GET" id="filter-form" class="flex flex-col sm:flex-row flex-wrap gap-3 mb-6 bg-gray-50/50 p-4 rounded-xl border border-gray-100 items-end">
+            <input type="hidden" name="page" id="page-input" value="1">
+            
+            <div class="w-full sm:w-auto flex-1 sm:flex-none">
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Status</label>
+                <div class="relative">
+                    <select name="status" class="appearance-none w-full sm:w-44 bg-white border border-gray-300 text-gray-700 py-2.5 pl-4 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all cursor-pointer">
+                        <option value="all" <?php echo $filter_status == 'all'     ? 'selected' : ''; ?>>Semua Status</option>
+                        <option value="success" <?php echo $filter_status == 'success' ? 'selected' : ''; ?>>Sukses</option>
+                        <option value="pending" <?php echo $filter_status == 'pending' ? 'selected' : ''; ?>>Pending</option>
+                        <option value="expired" <?php echo $filter_status == 'expired' ? 'selected' : ''; ?>>Expired</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                        <i class="fa-solid fa-chevron-down text-xs"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full sm:w-auto flex-1 sm:flex-none">
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Dari Tanggal</label>
+                <input type="date" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>" 
+                       class="w-full sm:w-40 bg-white border border-gray-300 text-gray-700 py-2.5 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+            </div>
+
+            <div class="w-full sm:w-auto flex-1 sm:flex-none">
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Sampai Tanggal</label>
+                <input type="date" name="end_date" value="<?php echo htmlspecialchars($end_date); ?>" 
+                       class="w-full sm:w-40 bg-white border border-gray-300 text-gray-700 py-2.5 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+            </div>
+
+            <div class="w-full sm:w-auto flex-1 sm:flex-none mt-2 sm:mt-0">
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-filter"></i> Terapkan
+                </button>
+            </div>
+            
+            <?php if(!empty($start_date) || $filter_status !== 'all'): ?>
+            <div class="w-full sm:w-auto flex-1 sm:flex-none mt-2 sm:mt-0">
+                <a href="order" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-2.5 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
+                </a>
+            </div>
+            <?php endif; ?>
+        </form>
+
         <div class="overflow-x-auto rounded-xl border border-gray-200">
-          <table class="w-full text-sm text-left whitespace-nowrap">
+          <table class="w-full text-sm text-left whitespace-nowrap min-w-max">
             <thead class="bg-gray-50 text-gray-600 font-semibold border-b border-gray-200 uppercase text-[11px] tracking-wider">
               <tr>
                 <th class="px-5 py-4">No Meja</th>
+                <th class="px-5 py-4">Kode Pesanan</th>
+                <th class="px-5 py-4">Nama Pelanggan</th>
                 <th class="px-5 py-4">Total Tagihan</th>
-                <th class="px-5 py-4">Dibuat</th>
+                <th class="px-5 py-4">Waktu Dibuat</th>
                 <th class="px-5 py-4">Status</th>
-                <th class="px-5 py-4 text-center">Aksi</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100 bg-white">
               <?php if (empty($orders)): ?>
                 <tr>
-                  <td colspan="5" class="px-5 py-8 text-center text-gray-500">Tidak ada pesanan yang ditemukan.</td>
+                  <td colspan="6" class="px-5 py-10 text-center text-gray-500">
+                      <i class="fa-regular fa-folder-open text-3xl mb-3 text-gray-300 block"></i>
+                      Tidak ada data pesanan yang ditemukan.
+                  </td>
                 </tr>
               <?php else: ?>
                 <?php foreach ($orders as $index => $o):
@@ -163,33 +198,22 @@ include '../layout/sidebar.php';
                         <?php echo htmlspecialchars($o['table_name'] ?? '-'); ?>
                       </div>
                     </td>
-                    <td class="px-5 py-4 font-medium text-gray-700">Rp <?php echo number_format((float)$o['total'], 0, ',', '.'); ?></td>
-                    <td class="px-5 py-4 text-gray-500 text-xs font-medium"><i class="fa-regular fa-clock mr-1"></i> <?php echo htmlspecialchars($o['created_at']); ?></td>
-                    <td class="px-5 py-4"><?php echo $statusBadge; ?></td>
                     <td class="px-5 py-4">
-                      <div class="flex items-center justify-center gap-2">
-                        <button type="button"
-                          onclick="openDetail(<?php echo $index; ?>, <?php echo (int)$o['id']; ?>)"
-                          class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white border-transparent hover:border-blue-600">
-                          <i class="fa-solid fa-eye"></i> Detail
+                        <button type="button" onclick="openDetail(<?php echo $index; ?>, <?php echo (int)$o['id']; ?>)" 
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white border border-transparent shadow-sm">
+                            <i class="fa-solid fa-receipt"></i> <?php echo htmlspecialchars($o['code']); ?>
                         </button>
-
-                        <?php if ($raw_status === 1): ?>
-                          <form action="struk" method="POST">
-                            <input type="hidden" name="order_id" value="<?php echo $o['id']; ?>">
-                            <button type="submit"
-                              class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 border rounded-lg text-xs font-bold transition-all duration-200 shadow-sm bg-gray-50 text-gray-600 hover:bg-gray-800 hover:text-white hover:border-gray-800">
-                              <i class="fa-solid fa-print"></i> Print
-                            </button>
-                          </form>
-                        <?php else: ?>
-                          <button type="button" disabled
-                            class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 border rounded-lg text-xs font-bold transition-all duration-200 shadow-sm bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60">
-                            <i class="fa-solid fa-print"></i> Print
-                          </button>
-                        <?php endif; ?>
-                      </div>
                     </td>
+                    <td class="px-5 py-4 font-medium text-gray-800">
+                        <?php echo htmlspecialchars($o['customer_name'] ?? '-'); ?>
+                    </td>
+                    <td class="px-5 py-4 font-bold text-gray-900">
+                        Rp <?php echo number_format((float)$o['total'], 0, ',', '.'); ?>
+                    </td>
+                    <td class="px-5 py-4 text-gray-500 text-xs font-medium">
+                        <i class="fa-regular fa-clock mr-1"></i> <?php echo htmlspecialchars($o['created_at']); ?>
+                    </td>
+                    <td class="px-5 py-4"><?php echo $statusBadge; ?></td>
                   </tr>
                 <?php endforeach; ?>
               <?php endif; ?>
@@ -197,7 +221,6 @@ include '../layout/sidebar.php';
           </table>
         </div>
 
-        <!-- Pagination -->
         <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <span class="text-sm font-medium text-gray-500">
             <?php
@@ -243,105 +266,103 @@ include '../layout/sidebar.php';
       </div>
     </div>
   </div>
-</div>
-<!-- [ Main Content ] end -->
+</main>
+<div id="detail-modal" class="fixed inset-0 z-[1050] hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm overflow-y-auto p-4">
+  <div class="relative w-full max-w-2xl bg-white rounded-xl shadow-2xl flex flex-col max-h-full">
+    
+    <div class="flex-shrink-0 flex items-center justify-between border-b border-gray-100 p-4 md:p-5">
+      <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+        <i class="fa-solid fa-receipt text-blue-600"></i> Detail Transaksi
+      </h3>
+      <button type="button" onclick="closeDetailModal()" class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-200 hover:text-gray-900 transition-colors">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
 
-<!-- Modal Detail Pesanan -->
-<div id="detail-modal"
-  class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm overflow-y-auto">
-  <div class="relative w-full max-w-2xl p-4 my-4">
-    <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
-
-      <!-- Header -->
-      <div class="flex items-center justify-between border-b border-gray-100 p-4 md:p-5">
-        <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-          <i class="fa-solid fa-receipt text-blue-600"></i> Detail Transaksi
-        </h3>
-        <button type="button" onclick="closeDetailModal()"
-          class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-200 hover:text-gray-900">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
+    <div class="overflow-y-auto p-4 md:p-5 space-y-4">
+      
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
+          <span class="block text-xs text-gray-500 uppercase font-semibold mb-1">Kode Pesanan</span>
+          <span id="det-code" class="text-sm font-bold text-gray-900">-</span>
+        </div>
+        <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
+          <span class="block text-xs text-gray-500 uppercase font-semibold mb-1">Kasir / User</span>
+          <span id="det-user" class="text-sm font-bold text-gray-900">-</span>
+        </div>
+        <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
+          <span class="block text-xs text-gray-500 uppercase font-semibold mb-1">Meja</span>
+          <span id="det-table" class="text-sm font-bold text-gray-900">-</span>
+        </div>
+        <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
+          <span class="block text-xs text-gray-500 uppercase font-semibold mb-1">Nama Pelanggan</span>
+          <span id="det-customer" class="text-sm font-bold text-gray-900">-</span>
+        </div>
       </div>
 
-      <div class="p-4 md:p-5 space-y-4">
-
-        <!-- Info grid -->
-        <div class="grid grid-cols-2 gap-3">
-          <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
-            <span class="block text-xs text-gray-500 uppercase font-semibold mb-1">Kode Pesanan</span>
-            <span id="det-code" class="text-sm font-bold text-gray-900">-</span>
+      <div>
+        <span class="block text-xs text-gray-500 uppercase font-semibold mb-2 flex items-center gap-1.5">
+          <i class="fa-solid fa-bowl-food text-gray-400"></i> Item Pesanan
+        </span>
+        <div id="det-items-wrap" class="border border-gray-200 rounded-lg overflow-hidden">
+          <div id="det-items-loading" class="px-4 py-6 text-center text-sm text-gray-400">
+            <i class="fa-solid fa-spinner fa-spin mr-1"></i> Memuat item...
           </div>
-          <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
-            <span class="block text-xs text-gray-500 uppercase font-semibold mb-1">Kasir / User</span>
-            <span id="det-user" class="text-sm font-bold text-gray-900">-</span>
-          </div>
-          <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
-            <span class="block text-xs text-gray-500 uppercase font-semibold mb-1">Meja</span>
-            <span id="det-table" class="text-sm font-bold text-gray-900">-</span>
-          </div>
-          <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
-            <span class="block text-xs text-gray-500 uppercase font-semibold mb-1">Nama Pelanggan</span>
-            <span id="det-customer" class="text-sm font-bold text-gray-900">-</span>
-          </div>
-        </div>
-
-        <!-- Ringkasan biaya -->
-        
-
-        <!-- Order Items -->
-        <div>
-          <span class="block text-xs text-gray-500 uppercase font-semibold mb-2 flex items-center gap-1.5">
-            <i class="fa-solid fa-bowl-food text-gray-400"></i> Item Pesanan
-          </span>
-          <div id="det-items-wrap" class="border border-gray-200 rounded-lg overflow-hidden">
-            <!-- diisi JS -->
-            <div id="det-items-loading" class="px-4 py-6 text-center text-sm text-gray-400">
-              <i class="fa-solid fa-spinner fa-spin mr-1"></i> Memuat item...
-            </div>
-            <table id="det-items-table" class="w-full text-sm text-left hidden">
-              <thead class="bg-gray-50 border-b border-gray-200 text-gray-500 uppercase text-[10px] tracking-wider font-semibold">
-                <tr>
-                  <th class="px-4 py-2.5">Menu</th>
-                  <th class="px-4 py-2.5 text-center">Qty</th>
-                  <th class="px-4 py-2.5 text-right">Subtotal</th>
-                </tr>
-              </thead>
-              <tbody id="det-items-body" class="divide-y divide-gray-100 bg-white"></tbody>
-            </table>
-            <div id="det-items-empty" class="px-4 py-6 text-center text-sm text-gray-400 hidden">
-              Tidak ada item ditemukan.
-            </div>
-          </div>
-        </div>
-
-        <div class="border border-gray-200 rounded-lg overflow-hidden">
-          <table class="w-full text-sm text-left text-gray-500">
-            <tbody class="divide-y divide-gray-200">
-              <tr class="bg-white">
-                <th class="px-4 py-3 font-medium text-gray-900 bg-gray-50 w-1/3">Subtotal</th>
-                <td class="px-4 py-3" id="det-subtotal">Rp 0</td>
+          <table id="det-items-table" class="w-full text-sm text-left hidden">
+            <thead class="bg-gray-50 border-b border-gray-200 text-gray-500 uppercase text-[10px] tracking-wider font-semibold">
+              <tr>
+                <th class="px-4 py-2.5">Menu</th>
+                <th class="px-4 py-2.5 text-center">Qty</th>
+                <th class="px-4 py-2.5 text-right">Subtotal</th>
               </tr>
-              <tr class="bg-white">
-                <th class="px-4 py-3 font-medium text-gray-900 bg-gray-50">Pajak</th>
-                <td class="px-4 py-3" id="det-tax">Rp 0</td>
-              </tr>
-              <tr class="bg-blue-50">
-                <th class="px-4 py-3 font-bold text-blue-900">Total Tagihan</th>
-                <td class="px-4 py-3 font-bold text-blue-700" id="det-total">Rp 0</td>
-              </tr>
-              <tr class="bg-white">
-                <th class="px-4 py-3 font-medium text-gray-900 bg-gray-50">Metode Bayar</th>
-                <td class="px-4 py-3" id="det-payment">-</td>
-              </tr>
-              <tr class="bg-white">
-                <th class="px-4 py-3 font-medium text-gray-900 bg-gray-50">Status</th>
-                <td class="px-4 py-3" id="det-status">-</td>
-              </tr>
-            </tbody>
+            </thead>
+            <tbody id="det-items-body" class="divide-y divide-gray-100 bg-white"></tbody>
           </table>
+          <div id="det-items-empty" class="px-4 py-6 text-center text-sm text-gray-400 hidden">
+            Tidak ada item ditemukan.
+          </div>
         </div>
-
       </div>
+
+      <div class="border border-gray-200 rounded-lg overflow-hidden">
+        <table class="w-full text-sm text-left text-gray-500">
+          <tbody class="divide-y divide-gray-200">
+            <tr class="bg-white">
+              <th class="px-4 py-3 font-medium text-gray-900 bg-gray-50 w-1/3">Subtotal</th>
+              <td class="px-4 py-3" id="det-subtotal">Rp 0</td>
+            </tr>
+            <tr class="bg-white">
+              <th class="px-4 py-3 font-medium text-gray-900 bg-gray-50">Pajak</th>
+              <td class="px-4 py-3" id="det-tax">Rp 0</td>
+            </tr>
+            <tr class="bg-blue-50">
+              <th class="px-4 py-3 font-bold text-blue-900">Total Tagihan</th>
+              <td class="px-4 py-3 font-bold text-blue-700" id="det-total">Rp 0</td>
+            </tr>
+            <tr class="bg-white">
+              <th class="px-4 py-3 font-medium text-gray-900 bg-gray-50">Metode Bayar</th>
+              <td class="px-4 py-3" id="det-payment">-</td>
+            </tr>
+            <tr class="bg-white">
+              <th class="px-4 py-3 font-medium text-gray-900 bg-gray-50">Status</th>
+              <td class="px-4 py-3" id="det-status">-</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <div class="flex-shrink-0 p-4 border-t border-gray-100 bg-gray-50 rounded-b-xl flex flex-wrap justify-end gap-3">
+        <button type="button" onclick="closeDetailModal()" class="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 text-sm font-bold transition-colors">
+            Tutup
+        </button>
+        <form action="struk" method="POST" id="print-form">
+            <input type="hidden" name="order_id" id="print-order-id" value="">
+            <button type="submit" id="btn-print" class="px-5 py-2.5 rounded-lg text-sm font-bold transition-colors shadow-sm flex items-center gap-2">
+                <i class="fa-solid fa-print"></i> Cetak Struk
+            </button>
+        </form>
     </div>
   </div>
 </div>
@@ -376,6 +397,17 @@ include '../layout/sidebar.php';
         ? '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-bold border border-yellow-200">Pending</span>'
         : '<span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-bold border border-red-200">Expired</span>';
     document.getElementById("det-status").innerHTML = sc;
+    
+    // Logika Tombol Print
+    const btnPrint = document.getElementById("btn-print");
+    document.getElementById("print-order-id").value = orderId;
+    if(s === 1) {
+        btnPrint.disabled = false;
+        btnPrint.className = "px-5 py-2.5 bg-gray-800 hover:bg-black text-white rounded-lg text-sm font-bold transition-colors shadow-sm flex items-center gap-2";
+    } else {
+        btnPrint.disabled = true;
+        btnPrint.className = "px-5 py-2.5 bg-gray-200 text-gray-400 cursor-not-allowed rounded-lg text-sm font-bold transition-colors flex items-center gap-2";
+    }
 
     // Reset state items
     document.getElementById("det-items-loading").classList.remove("hidden");
@@ -387,6 +419,7 @@ include '../layout/sidebar.php';
     const modal = document.getElementById("detail-modal");
     modal.classList.remove("hidden");
     modal.classList.add("flex");
+    document.body.classList.add("overflow-hidden"); // Prevent background scroll
 
     // Fetch order items via AJAX
     fetch(BASE_URL_JS + "kasir/history/items?order_id=" + orderId)
@@ -432,9 +465,10 @@ include '../layout/sidebar.php';
     const modal = document.getElementById("detail-modal");
     modal.classList.add("hidden");
     modal.classList.remove("flex");
+    document.body.classList.remove("overflow-hidden");
   }
 
-  // Tutup klik di luar modal
+  // Tutup klik di luar modal (area background gelap)
   document.getElementById("detail-modal").addEventListener("click", function(e) {
     if (e.target === this) closeDetailModal();
   });
