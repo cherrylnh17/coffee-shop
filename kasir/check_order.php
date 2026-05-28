@@ -39,7 +39,6 @@ try {
 
 $payment_status = ($order['status'] == 1) ? 'Lunas' : 'Belum Bayar';
 
-
 ?>
 
 <?php 
@@ -92,7 +91,7 @@ include 'layout/sidebar.php';
             <div class="flex flex-col sm:flex-row gap-4">
                 <?php if($order['status'] == 1): ?>
                 <div class="flex-1">
-                    <button name="aksi" value="lunas" class="w-full bg-green-600 hover:bg-green-700 cursor-not-allowed text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2">
+                    <button name="aksi" value="lunas" disabled class="w-full bg-green-600 hover:bg-green-700 cursor-not-allowed text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2">
                         <i class="fa-solid fa-cash-register"></i> Pesanan telah diselesaikan
                     </button>
                 </div>
@@ -100,7 +99,8 @@ include 'layout/sidebar.php';
                 <form action="update_order" method="POST" class="flex-1" id="checkout-form">
                     <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
                     <input type="hidden" name="total" value="<?= $order['total'] ?>">
-                    <button name="aksi" type="submit"  value="selesai" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-green-200 transition-all flex items-center justify-center gap-2">
+                    
+                    <button name="aksi" type="submit" id="btn-selesai" disabled value="selesai" class="w-full bg-gray-400 cursor-not-allowed text-white font-bold py-4 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2">
                         <i class="fa-solid fa-check-double"></i> Selesaikan Pesanan 
                     </button>
                 </form>
@@ -137,12 +137,10 @@ include 'layout/sidebar.php';
                 
                 <?php if($order['status'] != 1): ?>
                 
-                <!-- Jika pesanan belum selesai, tampilkan form input uang -->
                 <div class="pt-4 flex justify-between items-center">
                   <label for="paid-input" class="font-bold text-gray-900">Uang Bayar</label>
                   <div class="relative w-1/2">
                      <span class="absolute left-3 top-2 text-gray-500 font-medium text-sm">Rp</span>
-                     <!-- atribut form="checkout-form" mengaitkan input ini ke form di sisi kiri -->
                      <input type="text" name="paid" id="paid-input" inputmode="numeric" form="checkout-form" required placeholder="0"
                             class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-right font-bold text-gray-900 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all">
                   </div>
@@ -151,13 +149,11 @@ include 'layout/sidebar.php';
                 <div class="pt-2 flex justify-between items-center">
                   <span class="font-bold text-green-600">Kembalian</span>
                   <span class="text-xl font-black text-green-600" id="change-display">Rp 0</span>
-                  <!-- Input hidden kembalian akan otomatis diisi oleh Javascript -->
                   <input type="hidden" name="change" id="change-input" form="checkout-form" value="0">
                 </div>
 
                 <?php else: ?>
                 
-                <!-- Jika pesanan sudah lunas, tampilkan riwayat uangnya dari DB -->
                 <div class="pt-4 flex justify-between items-center text-sm border-t border-dashed border-gray-200">
                   <span class="text-gray-500">Uang Bayar</span>
                   <span class="font-medium text-gray-800">Rp <?= number_format($order['paid'] ?? 0, 0, ',', '.') ?></span>
@@ -199,6 +195,7 @@ include 'layout/sidebar.php';
         const paidInput = document.getElementById('paid-input');
         const changeDisplay = document.getElementById('change-display');
         const changeInput = document.getElementById('change-input');
+        const btnSelesai = document.getElementById('btn-selesai');
         const totalAmount = <?= (int)$order['total'] ?>;
 
         if (paidInput) {
@@ -215,16 +212,36 @@ include 'layout/sidebar.php';
                     changeDisplay.classList.remove('text-green-600');
                     changeDisplay.classList.add('text-red-500');
                     changeInput.value = 0;
+                    
+                    if (btnSelesai) {
+                        btnSelesai.disabled = true;
+                        btnSelesai.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'shadow-green-200');
+                        btnSelesai.classList.add('bg-gray-400', 'cursor-not-allowed');
+                    }
                 } else {
                     changeDisplay.innerText = "Rp " + change.toLocaleString('id-ID');
                     changeDisplay.classList.remove('text-red-500');
                     changeDisplay.classList.add('text-green-600');
                     changeInput.value = change;
+                    
+                    if (btnSelesai) {
+                        btnSelesai.disabled = false;
+                        btnSelesai.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                        btnSelesai.classList.add('bg-blue-600', 'hover:bg-blue-700', 'shadow-green-200');
+                    }
                 }
             });
 
-            document.getElementById('checkout-form').addEventListener('submit', function() {
+            document.getElementById('checkout-form').addEventListener('submit', function(e) {
                 let raw = paidInput.value.replace(/\./g, '');
+                let paid = parseInt(raw) || 0;
+                
+                if (paid < totalAmount) {
+                    e.preventDefault();
+                    alert("Uang yang dimasukkan masih kurang!");
+                    return false;
+                }
+                
                 paidInput.value = raw;
             });
         }
@@ -233,6 +250,5 @@ include 'layout/sidebar.php';
 
 
 <?php 
-
 include 'layout/footer.php'; 
 ?>

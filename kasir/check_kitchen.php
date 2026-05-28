@@ -183,10 +183,10 @@ include 'layout/sidebar.php';
             </button>
           </form>
 
-          <a href="index"
+          <a href="<?= BASE_URL; ?>kasir/history/order"
             class="w-full flex items-center justify-center gap-2 border border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-500 hover:text-gray-700 font-semibold text-sm py-3.5 rounded-xl transition-all duration-150">
-            <i class="fa-solid fa-forward-step"></i>
-            Lewati, kembali ke daftar pesanan
+            <i class="fa-solid fa-file-invoice-dollar"></i>
+            Cek Riwayat Pesanan
           </a>
 
           <p class="text-xs text-gray-400 text-center pt-1">

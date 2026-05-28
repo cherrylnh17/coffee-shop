@@ -101,14 +101,14 @@ scan qr dibuat menjadi auto fill bagian input kode pesanan, dan bisa enter
 
 kalau nggak di buat scan qr langsung ke buka scan waktu masuk ke dalam dashboard -->
 
-perbaiki dibagian kasir jika batas waktu sudah expired akan muncul sesuatu, jadi pesanan tidak akan di proses - jika sudah kadalluarsa bisa dibuat force kadaluarsa atau ..
+<!-- perbaiki dibagian kasir jika batas waktu sudah expired akan muncul sesuatu, jadi pesanan tidak akan di proses - jika sudah kadalluarsa bisa dibuat force kadaluarsa atau .. -->
 
-dibuat kalau uang kurang tidak bisa di klik 
+<!-- dibuat kalau uang kurang tidak bisa di klik  -->
 
 
-di halaman cetak struk dapur
+<!-- di halaman cetak struk dapur
 print ke dapur
-lewati, ganti menjadi lihat daftar pesanan
+lewati, ganti menjadi lihat daftar pesanan -->
 
 <!-- tombol kamera atau scanner ada di kanan -->
 
