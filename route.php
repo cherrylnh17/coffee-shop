@@ -38,7 +38,7 @@ if (preg_match('~^/order/([a-zA-Z0-9]+)/([a-zA-Z0-9_-]+)/([^/]+)$~', $route, $ma
 
     loadPage(
         'order/' . $matches[2] . '.php',
-        'order/index.php'
+        'order/menu.php'
     );
 }
 
@@ -51,7 +51,7 @@ if (preg_match('~^/order/([a-zA-Z0-9]+)/(\w+)$~', $route, $matches)) {
 
     loadPage(
         'order/' . $matches[2] . '.php',
-        'order/index.php'
+        'order/menu.php'
     );
 }
 

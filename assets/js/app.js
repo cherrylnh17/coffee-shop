@@ -152,7 +152,7 @@ function initQRScanner() {
           "",
         );
         var redirectUrl =
-          baseUrl + "/" + redirectOrder + "/" + tableNumber + "/index";
+          baseUrl + "/" + redirectOrder + "/" + tableNumber + "/menu";
 
         stopScanner();
         statusEl.textContent =

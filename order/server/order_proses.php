@@ -124,12 +124,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $pdo->commit();
-        header("Location: " . BASE_URL . "order/" . $table_code . "/checkout/" . $order_code);
+        header("Location: " . BASE_URL . "order/" . $table_code . "/payment/" . $order_code);
         exit();
     } catch (Exception $e) {
         $pdo->rollBack();
         $table_code = $_POST['table_name'];
-        header("Location: " . BASE_URL . "order/" . $table_code . "/identitas" . "&m=" . urlencode($e->getMessage()));
+        header("Location: " . BASE_URL . "order/" . $table_code . "/checkout" . "&m=" . urlencode($e->getMessage()));
         exit();
     }
 }

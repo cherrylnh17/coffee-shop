@@ -9,7 +9,7 @@ $order_code = $_GET['code'];
 validateTable($pdo, $table_code);
 
 if (!isset($_GET['code']) || empty($_GET['code'])) {
-  header("Location:  " . BASE_URL . "order/" . $table_code . "/index");
+  header("Location:  " . BASE_URL . "order/" . $table_code . "/menu");
   exit();
 }
 
@@ -20,7 +20,7 @@ try {
   $stmt->execute([$order_code]);
   $order = $stmt->fetch(PDO::FETCH_ASSOC);
   if (empty($order)) {
-    header("Location:  " . BASE_URL . "order/" . $table_code . "/index");
+    header("Location:  " . BASE_URL . "order/" . $table_code . "/menu");
     exit();
   }
   // Ambil rincian menu yang dibeli

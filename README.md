@@ -21,6 +21,13 @@ Untuk konfigurasi di linux perlu memberikan izin untuk pengubahan folder, beriku
 ```sudo chmod -R 775 assets```
 
 
+# Berikan izin akses cron job
+```chmod +x /{lokasi file}/cron.sh```
+
+# Command Cron Job
+```0 * * * * /bin/bash /{lokasi file}/cron.sh >> /{lokasi file}/cron_error.log 2>&1```
+
+
 
 
 nasi goreng terbeli berapa??
@@ -42,6 +49,7 @@ tambahan tabel printer dimana user bisa langsung komfigurasi di dalam laptop nya
 | `usb_device` | Misal `/dev/usb/lp0`   |
 | `timeout`    | Timeout koneksi        |
 | `is_active`  | Aktif/nonaktif         |
+
 
 
 perintah dump isinya 
@@ -82,15 +90,15 @@ dengan cron job di buat 30 menit setelah dimulai
 
 
 mulai halaman
-order/1/menu
-order/1/cart
-order/1/checkout
+order/1/menu --
+order/1/cart --
+order/1/checkout --
 order/1/payment
 report/cron/order =  pakai ajax untuk ubah expired dan membuat cron job 
-order/1/success
+order/1/success --
+ 
 
-
-url kasir ubah dari /kasir/index jadi /kasir
+url kasir ubah dari /kasir/index jadi /kasir 
 
 ////
 

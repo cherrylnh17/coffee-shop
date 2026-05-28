@@ -414,7 +414,7 @@ include __DIR__ . '/layout/header.php';
 
     function goToCheckout() {
         if (!cart.length) return showToast('Keranjang kosong!');
-        window.location.href = `${BASE_URL}order/${TABLE_CODE}/pesanan`;
+        window.location.href = `${BASE_URL}order/${TABLE_CODE}/cart`;
     }
 
     //  IntersectionObserver (infinity scroll) 
