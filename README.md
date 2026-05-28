@@ -118,14 +118,14 @@ Printer Gagal
 Struk gagal di print di karenakan printer belum dikonfigurasi -->
 
 
-di modal detail transaksi untuk lokasinya di buat di tengah waktu sidebar di buka
+<!-- di modal detail transaksi untuk lokasinya di buat di tengah waktu sidebar di buka
 di aksi dihilangkan
 di tabel nya
 no meja
 total tagihan
 dibuat
 order code
-nama pemesan
+nama pemesan -->
 ditambahkan pencarian untuk search order code
 filter dari tanggal berapa sampai berapa , dan ekspor excel
 
@@ -134,7 +134,7 @@ tabel report
 export berdasarkan item semisalnya tanggal segini menu ini laku berapa
 
 
-tentang akun ganti profile saya menjadi icon menu
+<!-- tentang akun ganti profile saya menjadi icon menu -->
 
 
 Admin//
