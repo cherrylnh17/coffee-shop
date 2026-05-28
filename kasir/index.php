@@ -17,84 +17,118 @@ include 'layout/sidebar.php';
 
     
     <main class="relative min-h-screen pt-[74px] transition-all duration-300 lg:ml-[280px] pc-main">
-      <div class="p-4 sm:p-6 lg:p-8">  
-          <div class="rounded-2xl border border-gray-100 bg-white p-4 sm:p-8 shadow-sm text-center">
-            <div class="mb-6">
-                <h2 class="text-xl font-bold text-gray-800">Scan QR Code Pesanan</h2>
-                <p class="text-sm text-gray-500">Arahkan kamera ke QR Code pelanggan untuk memproses pesanan.</p>
-            </div>
-            
-            <div class="mx-auto w-full max-w-md overflow-hidden rounded-xl bg-gray-50 p-2 sm:p-4 border-2 border-dashed border-gray-200">
-                <div id="reader" class="w-full"></div>
+    <div class="p-4 sm:p-6 lg:p-8">  
+        <div class="rounded-2xl border border-gray-100 bg-white p-6 sm:p-10 shadow-sm text-center max-w-lg mx-auto mt-10">
+            <div class="mb-8">
+                <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-blue-600">
+                    <i class="fa-solid fa-store text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">Proses Pesanan</h2>
+                <p class="text-sm text-gray-500 mt-2">Masukkan kode pesanan secara manual atau scan QR Code dari perangkat pelanggan.</p>
             </div>
 
-            <div class="mt-6 flex flex-wrap justify-center gap-4">
-                <div class="flex items-center gap-2 text-xs text-gray-500 bg-gray-100 px-3 py-2 rounded-full">
-                    <i class="fa-solid fa-circle-info text-blue-500"></i> Pastikan cahaya terang
-                </div>
-                <div class="flex items-center gap-2 text-xs text-gray-500 bg-gray-100 px-3 py-2 rounded-full">
-                    <i class="fa-solid fa-camera text-green-500"></i> Gunakan kamera belakang
-                </div>
-            </div>
-            <div class="mt-8 flex items-center justify-center gap-4">
-                <div class="h-px bg-gray-200 flex-1 max-w-[100px]"></div>
-                <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">ATAU</span>
-                <div class="h-px bg-gray-200 flex-1 max-w-[100px]"></div>
-            </div>
-
-            <div class="mt-6 max-w-sm mx-auto">
-                <p class="text-sm font-medium text-gray-700 text-center mb-3">Masukkan Kode Pesanan Manual</p>
-                <form action="proses_input.php" method="POST" class="flex flex-col gap-3">
-                    <input type="text" name="code" placeholder="Contoh: ORD-12345678" required
-                        class="w-full text-center tracking-widest uppercase bg-white border border-gray-300 text-gray-900 rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-3 outline-none font-bold">
-                    <button type="submit" class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-xl text-sm px-5 py-3 text-center flex items-center justify-center gap-2 transition-colors">
-                        <i class="fa-solid fa-keyboard"></i> Proses Pesanan Manual
+            <form id="orderForm" action="proses_input.php" method="POST" class="flex flex-col gap-4">
+                <div class="relative w-full">
+                    <input type="text" name="code" id="order_code" placeholder="Contoh: ORD-12345678" required
+                        class="w-full text-center tracking-widest uppercase bg-white border border-gray-300 text-gray-900 rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-4 pr-16 outline-none font-bold transition-all shadow-sm">
+                    
+                    <button type="button" id="btn-scan" class="absolute inset-y-0 right-0 flex items-center justify-center px-4 bg-gray-50 text-gray-500 border border-l-0 border-gray-300 rounded-r-xl hover:bg-gray-100 hover:text-blue-600 transition-colors cursor-pointer group">
+                        <i class="fa-solid fa-qrcode text-xl group-hover:scale-110 transition-transform"></i>
                     </button>
-                </form>
-            </div>
+                </div>
+                <button type="submit" class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-xl text-sm px-5 py-3.5 text-center flex items-center justify-center gap-2 transition-colors shadow-sm">
+                    <i class="fa-solid fa-keyboard"></i> Proses Pesanan
+                </button>
+            </form>
         </div>
     </div>
 </main>
 
+<div id="scannerModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4 transition-opacity">
+    <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-fade-in-up">
+        <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+            <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                <i class="fa-solid fa-camera text-blue-500"></i> Scan QR Code
+            </h3>
+            <button type="button" id="close-scan" class="text-gray-400 hover:text-red-500 bg-white rounded-full w-8 h-8 flex items-center justify-center shadow-sm transition-colors">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+        <div class="p-5">
+            <div id="reader" class="w-full overflow-hidden rounded-xl border-2 border-dashed border-blue-200"></div>
+            <p class="text-xs text-center text-gray-500 mt-4">Posisikan QR Code di dalam area kotak untuk memindai otomatis</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    #reader video { width: 100% !important; border-radius: 0.5rem; object-fit: cover; }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-up { animation: fadeInUp 0.3s ease-out forwards; }
+</style>
+
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script>
-    function onScanSuccess(decodedText, decodedResult) {
-        html5QrcodeScanner.clear();
-        fetch('proses_scan.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'qrcode_data=' + encodeURIComponent(decodedText)
-        })
-        .then(response => response.text())
-        .then(data => {
-            if (data.includes("SUCCESS:")) {
-                const targetUrl = data.split(":")[1];
-                window.location.href = targetUrl; 
-            } else {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Gagal',
-                    text: data,
-                    confirmButtonColor: '#3b82f6'
-                }).then(() => location.reload());
+    const html5QrCode = new Html5Qrcode("reader");
+    const scannerModal = document.getElementById('scannerModal');
+    const orderForm = document.getElementById('orderForm');
+    const orderCodeInput = document.getElementById('order_code');
+    const btnScan = document.getElementById('btn-scan');
+    const btnCloseScan = document.getElementById('close-scan');
+
+    btnScan.addEventListener('click', () => {
+        scannerModal.classList.remove('hidden');
+        scannerModal.classList.add('flex');
+        
+        html5QrCode.start(
+            { facingMode: "environment" },
+            {
+                fps: 10,
+                qrbox: { width: 250, height: 250 }
+            },
+            (decodedText, decodedResult) => {
+                html5QrCode.stop().then(() => {
+                    scannerModal.classList.add('hidden');
+                    scannerModal.classList.remove('flex');
+                    
+                    orderCodeInput.value = decodedText;
+                    
+                    orderForm.dispatchEvent(new Event('submit'));
+                }).catch((err) => {
+                    console.error("Gagal menghentikan kamera", err);
+                });
+            },
+            (errorMessage) => {
             }
-
+        ).catch((err) => {
+            console.error("Camera start failed", err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Akses Ditolak',
+                text: 'Gagal mengakses kamera. Pastikan perangkat memiliki kamera dan izin diberikan.',
+                confirmButtonColor: '#3b82f6'
+            });
+            scannerModal.classList.add('hidden');
+            scannerModal.classList.remove('flex');
         });
-    }
-
-    let html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
-        fps: 20,              
-        qrbox: (viewfinderWidth, viewfinderHeight) => {
-            const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-            const qrboxSize = Math.floor(minEdge * 0.7);
-            return { width: qrboxSize, height: qrboxSize };
-        },
-        aspectRatio: 1.0
     });
-    html5QrcodeScanner.render(onScanSuccess);
 
-    document.querySelector('form[action="proses_input.php"]').addEventListener('submit', function(e) {
+    btnCloseScan.addEventListener('click', () => {
+        html5QrCode.stop().then(() => {
+            scannerModal.classList.add('hidden');
+            scannerModal.classList.remove('flex');
+        }).catch((err) => {
+            scannerModal.classList.add('hidden');
+            scannerModal.classList.remove('flex');
+        });
+    });
+
+    orderForm.addEventListener('submit', function(e) {
         e.preventDefault();
+        
         const formData = new FormData(this);
 
         fetch('proses_input.php', {

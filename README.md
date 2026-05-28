@@ -92,14 +92,15 @@ order/1/success
 
 url kasir ubah dari /kasir/index jadi /kasir
 
+////
 
-
-ui kasir di perbaiki ada 2 tombol , scan dan masukkan kode
+<!-- ui kasir di perbaiki ada 2 tombol , scan dan masukkan kode
 saat muncul nanti kotak buat masukkan qr atau drag qr
 dibuat menjadi kolom bisa upload atau bisa drag and drop
 scan qr dibuat menjadi auto fill bagian input kode pesanan, dan bisa enter
 
-kalau nggak di buat scan qr langsung ke buka scan waktu masuk ke dalam dashboard
+kalau nggak di buat scan qr langsung ke buka scan waktu masuk ke dalam dashboard -->
+
 perbaiki dibagian kasir jika batas waktu sudah expired akan muncul sesuatu, jadi pesanan tidak akan di proses - jika sudah kadalluarsa bisa dibuat force kadaluarsa atau ..
 
 dibuat kalau uang kurang tidak bisa di klik 
@@ -109,7 +110,7 @@ di halaman cetak struk dapur
 print ke dapur
 lewati, ganti menjadi lihat daftar pesanan
 
-tombol kamera atau scanner ada di kanan
+<!-- tombol kamera atau scanner ada di kanan -->
 
 
 alert ganti 
