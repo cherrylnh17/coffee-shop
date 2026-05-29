@@ -1,3 +1,4 @@
 assets/image/menu
 env.php
 cron.sh
+cron_error.log
