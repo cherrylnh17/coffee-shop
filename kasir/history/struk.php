@@ -8,25 +8,16 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
     exit;
 }
 
-define('PRINTER_BT_MAC',     $_ENV['PRINTER_BT_MAC']);
-define('PRINTER_BT_CHANNEL', $_ENV['PRINTER_BT_CHANNEL']);                 
-define('PRINTER_RFCOMM_DEV', $_ENV['PRINTER_RFCOMM_DEV']);   
-define('PRINTER_TIMEOUT',    $_ENV['PRINTER_TIMEOUT']);   
- 
 // ============================================================
 //  HELPER ESC/POS
 // ============================================================
 
-function fmt($angka) {
-    return number_format((float)$angka, 0, ',', '.');
-}
-
+function fmt($angka) { return number_format((float)$angka, 0, ',', '.'); }
 function justify($left, $right, $width = 32) {
     $space = $width - strlen($left) - strlen($right);
     if ($space < 1) $space = 1;
     return $left . str_repeat(' ', $space) . $right;
 }
-
 function center($text, $width = 32) {
     $len = strlen($text);
     if ($len >= $width) return $text;
@@ -48,25 +39,18 @@ function buildEscPos($order, $order_items) {
     $CUT       = $GS  . "V\x41\x03";
 
     $data  = $INIT;
-
-    // Header
     $data .= $ALIGN_C;
     $data .= $BOLD_ON . $SIZE_2X . "TRAFFA COFFEE" . $SIZE_NORM . $BOLD_OFF . $LF;
     $data .= "Jl. HM Subchan ZE No.3" . $LF;
-    $data .= "IG: @traffacoffee" . $LF;
-    $data .= $LF;
+    $data .= "IG: @traffacoffee" . $LF . $LF;
 
-    // Info transaksi
     $data .= $ALIGN_L;
     $data .= str_repeat('-', 32) . $LF;
-    $data .= justify("No :",      $order['code'])                                          . $LF;
-    $data .= justify("Tgl :",     date('d-m-Y H:i', strtotime($order['created_at'])))     . $LF;
-    $data .= justify("Kasir :",   $order['user_name']     ?? '-')                          . $LF;
-    $data .= justify("Meja :",    $order['table_name']    ?? '-')                          . $LF;
-    $data .= justify("Pembeli :", $order['customer_name'] ?? '-')                          . $LF;
+    $data .= justify("No :",      $order['code']) . $LF;
+    $data .= justify("Tgl :",     date('d-m-Y H:i', strtotime($order['created_at']))) . $LF;
+    $data .= justify("Kasir :",   $order['user_name'] ?? '-') . $LF;
     $data .= str_repeat('-', 32) . $LF;
 
-    // Item pesanan
     foreach ($order_items as $item) {
         $harga_satuan = $item['qty'] > 0 ? $item['subtotal'] / $item['qty'] : 0;
         $nama  = mb_substr($item['menu_name'], 0, 32);
@@ -75,82 +59,26 @@ function buildEscPos($order, $order_items) {
 
         $data .= $nama . $LF;
         $data .= justify($left, $right) . $LF;
-
-        if (!empty($item['notes'])) {
-            $data .= "  *" . mb_substr($item['notes'], 0, 28) . $LF;
-        }
     }
 
-    // Total
-    $uang_bayar = $order['paid']   ?? $order['total'];
+    $uang_bayar = $order['paid'] ?? $order['total'];
     $kembalian  = $order['change'] ?? 0;
-    $metode     = ($order['payment'] == 1) ? 'Kasir' : 'Online';
+    
+    $data .= str_repeat('-', 32) . $LF;
+    $data .= justify("Subtotal :", "Rp " . fmt($order['subtotal'])) . $LF;
+    $data .= $BOLD_ON;
+    $data .= justify("TOTAL :",    "Rp " . fmt($order['total'])) . $LF;
+    $data .= $BOLD_OFF;
+    $data .= justify("Tunai :",    "Rp " . fmt($uang_bayar)) . $LF;
+    $data .= justify("KEMBALI :",  "Rp " . fmt($kembalian)) . $LF;
 
     $data .= str_repeat('-', 32) . $LF;
-    $data .= justify("Subtotal :",    "Rp " . fmt($order['subtotal']))  . $LF;
-    $data .= justify("Pajak (12%) :", "Rp " . fmt($order['tax']))       . $LF;
-    $data .= str_repeat('-', 32) . $LF;
-    $data .= $BOLD_ON;
-    $data .= justify("TOTAL :",       "Rp " . fmt($order['total']))     . $LF;
-    $data .= $BOLD_OFF;
-    $data .= justify("Tunai ($metode) :", "Rp " . fmt($uang_bayar))     . $LF;
-    $data .= $BOLD_ON;
-    $data .= justify("KEMBALIAN :",   "Rp " . fmt($kembalian))          . $LF;
-    $data .= $BOLD_OFF;
-
-    // Footer
-    $data .= str_repeat('-', 32) . $LF;
-    $data .= $ALIGN_C;
-    $data .= $LF;
+    $data .= $ALIGN_C . $LF;
     $data .= "Terima kasih atas kunjungannya!" . $LF;
-    $data .= "Layanan Kritik & Saran:"         . $LF;
-    $data .= "Telp: 0856-4195-4719"            . $LF;
-    $data .= $LF . $LF . $LF;
-    $data .= $CUT;
+    $data .= $LF . $LF . $LF . $CUT;
 
     return $data;
 }
-
-
-// ============================================================
-//  PRINT KE BLUETOOTH THERMAL PRINTER via /dev/rfcomm0
-// ============================================================
-
-function printToThermal($escposData) {
-    $devicePath = PRINTER_RFCOMM_DEV;
-
-    if (!file_exists($devicePath)) {
-        return [
-            'success' => false,
-            'message' => "Device {$devicePath} tidak ditemukan. Jalankan: sudo rfcomm bind 0 " . PRINTER_BT_MAC . " " . PRINTER_BT_CHANNEL
-        ];
-    }
-
-    if (!is_writable($devicePath)) {
-        return [
-            'success' => false,
-            'message' => "Tidak ada izin tulis ke {$devicePath}. Jalankan: sudo usermod -aG dialout www-data && sudo chmod 666 {$devicePath}"
-        ];
-    }
-
-    $fp = @fopen($devicePath, 'wb');
-    if (!$fp) {
-        return [
-            'success' => false,
-            'message' => "Gagal membuka {$devicePath}. Pastikan printer Bluetooth menyala dan sudah di-pair."
-        ];
-    }
-
-    $written = fwrite($fp, $escposData);
-    fclose($fp);
-
-    if ($written === false) {
-        return ['success' => false, 'message' => "Gagal menulis data ke {$devicePath}."];
-    }
-
-    return ['success' => true, 'message' => 'Struk berhasil dicetak.'];
-}
-
 
 // ============================================================
 //  MAIN
@@ -163,30 +91,21 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $order_id = (int)$_POST['order_id'];
 
-// Ambil data order beserta nama kasir, meja, dan pelanggan
 $stmtOrder = $pdo->prepare("
-    SELECT o.*,
-           u.name AS user_name,
-           t.name AS table_name
+    SELECT o.*, u.name AS user_name
     FROM `order` o
-    LEFT JOIN `user`  u ON u.id = o.user_id
-    LEFT JOIN `table` t ON t.id = o.table_id
+    LEFT JOIN `user` u ON u.id = o.user_id
     WHERE o.id = ?
 ");
 $stmtOrder->execute([$order_id]);
 $orderData = $stmtOrder->fetch(PDO::FETCH_ASSOC);
 
 if (!$orderData) {
-    $_SESSION['swal_msg'] = [
-        'icon'  => 'error',
-        'title' => 'Gagal',
-        'text'  => 'Data pesanan tidak ditemukan.'
-    ];
+    $_SESSION['swal_msg'] = ['icon' => 'error', 'title' => 'Gagal', 'text' => 'Data tidak ditemukan.'];
     header("Location: order");
     exit;
 }
 
-// Ambil item pesanan
 $stmtItems = $pdo->prepare("
     SELECT oi.*, m.name AS menu_name
     FROM order_item oi
@@ -196,22 +115,18 @@ $stmtItems = $pdo->prepare("
 $stmtItems->execute([$order_id]);
 $orderItems = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
 
-$escpos      = buildEscPos($orderData, $orderItems);
-$printResult = printToThermal($escpos);
+// 1. Format teks struk
+$escpos = buildEscPos($orderData, $orderItems);
 
-if ($printResult['success']) {
-    $_SESSION['swal_msg'] = [
-        'icon'  => 'success',
-        'title' => 'Berhasil!',
-        'text'  => 'Struk berhasil dicetak oleh ' . ($orderData['user_name'] ?? '-')
-    ];
-} else {
-    $_SESSION['swal_msg'] = [
-        'icon'  => 'warning',
-        'title' => 'Gagal dicetak',
-        'text'  => 'Struk gagal di cetak, dikarenakan printer belum dikonfigurasi.'
-    ];
-}
+// 2. Simpan teks struk ke Session (di-encode base64 agar aman dari karakter aneh saat dikirim)
+$_SESSION['print_payload'] = base64_encode($escpos);
+
+// 3. Beri notifikasi sukses dan kembali ke halaman order
+$_SESSION['swal_msg'] = [
+    'icon'  => 'success',
+    'title' => 'Disimpan!',
+    'text'  => 'Pesanan berhasil disimpan. Mengirim ke printer...'
+];
 
 header("Location: order");
 exit;

@@ -474,4 +474,18 @@ include '../layout/sidebar.php';
   });
 </script>
 
+<?php if (isset($_SESSION['print_payload'])): ?>
+    <script>
+        // Sambung ke BroadcastChannel
+        const saluranKirim = new BroadcastChannel('printer_channel');
+        
+        // Ambil data struk dari PHP, ubah kembali dari Base64 ke teks normal
+        const dataStruk = atob("<?= $_SESSION['print_payload'] ?>");
+        
+        // Kirim (Broadcast) ke Tab Printer Server!
+        saluranKirim.postMessage(dataStruk);
+    </script>
+    <?php unset($_SESSION['print_payload']); // Hapus session agar tidak ke-print dobel saat direfresh ?>
+<?php endif; ?>
+
 <?php include '../layout/footer.php'; ?>

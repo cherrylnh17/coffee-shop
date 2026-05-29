@@ -152,6 +152,20 @@ include 'layout/sidebar.php';
     });
 </script>
 
+<?php if (isset($_SESSION['print_payload'])): ?>
+    <script>
+        // Sambungkan ke channel printer yang ada di tab sebelahnya
+        const saluranKirim = new BroadcastChannel('printer_channel');
+        
+        // Dekode Base64 menjadi string biasa
+        const dataStruk = atob("<?= $_SESSION['print_payload'] ?>");
+        
+        // Kirimkan perintah cetak
+        saluranKirim.postMessage(dataStruk);
+    </script>
+    <?php unset($_SESSION['print_payload']); ?>
+<?php endif; ?>
+
 <?php 
 
 include 'layout/footer.php'; 

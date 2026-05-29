@@ -96,7 +96,7 @@ include 'layout/sidebar.php';
                     </button>
                 </div>
                 <?php else: ?>
-                <form action="update_order" method="POST" class="flex-1" id="checkout-form">
+                <form action="print_order" method="POST" class="flex-1" id="checkout-form">
                     <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
                     <input type="hidden" name="total" value="<?= $order['total'] ?>">
                     

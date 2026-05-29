@@ -38,7 +38,7 @@ include '../layout/header.php';
 include '../layout/sidebar.php';
 ?>
 
-<div class="relative ml-0 min-h-[calc(100vh-135px)] top-[74px] transition-all duration-200 ease-in-out lg:ml-[280px]">
+<main class="relative min-h-screen pt-[74px] transition-all duration-300 lg:ml-[280px] pc-main">
   <div class="p-4 sm:p-6 lg:p-8">
 
     <!-- Flash message -->
@@ -145,7 +145,7 @@ include '../layout/sidebar.php';
 
     </div>
   </div>
-</div>
+</main>
 
 <!--  MODAL 1: Pilih Tipe  -->
 <div id="modal-type-picker" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm">

@@ -243,4 +243,21 @@ document.getElementById('print-form').addEventListener('submit', function () {
 <?php unset($_SESSION['print_msg']); endif; ?>
 </script>
 
+<?php if (isset($_SESSION['print_payload'])): ?>
+    <script>
+        // Sambungkan ke channel printer yang ada di tab sebelahnya
+        const saluranKirim = new BroadcastChannel('printer_channel');
+        
+        // Dekode Base64 menjadi string biasa
+        const dataStruk = atob("<?= $_SESSION['print_payload'] ?>");
+        
+        // Kirimkan perintah cetak
+        saluranKirim.postMessage(dataStruk);
+    </script>
+    <?php 
+    // Hapus sesi agar tidak tercetak ulang jika halaman direfresh
+    unset($_SESSION['print_payload']); 
+    ?>
+<?php endif; ?>
+
 <?php include 'layout/footer.php'; ?>

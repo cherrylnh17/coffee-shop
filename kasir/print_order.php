@@ -8,11 +8,9 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
     exit;
 }
 
-define('PRINTER_BT_MAC',     $_ENV['PRINTER_BT_MAC']); 
-define('PRINTER_BT_CHANNEL', $_ENV['PRINTER_BT_CHANNEL']);           
-define('PRINTER_RFCOMM_DEV', $_ENV['PRINTER_RFCOMM_DEV']);      
-define('PRINTER_TIMEOUT',    $_ENV['PRINTER_TIMEOUT']);               
-
+// ============================================================
+//  HELPER ESC/POS
+// ============================================================
 
 function fmt($angka) {
     return number_format((float)$angka, 0, ',', '.');
@@ -66,7 +64,7 @@ function buildEscPos($order, $order_items) {
     $data .= str_repeat('-', 32) . $LF;
 
     foreach ($order_items as $item) {
-        $harga_satuan = $item['subtotal'] / $item['qty'];
+        $harga_satuan = $item['qty'] > 0 ? $item['subtotal'] / $item['qty'] : 0; // Mencegah division by zero
         $nama  = mb_substr($item['menu_name'], 0, 32);
         $left  = "  " . $item['qty'] . " x " . fmt($harga_satuan);
         $right = fmt($item['subtotal']);
@@ -110,79 +108,10 @@ function buildEscPos($order, $order_items) {
     return $data;
 }
 
-function printViaRfcomm($escposData) {
-    $devicePath = PRINTER_RFCOMM_DEV;
 
-    if (!file_exists($devicePath)) {
-        return [
-            'success' => false,
-            'message' => "Device {$devicePath} tidak ditemukan. Jalankan: sudo rfcomm bind 0 " . PRINTER_BT_MAC . " " . PRINTER_BT_CHANNEL
-        ];
-    }
-
-    if (!is_writable($devicePath)) {
-        return [
-            'success' => false,
-            'message' => "Tidak ada izin tulis ke {$devicePath}. Jalankan: sudo usermod -aG dialout www-data && sudo chmod 666 {$devicePath}"
-        ];
-    }
-
-    $fp = @fopen($devicePath, 'wb');
-    if (!$fp) {
-        return [
-            'success' => false,
-            'message' => "Gagal membuka device {$devicePath}. Cek apakah printer Bluetooth menyala dan sudah di-pair."
-        ];
-    }
-
-    $written = fwrite($fp, $escposData);
-    fclose($fp);
-
-    if ($written === false) {
-        return ['success' => false, 'message' => "Gagal menulis data ke {$devicePath}."];
-    }
-
-    return ['success' => true, 'message' => 'Struk berhasil dicetak via rfcomm.'];
-}
-
-function printViaShell($escposData) {
-    $mac     = PRINTER_BT_MAC;
-    $channel = PRINTER_BT_CHANNEL;
-    $tmpFile = tempnam(sys_get_temp_dir(), 'escpos_') . '.bin';
-
-    if (file_put_contents($tmpFile, $escposData) === false) {
-        return ['success' => false, 'message' => 'Gagal membuat file temporary ESC/POS.'];
-    }
-
-    $cmd = "rfcomm connect /dev/rfcomm1 {$mac} {$channel} < /dev/null & sleep 1 && cat " . escapeshellarg($tmpFile) . " > /dev/rfcomm1 ; rfcomm release /dev/rfcomm1 2>&1";
-    $output = shell_exec($cmd);
-
-    unlink($tmpFile);
-
-    if (strpos($output, 'Can\'t') !== false || strpos($output, 'error') !== false) {
-        return [
-            'success' => false,
-            'message' => "Gagal koneksi Bluetooth: " . trim($output) . ". Pastikan printer menyala & sudah di-pair."
-        ];
-    }
-
-    return ['success' => true, 'message' => 'Struk berhasil dicetak via rfcomm shell.'];
-}
-
-function printToThermal($escposData) {
-    $result = printViaRfcomm($escposData);
-
-    if ($result['success']) {
-        return $result;
-    }
-
-    if (strpos($result['message'], 'tidak ditemukan') !== false) {
-        return printViaShell($escposData);
-    }
-
-    return $result;
-}
-
+// ============================================================
+//  MAIN POST
+// ============================================================
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $order_id  = $_POST['order_id'];
@@ -212,26 +141,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmtOrder->execute([$order_id]);
                 $orderData = $stmtOrder->fetch(PDO::FETCH_ASSOC);
 
-                $stmtItems = $pdo->prepare("SELECT * FROM order_item WHERE order_id = ?");
+                $stmtItems = $pdo->prepare("SELECT oi.*, m.name AS menu_name FROM order_item oi LEFT JOIN menu m ON m.id = oi.menu_id WHERE oi.order_id = ?");
                 $stmtItems->execute([$order_id]);
                 $orderItems = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
 
-                $escpos      = buildEscPos($orderData, $orderItems);
-                $printResult = printToThermal($escpos);
+                // 1. Format teks struk
+                $escpos = buildEscPos($orderData, $orderItems);
 
-                if ($printResult['success']) {
-                    $_SESSION['swal_msg'] = [
-                        'icon'  => 'success',
-                        'title' => 'Berhasil!',
-                        'text'  => 'Pesanan diselesaikan & struk dicetak oleh ' . $user_name
-                    ];
-                } else {
-                    $_SESSION['swal_msg'] = [
-                        'icon'  => 'warning',
-                        'title' => 'Transaksi Tersimpan',
-                        'text'  => 'Pesanan diselesaikan, tapi struk GAGAL dicetak. ' . $printResult['message']
-                    ];
-                }
+                // 2. Simpan teks struk ke Session untuk dilempar ke BroadcastChannel
+                $_SESSION['print_payload'] = base64_encode($escpos);
+
+                // 3. Set notifikasi sukses
+                $_SESSION['swal_msg'] = [
+                    'icon'  => 'success',
+                    'title' => 'Berhasil!',
+                    'text'  => 'Pesanan diselesaikan & struk sedang dikirim ke printer...'
+                ];
 
                 header("Location: check_kitchen?code=" . htmlspecialchars($orderCode));
                 exit;

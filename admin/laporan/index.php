@@ -110,7 +110,7 @@ include '../layout/sidebar.php';
 
 ?>
 
-    <div class="relative ml-0 min-h-[calc(100vh-135px)] top-[74px] transition-all duration-200 ease-in-out lg:ml-[280px]">
+    <main class="relative min-h-screen pt-[74px] transition-all duration-300 lg:ml-[280px] pc-main">
       <div class="p-4 sm:p-6 lg:p-8">
         
         <div class="gap-x-6">
@@ -267,7 +267,7 @@ include '../layout/sidebar.php';
           </div>
         </div>
       </div>
-    </div>
+    </main>
     <button id="trigger-detail-modal" data-modal-target="detail-modal" data-modal-toggle="detail-modal" class="hidden"></button>
     <div id="detail-modal" tabindex="-1" aria-hidden="true" class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-900/50 backdrop-blur-sm">
         <div class="relative max-h-full w-full max-w-3xl p-4">

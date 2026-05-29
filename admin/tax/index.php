@@ -30,28 +30,7 @@ include __DIR__ . '/../layout/header.php';
 include __DIR__ . '/../layout/sidebar.php';
 
 ?>
-
-    <header class="fixed inset-x-0 top-0 z-[1025] flex h-[74px] items-center bg-white/80 px-4 shadow-sm backdrop-blur-md transition-all duration-200 ease-in-out lg:left-[280px]">
-      <div class="flex grow items-center sm:px-2">
-        <div class="mr-auto">
-          <ul class="inline-flex h-[74px] items-center">
-            <li class="hidden items-center lg:inline-flex">
-              <a href="#" class="flex h-11 w-11 items-center justify-center rounded-lg text-gray-600 transition-all hover:bg-gray-100" id="sidebar-hide">
-                <i class="fa-solid fa-bars text-lg"></i>
-              </a>
-            </li>
-            <li class="inline-flex items-center lg:hidden">
-              <a href="#" class="flex h-11 w-11 items-center justify-center rounded-lg text-gray-600 transition-all hover:bg-gray-100" id="mobile-collapse">
-                <i class="fa-solid fa-bars text-lg"></i>
-              </a>
-            </li>
-          </ul>
-        </div>
-        <h1 class="text-lg font-bold text-gray-800 ml-2">Manajemen Pajak</h1>
-      </div>
-    </header>
-
-    <main class="relative ml-0 min-h-[calc(100vh-135px)] top-[74px] transition-all duration-200 ease-in-out lg:ml-[280px]">
+    <main class="relative min-h-screen pt-[74px] transition-all duration-300 lg:ml-[280px] pc-main">
       <div class="p-4 sm:p-6 lg:p-8">  
           
           <?php if(isset($_GET['status'])): ?>
