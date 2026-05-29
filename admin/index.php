@@ -65,7 +65,7 @@ include 'layout/sidebar.php';
 
 ?>
 
-    <div class="relative ml-0 min-h-[calc(100vh-135px)] top-[74px] transition-all duration-200 ease-in-out lg:ml-[280px]">
+    <main class="relative min-h-screen pt-[74px] transition-all duration-300 lg:ml-[280px] pc-main">
       <div class="p-4 sm:p-6 lg:p-8">  
 
           <div class="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
@@ -124,7 +124,7 @@ include 'layout/sidebar.php';
               <p class="text-gray-600">Gunakan menu di sebelah kiri untuk mengelola laporan penjualan, daftar menu, dan akun kasir.</p>
           </div>
       </div>
-    </div>
+    </main>
 
     <script>
       const dataDashboard = {
