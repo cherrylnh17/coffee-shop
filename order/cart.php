@@ -27,7 +27,7 @@ include __DIR__ . '/layout/header.php';
 <main class="w-full max-w-[480px] mx-auto bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-x-hidden">
 
     <header class="sticky top-0 z-20 bg-white shadow-sm pt-5 pb-4 px-4 flex items-center gap-3">
-        <a href="<?= BASE_URL ?>order/<?= $table_code ?>/index" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
+        <a href="<?= BASE_URL ?>order/<?= $table_code ?>/menu" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
             <i class="ph-bold ph-arrow-left text-lg"></i>
         </a>
         <h1 class="text-xl font-bold text-gray-900">Keranjang Pesanan</h1>
@@ -62,7 +62,7 @@ include __DIR__ . '/layout/header.php';
                 </div>
                 <p class="font-bold text-gray-900">Keranjang kosong</p>
                 <p class="text-xs text-gray-500 mt-1">Tambahkan menu terlebih dahulu.</p>
-                <a href="<?= BASE_URL ?>order/<?= $table_code ?>/index" class="mt-4 px-5 py-2 bg-sky-500 text-white rounded-full text-sm font-semibold">
+                <a href="<?= BASE_URL ?>order/<?= $table_code ?>/menu" class="mt-4 px-5 py-2 bg-sky-500 text-white rounded-full text-sm font-semibold">
                     Lihat Menu
                 </a>
             </div>
@@ -88,7 +88,7 @@ include __DIR__ . '/layout/header.php';
         </div>
 
         <!-- Tambah menu lagi -->
-        <a href="<?= BASE_URL ?>order/<?= $table_code ?>/index" class="w-full border-2 border-dashed border-gray-200 rounded-2xl py-4 text-sm font-semibold text-gray-400 hover:border-sky-300 hover:text-sky-500 transition-all flex items-center justify-center gap-2">
+        <a href="<?= BASE_URL ?>order/<?= $table_code ?>/menu" class="w-full border-2 border-dashed border-gray-200 rounded-2xl py-4 text-sm font-semibold text-gray-400 hover:border-sky-300 hover:text-sky-500 transition-all flex items-center justify-center gap-2">
             <i class="ph ph-plus-circle text-lg"></i> Tambah Menu Lagi
         </a>
 
@@ -336,7 +336,7 @@ include __DIR__ . '/layout/header.php';
                 function goToIdentitas() {
                     const cart = getCart();
                     if (!cart.length) return;
-                    window.location.href = '<?= BASE_URL ?>order/<?= $table_code ?>/identitas';
+                    window.location.href = '<?= BASE_URL ?>order/<?= $table_code ?>/checkout';
                 }
 
                 document.addEventListener('DOMContentLoaded', () => {

@@ -43,6 +43,17 @@
                     </a>
                 </li>
 
+                <li>
+                    <a href="<?= BASE_URL; ?>kasir/printer/index" 
+                       class="group flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200 
+                       <?= ($currentPage == 'printer') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600'; ?>">
+                        <span class="flex w-6 justify-center text-lg <?= ($currentPage == 'printer') ? 'text-white' : 'text-gray-400 group-hover:text-blue-600'; ?>">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </span>
+                        <span class="font-medium">Printer</span>
+                    </a>
+                </li>
+
                 <li class="mt-5 px-4 py-2">
                     <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400">Authentication</span>
                 </li>

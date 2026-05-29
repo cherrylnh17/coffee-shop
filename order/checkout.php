@@ -7,34 +7,16 @@ $table_code = htmlspecialchars($_GET['table']);
 
 validateTable($pdo, $table_code);
 
-if (!isset($_GET['code']) || empty($_GET['code'])) {
-    header("Location:  " . BASE_URL . "order/" . $table_code . "/index");
-    exit();
-} else {
-    $order_code = $_GET['code'];
-}
-
 try {
-    // Ambil data Order utama
-    $stmt = $pdo->prepare("SELECT * FROM `order` WHERE code = ? AND `status` = 2");
-    $stmt->execute([$order_code]);
-    $order = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (empty($order)) {
-        header("Location: " . BASE_URL . "order/" . $table_code . "/index");
-        exit();
-    }
-    // Ambil rincian menu yang dibeli
-    $stmtItem = $pdo->prepare("SELECT * FROM order_item WHERE order_id = ?");
-    $stmtItem->execute([$order['id']]);
-    $order_items = $stmtItem->fetchAll(PDO::FETCH_ASSOC);
+    $query = "SELECT * FROM menu ORDER BY created_at ASC";
+    $stmt = $pdo->prepare($query);
+    $stmt->execute();
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     die("Error pada query: " . $e->getMessage());
 }
 
-$payment = ($order['payment'] == 1) ? 'Bayar di Kasir' : 'Bayar Online';
 
-
-$qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" . $order['code'];
 
 ?>
 
@@ -46,198 +28,239 @@ include __DIR__ . '/layout/header.php';
 <main class="w-full max-w-[480px] mx-auto bg-gray-50 min-h-screen relative shadow-2xl flex flex-col overflow-x-hidden">
 
     <header class="sticky top-0 z-20 bg-white shadow-sm pt-5 pb-4 px-4 flex items-center gap-3">
-        <a href="<?= BASE_URL ?>order/<?= $table_code ?>/identitas" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
+        <a href="<?= BASE_URL ?>order/<?= $table_code ?>/cart" class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
             <i class="ph-bold ph-arrow-left text-lg"></i>
         </a>
-        <h1 class="text-xl font-bold text-gray-900">Checkout</h1>
+        <h1 class="text-xl font-bold text-gray-900">Data Pemesan</h1>
     </header>
 
-    <div class="flex-1 px-4 py-5 space-y-4 pb-32 fade-in">
+    <form id="formPesanan" method="POST" action="<?= BASE_URL ?>order/server/order_proses">
+        <input type="hidden" name="table_name" value="<?= $table_code ?>">
+        <div class="flex-1 px-4 py-6 space-y-5 pb-32 fade-in">
 
-        <!-- Info Meja & Pemesan -->
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-            <div class="flex items-start justify-between mb-3">
-                <div>
-                    <p class="text-xs text-gray-500 mb-1">Nomor Meja</p>
-                    <div class="bg-blue-100 text-blue-600 px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5 border border-blue-200">
-                        <i class="ph-fill ph-armchair"></i>
-                        <span class="font-bold text-sm"><?= $order['table_name'] ?></span>
+            <!-- Informasi Pembeli -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                <h2 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <span class="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center text-sm">👤</span>
+                    Informasi Pembeli
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Nama Lengkap <span class="text-red-500">*</span></label>
+                        <input type="text" name="customer_name" id="name" placeholder="Masukkan nama Anda" required
+                            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Email <span class="text-gray-400 font-normal">(Opsional)</span></label>
+                        <input type="email" name="customer_email" id="email" placeholder="contoh@email.com"
+                            class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white">
                     </div>
                 </div>
-                <div class="text-right">
-                    <p class="text-xs text-gray-500 mb-0.5">Pemesan</p>
-                    <p class="font-semibold text-gray-900 text-sm" id="display-name"><?= $order['customer_name'] ?></p>
-                </div>
-            </div>
-            <div class="dashed-line my-3"></div>
-            <div class="flex justify-between items-center">
-                <div>
-                    <p class="text-xs text-gray-500 mb-1">Metode Bayar</p>
-                    <span class="text-sm font-bold text-blue-600" id="display-payment"><?= $payment ?></span>
-                </div>
-                <div>
-                    <p class="text-xs text-gray-500 mb-1">Batas Pembayaran</p>
-                    <span class="text-sm font-bold text-blue-600"
-                        id="display-countdown"
-                        data-expire="<?= $order['expired_at'] ?>">
-                        Loading...
-                    </span>
-                </div>
-            </div>
-        </div>
 
-        <!-- QR Pembayaran -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 text-center">
-            <h2 class="text-sm font-bold text-gray-900 mb-1">Order Code</h2>
-            <div class="mb-4 flex justify-center font-semibold">
-                <span class="bg-gray-100 border px-4 py-1.5 rounded-lg text-gray-500 text-sm"><?= $order['code'] ?></span>
-            </div>
-            <div class="mx-auto mb-3 p-2 bg-white border-2 border-gray-200 rounded-xl shadow-inner w-40 h-40 flex items-center justify-center">
-                <img src="<?= $qrUrl; ?>" alt="QR Pembayaran" class="w-full h-full object-contain">
-            </div>
-            <div class="flex items-center justify-center gap-2 bg-yellow-50 border border-yellow-200 px-4 py-2.5 rounded-xl">
-                <i class="ph-fill ph-warning text-yellow-500 text-xl flex-shrink-0"></i>
-                <p class="text-xs text-yellow-700"><span class="font-bold">Tunjukkan QR Code</span> atau <span class="font-bold">Order Code</span> kepada kasir</p>
-            </div>
-        </div>
-
-        <!-- Rincian Pesanan -->
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-            <h2 class="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <i class="ph-fill ph-shopping-bag text-blue-500 text-lg"></i> Rincian Pesanan
-            </h2>
-            <div id="order-list" class="space-y-3 divide-y divide-gray-50"></div>
-        </div>
-
-        <!-- Ringkasan Pembayaran -->
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-            <h2 class="text-sm font-bold text-gray-900 mb-3">Ringkasan Pembayaran</h2>
-            <div class="space-y-2 mb-3">
-                <div class="flex justify-between text-sm">
-                    <span class="text-gray-500">Subtotal</span>
-                    <span class="font-medium text-gray-800">Rp <?= number_format($order['subtotal'], 0, ',', '.') ?></span>
+                <!-- Metode Pembayaran -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                    <h2 class="font-bold text-gray-900 mb-1 flex items-center gap-2">
+                        <span class="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center text-sm">💳</span>
+                        Metode Pembayaran
+                    </h2>
+                    <p class="text-sm text-gray-400 mb-4">Pilih salah satu metode pembayaran</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <!-- Online — Coming Soon -->
+                        <label class="relative cursor-not-allowed opacity-50">
+                            <input type="radio" name="payment" value="online" class="peer hidden" disabled />
+                            <div class="w-full p-4 text-center border-2 border-gray-200 rounded-2xl bg-gray-100 transition-all duration-200">
+                                <i class="ph ph-device-mobile text-2xl text-gray-400 mb-1 block"></i>
+                                <span class="font-bold text-gray-400 text-sm">Online</span>
+                            </div>
+                            <div class="absolute -top-2 left-1/2 -translate-x-1/2 bg-gray-600 text-white text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider whitespace-nowrap">
+                                Coming Soon
+                            </div>
+                        </label>
+                        <!-- Bayar di Kasir -->
+                        <label class="relative cursor-pointer">
+                            <input type="radio" name="payment" value="1" class="peer hidden" checked />
+                            <div class="w-full p-4 text-center border-2 border-gray-100 rounded-2xl bg-gray-50 transition-all duration-200
+                                peer-checked:border-blue-400 peer-checked:bg-blue-50 peer-checked:ring-4 peer-checked:ring-blue-100
+                                hover:border-blue-200">
+                                <i class="ph ph-cash-register text-2xl text-blue-500 mb-1 block"></i>
+                                <span class="font-bold text-gray-700 text-sm peer-checked:text-blue-700">Bayar di Kasir</span>
+                            </div>
+                            <div class="absolute top-2 right-2 opacity-0 peer-checked:opacity-100 transition-opacity">
+                                <div class="bg-blue-400 rounded-full p-0.5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
                 </div>
-                <div class="flex justify-between text-sm">
-                    <span class="text-gray-500">Pajak (12%)</span>
-                    <span class="font-medium text-gray-800">Rp <?= number_format($order['tax'], 0, ',', '.') ?></span>
-                </div>
-            </div>
-            <div class="dashed-line my-3"></div>
-            <div class="flex justify-between items-center">
-                <span class="font-bold text-gray-800">Total Tagihan</span>
-                <span class="font-black text-blue-600 text-xl">Rp <?= number_format($order['total'], 0, ',', '.') ?></span>
-            </div>
-        </div>
-    </div>
 
-    <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-white border-t border-gray-100 px-4 py-4 shadow-2xl z-20">
-        <button onclick="backToMenu()"
-            class="w-full bg-blue-500 text-white font-black py-4 rounded-2xl text-base shadow-lg shadow-blue-200 active:scale-95 transition-transform flex items-center justify-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-            </svg>
-            Pesan Lagi
+                <!-- Ringkasan pesanan -->
+                <div class="mt-5 rounded-2xl border border-gray-100 overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 flex items-center gap-2 border-b border-gray-100">
+                        <span class="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center text-sm">🛍️</span>
+                        <h2 class="font-bold text-gray-900 text-sm">Ringkasan Pesanan</h2>
+                    </div>
+                    <div id="order-summary" class="divide-y divide-gray-100 bg-white"></div>
+                    <div class="bg-gray-50 px-4 py-3 space-y-2 border-t border-gray-100">
+                        <div class="flex justify-between text-xs text-gray-500">
+                            <span>Pajak (12%)</span>
+                            <span id="tax-price" class="font-semibold">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between items-center pt-1 border-t border-dashed border-gray-200">
+                            <span class="font-bold text-gray-900 text-sm">Total</span>
+                            <span class="font-black text-blue-600 text-base" id="summary-total">Rp 0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info kasir -->
+                <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex items-center gap-3">
+                    <i class="ph ph-info text-blue-500 text-xl flex-shrink-0"></i>
+                    <p class="text-sm text-blue-700 font-medium">Lanjutkan ke Checkout dan tunjukkan QR Code kepada kasir untuk menyelesaikan pembayaran.</p>
+                </div>
+
+            </div>
+    </form>
+
+    <div class="fixed bottom-0 w-full max-w-[480px] left-1/2 -translate-x-1/2 p-4 bg-white border-t border-gray-200 z-30">
+        <button id="btnCheckout" onclick="submitPesanan()" disabled
+            class="w-full bg-gray-300 text-gray-400 cursor-not-allowed rounded-xl py-3.5 font-bold text-base shadow-lg transition-all duration-200 flex items-center justify-center gap-2">
+            <span>Lanjut ke Checkout</span>
+            <i class="ph-bold ph-caret-right"></i>
         </button>
     </div>
 
-
-
 </main>
-
 <script>
-    function backToMenu() {
-        localStorage.removeItem('cart');
-        localStorage.removeItem('buyer_data');
-        window.location.href = '<?= BASE_URL ?>order/<?= $table_code ?>/index';
+    const MENU_DATA = <?php echo json_encode($result); ?>;
+
+    function getCart() {
+        return JSON.parse(localStorage.getItem('cart')) || [];
     }
-    const itemNotes = JSON.parse(localStorage.getItem('item_notes')) || {};
+
+    function saveCart(cart) {
+        localStorage.setItem('cart', JSON.stringify(cart));
+    }
+
+    function formatRupiah(angka) {
+        return 'Rp ' + parseInt(angka).toLocaleString('id-ID');
+    }
 
     document.addEventListener('DOMContentLoaded', () => {
-        // Ambil data dari PHP ke JS 
-        const orderData = <?php echo json_encode($order); ?>;
-        const itemsData = <?php echo json_encode($order_items); ?>;
+        const cart = getCart();
 
-        // Tampilkan Nama dan Metode Pembayaran dari Database
-        document.getElementById('display-name').innerText = orderData.customer_name;
+        if (!cart.length) {
+            window.location.href = 'index?code<?= $table_code ?>';
+            return;
+        }
 
-        // Konversi angka payment (1/2) ke teks
-        const paymentText = orderData.payment == 1 ? 'Bayar di Kasir' : 'Online';
-        document.getElementById('display-payment').innerText = paymentText;
-
-        // Render Daftar Pesanan dari Database 
-        const orderList = document.getElementById('order-list');
-        orderList.innerHTML = '';
-
-        itemsData.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'flex justify-between items-center py-2';
-            div.innerHTML = `
-                <div class="flex-1">
-                    <p class="font-semibold text-gray-800 text-sm">${item.menu_name}</p>
-                    <p class="text-xs text-gray-400">${item.qty}x @ Rp ${parseInt(item.subtotal/item.qty).toLocaleString('id-ID')}</p>
-                    ${item.notes ? `<p class="text-xs text-amber-600 italic mt-0.5">📝 ${item.notes}</p>` : ''}
+        // Render ringkasan pesanan
+        const listEl = document.getElementById('order-summary');
+        let total = 0;
+        cart.forEach(ci => {
+            const menu = MENU_DATA.find(m => m.id === ci.id);
+            if (!menu) return;
+            const sub = menu.price * ci.qty;
+            total += sub;
+            const hasNote = ci.note && ci.note.trim() !== '';
+            const row = document.createElement('div');
+            row.className = 'px-4 py-3';
+            row.innerHTML = `
+                <div class="flex items-start justify-between gap-3">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex items-center justify-center w-5 h-5 rounded-md bg-blue-600 text-white text-[10px] font-black flex-shrink-0">${ci.qty}</span>
+                            <span class="font-semibold text-sm text-gray-800 truncate">${menu.name}</span>
+                        </div>
+                        <p class="text-[11px] text-gray-400 mt-0.5 ml-7">${formatRupiah(menu.price)} / item</p>
+                        ${hasNote ? `<div class="ml-7 mt-1.5 flex items-start gap-1.5">
+                            <i class="ph ph-note-pencil text-amber-400 text-xs mt-0.5 flex-shrink-0"></i>
+                            <span class="text-[11px] text-amber-600 leading-relaxed italic">${ci.note}</span>
+                        </div>` : ''}
+                    </div>
+                    <span class="font-bold text-sm text-gray-900 flex-shrink-0 pt-0.5">${formatRupiah(sub)}</span>
                 </div>
-                <div class="font-semibold text-gray-900 text-sm">Rp ${parseInt(item.subtotal).toLocaleString('id-ID')}</div>`;
-            orderList.appendChild(div);
+            `;
+            listEl.appendChild(row);
         });
+        const tax = total * 0.12;
+        document.getElementById('tax-price').innerText = formatRupiah(tax);
+        document.getElementById('summary-total').innerText = formatRupiah(total + tax);
 
-
-        // localStorage.removeItem('cart');
-        // localStorage.removeItem('buyer_data');
-
+        // Pre-fill dari localStorage jika ada
+        const saved = JSON.parse(localStorage.getItem('buyer_data'));
+        if (saved) {
+            document.getElementById('name').value = saved.name || '';
+            document.getElementById('email').value = saved.email || '';
+            if (saved.payment) {
+                const radio = document.querySelector(`input[name="payment"][value="${saved.payment}"]`);
+                if (radio) radio.checked = true;
+            }
+        }
     });
 
-    // Fungsi untuk cek status ke server setiap 3 detik
-    const checkInterval = setInterval(async () => {
-        try {
-            const response = await fetch('<?= BASE_URL ?>order/server/cek_status?id=<?= $order['id'] ?>');
-            const data = await response.json();
-
-            if (data.status == 1) {
-                localStorage.removeItem('cart');
-                localStorage.removeItem('buyer_data');
-                clearInterval(checkInterval);
-                window.location.href = '<?= BASE_URL ?>order/<?= $table_code ?>/success/<?= $order_code ?>';
-            }
-        } catch (error) {
-            console.error("Gagal cek status", error);
+    // Contoh cara memasukkan data cart ke form sebelum submit
+    function submitPesanan() {
+        const form = document.getElementById('formPesanan');
+        // Buat input hidden secara dinamis untuk cart
+        if (!form.reportValidity()) {
+            return; // Berhenti di sini jika input tidak valid
         }
-    }, 3000); // 3000ms = 3 detik
+        const cart = getCart();
 
-    function startCountdown() {
-        const display = document.getElementById('display-countdown');
-        const expireTime = new Date(display.getAttribute('data-expire')).getTime();
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'cart_data';
+        hiddenInput.value = JSON.stringify(cart);
 
-        // Update setiap 1 detik
-        const timer = setInterval(function() {
-            const now = new Date().getTime();
-            const distance = expireTime - now;
+        form.appendChild(hiddenInput);
 
-            // Jika waktu sudah habis atau lewat
-            if (distance <= 0) {
-                clearInterval(timer);
-                display.innerHTML = "Kadaluarsa";
-                display.classList.remove('text-blue-600');
-                display.classList.add('text-red-600'); // Ubah warna jadi merahss
-                return;
-            }
+        const buyerData = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+        };
 
-            // Kalkulasi jam, menit, detik
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        localStorage.setItem('buyer_data', JSON.stringify(buyerData));
 
-            // Tampilkan format 00:00:00
-            display.innerHTML =
-                (hours < 10 ? "0" + hours : hours) + ":" +
-                (minutes < 10 ? "0" + minutes : minutes) + ":" +
-                (seconds < 10 ? "0" + seconds : seconds);
-
-        }, 1000);
+        form.submit();
     }
 
-    // Jalankan fungsi saat halaman dimuat
-    document.addEventListener('DOMContentLoaded', startCountdown);
+    // Toggle button checkout berdasarkan isian nama
+    const nameInput = document.getElementById('name');
+    const btnCheckout = document.getElementById('btnCheckout');
+
+    function toggleCheckoutButton() {
+        const filled = nameInput.value.trim() !== '';
+        btnCheckout.disabled = !filled;
+        if (filled) {
+            btnCheckout.classList.remove('bg-gray-300', 'text-gray-400', 'cursor-not-allowed');
+            btnCheckout.classList.add('bg-blue-600', 'hover:bg-blue-700', 'text-white', 'active:scale-[0.98]');
+        } else {
+            btnCheckout.classList.add('bg-gray-300', 'text-gray-400', 'cursor-not-allowed');
+            btnCheckout.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'text-white', 'active:scale-[0.98]');
+        }
+    }
+
+    nameInput.addEventListener('input', toggleCheckoutButton);
+    // Jalankan sekali saat load (jika ada pre-fill dari localStorage)
+    toggleCheckoutButton();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorMessage = urlParams.get('m');
+
+    if (errorMessage) {
+        Swal.fire({
+            title: "Waduh!",
+            text: errorMessage,
+            icon: "error",
+            confirmButtonText: "Oke",
+            confirmButtonColor: "#3b82f6",
+        });
+
+        window.history.replaceState({}, document.title, window.location.pathname + "?code=" + urlParams.get('code'));
+    }
 </script>
 
 <?php include __DIR__ . '/layout/footer.php'; ?>

@@ -27,7 +27,7 @@ include __DIR__ . '/layout/header.php';
     <!-- Header Search -->
     <header class="sticky top-0 z-30 bg-white shadow-sm px-4 pt-4 pb-3">
         <div class="flex items-center gap-3">
-            <a href="<?= BASE_URL ?>order/<?= $table_code ?>/index"
+            <a href="<?= BASE_URL ?>order/<?= $table_code ?>/menu"
                 class="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors shrink-0 text-gray-700">
                 <i class="ph-bold ph-arrow-left text-lg"></i>
             </a>

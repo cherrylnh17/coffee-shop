@@ -208,8 +208,8 @@ if ($printResult['success']) {
 } else {
     $_SESSION['swal_msg'] = [
         'icon'  => 'warning',
-        'title' => 'Transaksi Tersimpan',
-        'text'  => 'Pesanan selesai, tapi struk gagal dicetak dikarenakan printer belum di konfigurasi.'
+        'title' => 'Gagal dicetak',
+        'text'  => 'Struk gagal di cetak, dikarenakan printer belum dikonfigurasi.'
     ];
 }
 
