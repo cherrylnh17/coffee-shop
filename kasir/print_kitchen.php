@@ -14,14 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // ============================================================
-//  KONFIGURASI PRINTER
-// ============================================================
-define('PRINTER_BT_MAC',     $_ENV['PRINTER_BT_MAC']);
-define('PRINTER_BT_CHANNEL', $_ENV['PRINTER_BT_CHANNEL']);
-define('PRINTER_RFCOMM_DEV', $_ENV['PRINTER_RFCOMM_DEV']);
-define('PRINTER_TIMEOUT',    $_ENV['PRINTER_TIMEOUT']);
-
-// ============================================================
 //  HELPER ESC/POS
 // ============================================================
 
@@ -53,12 +45,12 @@ function buildKitchenTicket($order, $order_items) {
     // -- Header: Nomor Meja besar --
     $data .= $ALIGN_C;
     $data .= $BOLD_ON . $SIZE_2X;
-    $data .= "MEJA " . strtoupper($order['table_name']);
+    $data .= "MEJA " . strtoupper($order['table_name'] ?? '-');
     $data .= $SIZE_NORM . $BOLD_OFF . $LF;
 
     // -- Info singkat --
-    $data .= center("No: " . $order['code']) . $LF;
-    $data .= center(date('d-m-Y H:i', strtotime($order['created_at']))) . $LF;
+    $data .= center("No: " . ($order['code'] ?? '-')) . $LF;
+    $data .= center(date('d-m-Y H:i', strtotime($order['created_at'] ?? 'now'))) . $LF;
 
     if (!empty($order['customer_name'])) {
         $data .= center("Pembeli: " . $order['customer_name']) . $LF;
@@ -70,7 +62,7 @@ function buildKitchenTicket($order, $order_items) {
     // -- List Pesanan (tanpa harga) --
     $no = 1;
     foreach ($order_items as $item) {
-        $nama = mb_substr($item['menu_name'], 0, 30);
+        $nama = mb_substr($item['menu_name'] ?? '-', 0, 30);
         $data .= $BOLD_ON;
         $data .= $no . ". [" . $item['qty'] . "x] " . $nama . $LF;
         $data .= $BOLD_OFF;
@@ -93,81 +85,6 @@ function buildKitchenTicket($order, $order_items) {
     return $data;
 }
 
-// ============================================================
-//  FUNGSI PRINT
-// ============================================================
-
-function printViaRfcomm($escposData) {
-    $devicePath = PRINTER_RFCOMM_DEV;
-
-    if (!file_exists($devicePath)) {
-        return [
-            'success' => false,
-            'message' => "Device {$devicePath} tidak ditemukan. Jalankan: sudo rfcomm bind 0 " . PRINTER_BT_MAC . " " . PRINTER_BT_CHANNEL
-        ];
-    }
-
-    if (!is_writable($devicePath)) {
-        return [
-            'success' => false,
-            'message' => "Tidak ada izin tulis ke {$devicePath}."
-        ];
-    }
-
-    $fp = @fopen($devicePath, 'wb');
-    if (!$fp) {
-        return [
-            'success' => false,
-            'message' => "Gagal membuka device {$devicePath}."
-        ];
-    }
-
-    $written = fwrite($fp, $escposData);
-    fclose($fp);
-
-    if ($written === false) {
-        return ['success' => false, 'message' => "Gagal menulis data ke {$devicePath}."];
-    }
-
-    return ['success' => true, 'message' => 'Tiket dapur berhasil dicetak via rfcomm.'];
-}
-
-function printViaShell($escposData) {
-    $mac     = PRINTER_BT_MAC;
-    $channel = PRINTER_BT_CHANNEL;
-    $tmpFile = tempnam(sys_get_temp_dir(), 'escpos_') . '.bin';
-
-    if (file_put_contents($tmpFile, $escposData) === false) {
-        return ['success' => false, 'message' => 'Gagal membuat file temporary ESC/POS.'];
-    }
-
-    $cmd    = "rfcomm connect /dev/rfcomm1 {$mac} {$channel} < /dev/null & sleep 1 && cat " . escapeshellarg($tmpFile) . " > /dev/rfcomm1 ; rfcomm release /dev/rfcomm1 2>&1";
-    $output = shell_exec($cmd);
-
-    unlink($tmpFile);
-
-    if (strpos($output, "Can't") !== false || strpos($output, 'error') !== false) {
-        return [
-            'success' => false,
-            'message' => "Gagal koneksi Bluetooth: " . trim($output)
-        ];
-    }
-
-    return ['success' => true, 'message' => 'Tiket dapur berhasil dicetak via shell.'];
-}
-
-function printToThermal($escposData) {
-    $result = printViaRfcomm($escposData);
-
-    if ($result['success']) return $result;
-
-    // Fallback ke shell jika device belum di-bind
-    if (strpos($result['message'], 'tidak ditemukan') !== false) {
-        return printViaShell($escposData);
-    }
-
-    return $result;
-}
 
 // ============================================================
 //  MAIN
@@ -182,39 +99,47 @@ if (!$order_id) {
 }
 
 try {
-    $stmtOrder = $pdo->prepare("SELECT * FROM `order` WHERE id = ?");
+    // Ambil data order
+    $stmtOrder = $pdo->prepare("
+        SELECT o.*, t.name AS table_name 
+        FROM `order` o
+        LEFT JOIN `table` t ON t.id = o.table_id 
+        WHERE o.id = ?
+    ");
     $stmtOrder->execute([$order_id]);
     $orderData = $stmtOrder->fetch(PDO::FETCH_ASSOC);
 
-    $stmtItems = $pdo->prepare("SELECT * FROM order_item WHERE order_id = ?");
+    if (!$orderData) {
+        throw new Exception("Data order tidak ditemukan.");
+    }
+
+    // Ambil data item (join dengan menu untuk dapatkan nama)
+    $stmtItems = $pdo->prepare("
+        SELECT oi.*, m.name AS menu_name 
+        FROM order_item oi
+        LEFT JOIN menu m ON m.id = oi.menu_id 
+        WHERE oi.order_id = ?
+    ");
     $stmtItems->execute([$order_id]);
     $orderItems = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
 
-} catch (PDOException $e) {
-    $_SESSION['swal_msg'] = [
-        'icon'  => 'error',
-        'title' => 'Error DB',
-        'text'  => $e->getMessage()
-    ];
-    header("Location: index");
-    exit;
-}
+    // 1. Format teks tiket dapur
+    $escpos = buildKitchenTicket($orderData, $orderItems);
 
-// Build & print
-$escpos      = buildKitchenTicket($orderData, $orderItems);
-$printResult = printToThermal($escpos);
+    // 2. Simpan ke sesi agar di-broadcast oleh halaman tujuan
+    $_SESSION['print_payload'] = base64_encode($escpos);
 
-if ($printResult['success']) {
     $_SESSION['swal_msg'] = [
         'icon'  => 'success',
-        'title' => 'Berhasil!',
-        'text'  => 'Tiket dapur berhasil dicetak untuk Meja ' . $orderData['table_name']
+        'title' => 'Mengirim...',
+        'text'  => 'Tiket dapur sedang dikirim ke printer...'
     ];
-} else {
+
+} catch (Exception $e) {
     $_SESSION['swal_msg'] = [
-        'icon'  => 'warning',
+        'icon'  => 'error',
         'title' => 'Gagal Print',
-        'text'  => 'Tiket GAGAL dicetak. ' . $printResult['message']
+        'text'  => $e->getMessage()
     ];
 }
 

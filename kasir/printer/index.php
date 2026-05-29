@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../path.php';
 
@@ -10,21 +9,6 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
     exit;
 }
 
-/*
-|--------------------------------------------------------------------------
-| LOAD DATA PRINTER UNTUK DITAMPILKAN DI INFO
-|--------------------------------------------------------------------------
-*/
-$stmt = $pdo->query("
-    SELECT *
-    FROM printer
-    WHERE type = 1
-    AND is_active = 1
-    LIMIT 1
-");
-
-$printer = $stmt->fetch(PDO::FETCH_ASSOC);
-
 $pageTitle = "Printer Bluetooth (Web API)";
 $currentPage = "printer";
 include '../layout/header.php';
@@ -33,9 +17,7 @@ include '../layout/sidebar.php';
 
 <main class="relative min-h-screen pt-[74px] transition-all duration-300 lg:ml-[280px] pc-main">
     <div class="p-4 sm:p-6 lg:p-8">
-
         <div class="max-w-3xl mx-auto">
-
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
 
                 <div class="mb-6 text-center">
@@ -43,70 +25,49 @@ include '../layout/sidebar.php';
                         <i class="fa-brands fa-bluetooth text-2xl"></i>
                     </div>
                     <h2 class="text-2xl font-bold text-gray-800">
-                        Web Bluetooth Printer
+                        Server Printer Kasir
                     </h2>
                     <p class="text-gray-500 text-sm mt-2">
-                        Koneksi thermal printer langsung melalui browser tanpa terminal/server.
+                        Biarkan tab ini tetap terbuka selama kasir beroperasi. Tab lain akan mengirimkan perintah cetak ke sini.
                     </p>
                 </div>
 
                 <div id="js-alert" class="hidden mb-5 rounded-xl p-4 font-medium text-sm"></div>
 
-                <?php if ($printer): ?>
+                <div class="overflow-hidden rounded-xl border border-gray-200">
+                    <table class="w-full text-sm">
+                        <tbody>
+                            <tr class="border-b">
+                                <td class="p-4 font-semibold w-48">Tipe Koneksi</td>
+                                <td class="p-4 font-mono text-blue-600">Web Bluetooth API + BroadcastChannel</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-semibold">Status Browser</td>
+                                <td class="p-4">
+                                    <span id="status-badge" class="inline-flex items-center gap-2 text-red-600 font-semibold">
+                                        🔴 Terputus
+                                    </span>
+                                    <span id="device-name" class="ml-2 text-gray-500 font-normal"></span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-                    <div class="overflow-hidden rounded-xl border border-gray-200">
-                        <table class="w-full text-sm">
-                            <tbody>
-                                <tr class="border-b">
-                                    <td class="p-4 font-semibold w-48">Nama Printer (DB)</td>
-                                    <td class="p-4"><?= htmlspecialchars($printer['name']) ?></td>
-                                </tr>
-                                <tr class="border-b">
-                                    <td class="p-4 font-semibold">Tipe Koneksi</td>
-                                    <td class="p-4 font-mono text-blue-600">Web Bluetooth API</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-4 font-semibold">Status Browser</td>
-                                    <td class="p-4">
-                                        <span id="status-badge" class="inline-flex items-center gap-2 text-red-600 font-semibold">
-                                            🔴 Terputus
-                                        </span>
-                                        <span id="device-name" class="ml-2 text-gray-500 font-normal"></span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="mt-6 flex flex-wrap gap-3">
-                        
-                        <button id="btn-connect" onclick="connectBluetooth()" class="px-5 py-3 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-semibold transition-all">
-                            <i class="fa-solid fa-link mr-2"></i>
-                            Pilih & Sambungkan
-                        </button>
-
-                        <button id="btn-test" onclick="testPrint()" class="px-5 py-3 rounded-xl bg-green-600 text-white hover:bg-green-700 font-semibold transition-all hidden">
-                            <i class="fa-solid fa-print mr-2"></i>
-                            Test Print
-                        </button>
-
-                        <button id="btn-disconnect" onclick="disconnectBluetooth()" class="px-5 py-3 rounded-xl bg-red-600 text-white hover:bg-red-700 font-semibold transition-all hidden">
-                            <i class="fa-solid fa-link-slash mr-2"></i>
-                            Putuskan
-                        </button>
-
-                    </div>
-
-                <?php else: ?>
-                    <div class="rounded-xl bg-yellow-50 border border-yellow-200 p-5 text-yellow-700">
-                        Tidak ada konfigurasi printer di database.
-                    </div>
-                <?php endif; ?>
+                <div class="mt-6 flex flex-wrap gap-3">
+                    <button id="btn-connect" onclick="connectBluetooth()" class="px-5 py-3 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-semibold transition-all">
+                        <i class="fa-solid fa-link mr-2"></i> Pilih & Sambungkan
+                    </button>
+                    <button id="btn-test" onclick="testPrint()" class="px-5 py-3 rounded-xl bg-green-600 text-white hover:bg-green-700 font-semibold transition-all hidden">
+                        <i class="fa-solid fa-print mr-2"></i> Test Print
+                    </button>
+                    <button id="btn-disconnect" onclick="disconnectBluetooth()" class="px-5 py-3 rounded-xl bg-red-600 text-white hover:bg-red-700 font-semibold transition-all hidden">
+                        <i class="fa-solid fa-link-slash mr-2"></i> Putuskan
+                    </button>
+                </div>
 
             </div>
-
         </div>
-
     </div>
 </main>
 
@@ -114,17 +75,46 @@ include '../layout/sidebar.php';
     let bluetoothDevice = null;
     let writeCharacteristic = null;
 
-    // Perintah ESC/POS Standar
-    const ESC = '\x1B';
-    const GS = '\x1D';
-    const INIT = ESC + '@';
-    const CENTER = ESC + 'a' + '\x01';
-    const LEFT = ESC + 'a' + '\x00';
-    const BOLD_ON = ESC + 'E' + '\x01';
-    const BOLD_OFF = ESC + 'E' + '\x00';
-    const CUT = GS + 'V' + '\x41' + '\x03'; // Full cut
+    // --- FUNGSI BARU: MENGIRIM DATA SECARA BERCICIL (CHUNKING) ---
+    async function sendDataToPrinter(dataUint8Array) {
+        // Batas aman pengiriman Web Bluetooth adalah 512, kita pakai 400 agar lebih stabil
+        const CHUNK_SIZE = 400; 
+        
+        for (let i = 0; i < dataUint8Array.length; i += CHUNK_SIZE) {
+            const chunk = dataUint8Array.slice(i, i + CHUNK_SIZE);
+            await writeCharacteristic.writeValue(chunk);
+            
+            // Beri jeda sangat singkat antar potongan agar buffer printer tidak penuh
+            await new Promise(resolve => setTimeout(resolve, 50)); 
+        }
+    }
+    // -------------------------------------------------------------
 
-    // Elemen UI
+    // --- FITUR KOMUNIKASI ANTAR TAB (BROADCAST CHANNEL) ---
+    const saluranPrinter = new BroadcastChannel('printer_channel');
+
+    saluranPrinter.onmessage = async (event) => {
+        if (!writeCharacteristic) {
+            showAlert('Menerima pesanan cetak, tapi printer belum disambungkan di tab ini!', false);
+            return;
+        }
+        
+        try {
+            console.log("Menerima data cetak dari tab lain...");
+            const encoder = new TextEncoder();
+            const data = encoder.encode(event.data);
+            
+            // Gunakan fungsi chunking di sini
+            await sendDataToPrinter(data);
+            
+            showAlert('Struk kasir berhasil dicetak!', true);
+        } catch (error) {
+            console.error("Gagal mencetak struk:", error);
+            showAlert('Gagal mencetak struk dari kasir: ' + error.message, false);
+        }
+    };
+    // -----------------------------------------------------
+
     const statusBadge = document.getElementById('status-badge');
     const deviceName = document.getElementById('device-name');
     const btnConnect = document.getElementById('btn-connect');
@@ -134,11 +124,7 @@ include '../layout/sidebar.php';
 
     function showAlert(message, isSuccess = true) {
         jsAlert.classList.remove('hidden', 'bg-green-50', 'text-green-700', 'border-green-200', 'bg-red-50', 'text-red-700', 'border-red-200');
-        if (isSuccess) {
-            jsAlert.classList.add('bg-green-50', 'text-green-700', 'border', 'border-green-200');
-        } else {
-            jsAlert.classList.add('bg-red-50', 'text-red-700', 'border', 'border-red-200');
-        }
+        jsAlert.classList.add(isSuccess ? 'bg-green-50' : 'bg-red-50', isSuccess ? 'text-green-700' : 'text-red-700', 'border', isSuccess ? 'border-green-200' : 'border-red-200');
         jsAlert.innerHTML = message;
     }
 
@@ -146,7 +132,6 @@ include '../layout/sidebar.php';
         statusBadge.innerHTML = '🟢 Terhubung';
         statusBadge.classList.replace('text-red-600', 'text-green-600');
         deviceName.innerText = '(' + name + ')';
-        
         btnConnect.classList.add('hidden');
         btnTest.classList.remove('hidden');
         btnDisconnect.classList.remove('hidden');
@@ -156,7 +141,6 @@ include '../layout/sidebar.php';
         statusBadge.innerHTML = '🔴 Terputus';
         statusBadge.classList.replace('text-green-600', 'text-red-600');
         deviceName.innerText = '';
-        
         btnConnect.classList.remove('hidden');
         btnTest.classList.add('hidden');
         btnDisconnect.classList.add('hidden');
@@ -165,95 +149,75 @@ include '../layout/sidebar.php';
 
     async function connectBluetooth() {
         if (!navigator.bluetooth) {
-            showAlert('Browser Anda tidak mendukung Web Bluetooth API. Gunakan Google Chrome atau Edge.', false);
+            showAlert('Browser Anda tidak mendukung Web Bluetooth API.', false);
             return;
         }
 
         try {
-            // Meminta device dari browser
             bluetoothDevice = await navigator.bluetooth.requestDevice({
-                // UUID ini adalah UUID standar untuk printer thermal (Serial Port Profile)
-                filters: [
-                    { services: ['000018f0-0000-1000-8000-00805f9b34fb'] }, // Custom UUID (Sering dipakai thermal)
-                    { services: ['e7810a71-73ae-499d-8c15-faa9aef0c3f2'] }  // Custom UUID lainnya
-                ],
-                optionalServices: ['00001101-0000-1000-8000-00805f9b34fb'] // SPP Standar
+                acceptAllDevices: true,
+                optionalServices: [
+                    '000018f0-0000-1000-8000-00805f9b34fb', 
+                    '00001101-0000-1000-8000-00805f9b34fb',
+                    'e7810a71-73ae-499d-8c15-faa9aef0c3f2'
+                ]
             });
 
-            // Handle jika device terputus tiba-tiba
-            bluetoothDevice.addEventListener('gattserverdisconnected', onDisconnected);
-
-            // Konek ke GATT Server
+            bluetoothDevice.addEventListener('gattserverdisconnected', updateUIDisconnected);
             const server = await bluetoothDevice.gatt.connect();
+            const services = await server.getPrimaryServices();
+            writeCharacteristic = null;
 
-            // Mendapatkan Primary Service
-            // Catatan: Anda mungkin perlu menyesuaikan UUID service sesuai merk printer Anda.
-            // Gunakan aplikasi "nRF Connect" di HP untuk mengecek UUID service printer Anda jika gagal.
-            const service = await server.getPrimaryService(bluetoothDevice.uuids[0]);
-            
-            const characteristics = await service.getCharacteristics();
-            writeCharacteristic = characteristics.find(c => c.properties.write || c.properties.writeWithoutResponse);
-
-            if (!writeCharacteristic) {
-                throw new Error('Karakteristik penulisan (Write) tidak ditemukan pada device ini.');
+            for (const service of services) {
+                try {
+                    const characteristics = await service.getCharacteristics();
+                    writeCharacteristic = characteristics.find(c => c.properties.write || c.properties.writeWithoutResponse);
+                    if (writeCharacteristic) break;
+                } catch (e) {}
             }
 
-            updateUIConnected(bluetoothDevice.name);
-            showAlert('Printer <b>' + bluetoothDevice.name + '</b> berhasil disambungkan!', true);
+            if (!writeCharacteristic) throw new Error('Karakteristik penulisan (Write) tidak ditemukan.');
+
+            updateUIConnected(bluetoothDevice.name || 'Printer Thermal');
+            showAlert('Printer siap menerima struk dari tab kasir!', true);
 
         } catch (error) {
-            console.error(error);
             showAlert('Gagal menyambung: ' + error.message, false);
         }
     }
 
     async function testPrint() {
-        if (!writeCharacteristic) {
-            showAlert('Printer belum terhubung!', false);
-            return;
-        }
-
+        if (!writeCharacteristic) return;
         try {
             const encoder = new TextEncoder();
             
-            // Format Struk Test Print
-            let receipt = INIT;
-            receipt += CENTER + BOLD_ON + "TEST PRINTER WEB API\n" + BOLD_OFF;
-            receipt += "COFFEE SHOP\n";
+            // Format struk test print agak panjang untuk menguji chunking
+            let receipt = "\x1B\x40\x1B\x61\x01\x1B\x45\x01TEST PRINTER WEB API\n\x1B\x45\x00";
+            receipt += "Koneksi Antar Tab Berhasil\n";
+            receipt += "Sistem Chunking Data Aktif\n";
             receipt += "--------------------------------\n";
-            receipt += LEFT;
-            receipt += "Waktu   : " + new Date().toLocaleString('id-ID') + "\n";
-            receipt += "Sistem  : Ubuntu Localhost\n";
-            receipt += "Metode  : Web Bluetooth\n";
-            receipt += "--------------------------------\n";
-            receipt += CENTER + "Terima Kasih\n";
-            receipt += "\n\n\n" + CUT;
+            receipt += "Jika tulisan ini tercetak,\n";
+            receipt += "berarti printer Anda sudah\n";
+            receipt += "bisa mencetak struk panjang\n";
+            receipt += "melebihi batas 512 byte.\n";
+            receipt += "--------------------------------\n\n\n";
+            receipt += "\x1D\x56\x41\x03";
 
-            // Karena Web Bluetooth punya batas pengiriman data (biasanya 512 bytes per kiriman),
-            // kita ubah ke Uint8Array dan kirim.
             const data = encoder.encode(receipt);
-            await writeCharacteristic.writeValue(data);
             
-            showAlert('Test print berhasil dikirim ke printer.', true);
-
+            // Gunakan fungsi chunking di sini juga
+            await sendDataToPrinter(data);
+            showAlert('Test print sukses!', true);
+            
         } catch (error) {
-            console.error(error);
-            showAlert('Gagal mencetak: ' + error.message, false);
+            showAlert('Gagal test print: ' + error.message, false);
         }
     }
 
     function disconnectBluetooth() {
-        if (!bluetoothDevice) {
-            return;
-        }
-        if (bluetoothDevice.gatt.connected) {
+        if (bluetoothDevice && bluetoothDevice.gatt.connected) {
             bluetoothDevice.gatt.disconnect();
         }
-    }
-
-    function onDisconnected() {
-        updateUIDisconnected();
-        showAlert('Koneksi printer terputus.', false);
     }
 </script>
 
