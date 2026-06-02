@@ -57,48 +57,48 @@ perintah dump isinya
 drop if exist dan isinya foreign key foreign key
 
 
-
+<!-- 
 harus ada 1 tombol untuk melakkan sesuatu
 contohnya order di hero hilang terus order di navbar keliatan
-begitu pula sebaliknya
+begitu pula sebaliknya -->
 
 
 
-button di menu di ubah Lihat Semua Menu
+<!-- button di menu di ubah Lihat Semua Menu -->
 
 
 
-jika qr not found atau tidak di temmukan dikasih alert meja tidak di temukan
-dikasih alert di scan qr nya, dan ada tanda coba lagi
+<!-- jika qr not found atau tidak di temmukan dikasih alert meja tidak di temukan -->
+<!-- dikasih alert di scan qr nya, dan ada tanda coba lagi -->
 
-pesanan ganti cart
+<!-- pesanan ganti cart -->
 
 
 <!-- pajak semua persen
 tabel tax diganti dengan graduity
 kasih kolom tipe dengan tiny int -->
 
-
+<!-- 
 identitas di ganti -> checkout
 
 checkout diganti -> payment
 
 
 jika batas pembayaran lewat akan memanggil cron job yang akan membuat data tersebut menjadi expired
-dengan cron job di buat 30 menit setelah dimulai
+dengan cron job di buat 30 menit setelah dimulai -->
 
 
-
+<!-- 
 mulai halaman
 order/1/menu --
 order/1/cart --
 order/1/checkout --
 order/1/payment
 report/cron/order =  pakai ajax untuk ubah expired dan membuat cron job 
-order/1/success --
+order/1/success -- -->
  
 
-url kasir ubah dari /kasir/index jadi /kasir 
+<!-- url kasir ubah dari /kasir/index jadi /kasir  -->
 
 ////
 
@@ -137,9 +137,9 @@ nama pemesan -->
 ditambahkan pencarian untuk search order code
 filter dari tanggal berapa sampai berapa , dan ekspor excel
 
-
+<!-- 
 tabel report 
-export berdasarkan item semisalnya tanggal segini menu ini laku berapa
+export berdasarkan item semisalnya tanggal segini menu ini laku berapa -->
 
 
 <!-- tentang akun ganti profile saya menjadi icon menu -->
@@ -165,7 +165,7 @@ di perbaiki bagian tabel nya untuk bagian laporan penjualan
 
 namanya langsung tidak perlu kata manajemen
 
-dropdown di menu dibuat sama semua
+<!-- dropdown di menu dibuat sama semua -->
 
 ditambahkan kolom terjual berapa di bagian menu agar tau menu ini yang beli berapa 
 
