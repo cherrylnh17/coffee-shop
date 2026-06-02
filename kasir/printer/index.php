@@ -146,7 +146,7 @@ include '../layout/sidebar.php';
         btnDisconnect.classList.add('hidden');
         writeCharacteristic = null;
     }
-
+ 
     // Terjemahkan error teknis ke pesan ramah pengguna
     function friendlyError(error, context) {
         const msg = (error.message || '').toLowerCase();

@@ -104,7 +104,7 @@ function initQRScanner() {
     "open-qr-scanner-mobile",
     "open-qr-scanner-menu",
     "hero-order-btn",
-    "cta-order-btn",
+    "cta-order-btn", 
   ];
   var modal = document.getElementById("qr-modal");
   var closeBtn = document.getElementById("close-qr-modal");
@@ -132,6 +132,7 @@ function initQRScanner() {
       return;
     }
 
+    // Pastikan tombol coba lagi dari error sebelumnya dihapus jika ada
     var oldRetryBtn = document.getElementById('retry-qr-btn');
     if (oldRetryBtn) oldRetryBtn.remove();
 
@@ -148,6 +149,7 @@ function initQRScanner() {
       function (decodedText) {
         var tableNumber = decodedText.trim();
 
+        // 1. Hentikan scanner sementara saat melakukan validasi
         stopScanner();
         statusEl.innerHTML = '<span class="text-blue-600 font-bold">⏳ Mengecek validasi QR...</span>';
 
@@ -155,17 +157,20 @@ function initQRScanner() {
         var redirectOrder = (window.APP_REDIRECT || "order").replace(/^\/|\/$/g, "");
         var redirectUrl = baseUrl + "/" + redirectOrder + "/" + tableNumber + "/menu";
 
+        // 2. Request ke backend untuk cek tabel
         fetch(baseUrl + "/check_table.php?table_name=" + encodeURIComponent(tableNumber))
           .then(function(response) {
             return response.json();
           })
           .then(function(data) {
             if (data.status === 'success') {
+              // Jika Valid -> Alihkan
               statusEl.innerHTML = '<span class="text-green-600 font-bold">✅ QR Valid! Mengalihkan ke Meja ' + tableNumber + '...</span>';
               setTimeout(function () {
                 window.location.href = redirectUrl;
               }, 800);
             } else {
+              // Jika Tidak Valid -> Munculkan Error & Tombol Coba Lagi
               showQRInvalidError();
             }
           })
@@ -177,10 +182,12 @@ function initQRScanner() {
     );
   }
 
+  // Fungsi tambahan untuk menampilkan error dan tombol Coba Lagi
   function showQRInvalidError(customMsg) {
     var errorMsg = customMsg || "QR Tidak Valid atau Meja Tidak Ditemukan.";
     statusEl.innerHTML = '<span class="text-red-600 font-bold">❌ ' + errorMsg + '</span>';
     
+    // Cek agar tidak menduplikasi tombol
     if (!document.getElementById("retry-qr-btn")) {
       var retryBtn = document.createElement("button");
       retryBtn.id = "retry-qr-btn";
@@ -188,11 +195,12 @@ function initQRScanner() {
       retryBtn.innerText = "Coba Lagi Scanner";
       
       retryBtn.onclick = function() {
-        this.remove();
+        this.remove(); // Hapus tombol
         statusEl.textContent = "Menginisialisasi kamera...";
-        startScanner();
+        startScanner(); // Mulai ulang kamera
       };
       
+      // Tambahkan tombol tepat di bawah status
       statusEl.parentNode.appendChild(retryBtn);
     }
   }

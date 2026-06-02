@@ -138,7 +138,7 @@ ditambahkan pencarian untuk search order code
 filter dari tanggal berapa sampai berapa , dan ekspor excel
 
 
-tabel report 
+<!-- tabel report  -->
 export berdasarkan item semisalnya tanggal segini menu ini laku berapa
 
 

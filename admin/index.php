@@ -85,13 +85,6 @@ include 'layout/sidebar.php';
 <main class="relative min-h-screen pt-[74px] transition-all duration-300 lg:ml-[280px] pc-main">
   <div class="p-4 sm:p-6 lg:p-8">
 
-    <div class="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-      <div>
-        <h2 class="text-2xl font-bold text-gray-800">Dashboard</h2>
-        <p class="mt-1 text-sm text-gray-500">Ringkasan performa dan penjualan</p>
-      </div>
-    </div>
-
     <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-3">
       <div class="flex items-center gap-4 rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
         <div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-xl text-blue-600">
