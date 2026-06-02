@@ -82,7 +82,7 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
     </ul>
 
     <!-- CTA Button -->
-    <div class="hidden md:flex items-center gap-3 shrink-0">
+    <div id="nav-order-wrapper" class="hidden md:flex items-center gap-3 shrink-0 transition-all duration-300 opacity-0 scale-95 pointer-events-none">
       <button id="open-qr-scanner"
         class="bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-sm font-semibold px-6 py-2.5 rounded-full transition-all duration-200 shadow-lg shadow-blue-600/30">
         Order Sekarang
@@ -343,7 +343,7 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
     <div class="text-center mt-16 scroll-reveal">
       <button id="open-qr-scanner-menu"
         class="group inline-flex items-center justify-center gap-3 bg-white border-2 border-slate-200 hover:border-blue-600 text-slate-800 hover:text-blue-600 font-bold px-10 py-4 rounded-full transition-all duration-300 hover:shadow-lg w-full sm:w-auto">
-        Lihat Semua Menu via QR
+        Lihat Semua Menu
         <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
         </svg>
@@ -410,7 +410,7 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 </section>
 
 
-<section class="relative py-24 lg:py-32 overflow-hidden bg-blue-600">
+<section id="cta" class="relative py-24 lg:py-32 overflow-hidden bg-blue-600">
   <div class="absolute top-0 right-0 w-96 h-96 bg-blue-500 rounded-full blur-[80px] opacity-60"></div>
   <div class="absolute bottom-0 left-0 w-80 h-80 bg-blue-700 rounded-full blur-[80px] opacity-60"></div>
   <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle, white 2px, transparent 2px); background-size: 30px 30px;"></div>
@@ -615,6 +615,51 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
         `;
       });
       menuGridOverride.innerHTML = menuHTML;
+    }
+
+    const navOrderWrapper = document.getElementById('nav-order-wrapper');
+    const heroSection = document.getElementById('hero');
+    const ctaSection = document.getElementById('cta');
+
+    if (navOrderWrapper && heroSection && ctaSection) {
+      const observerOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1 
+      };
+
+      let isHeroVisible = true; 
+      let isCtaVisible = false;
+
+      const toggleNavButton = () => {
+        const isDesktop = window.innerWidth >= 768;
+
+        if (isDesktop) {
+          if (isHeroVisible || isCtaVisible) {
+            navOrderWrapper.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+            navOrderWrapper.classList.remove('opacity-100', 'scale-100');
+          } else {
+            navOrderWrapper.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+            navOrderWrapper.classList.add('opacity-100', 'scale-100');
+          }
+        }
+      };
+
+      const sectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.target.id === 'hero') {
+            isHeroVisible = entry.isIntersecting;
+          } else if (entry.target.id === 'cta') {
+            isCtaVisible = entry.isIntersecting;
+          }
+        });
+        toggleNavButton();
+      }, observerOptions);
+
+      sectionObserver.observe(heroSection);
+      sectionObserver.observe(ctaSection);
+
+      window.addEventListener('resize', toggleNavButton);
     }
   });
 
