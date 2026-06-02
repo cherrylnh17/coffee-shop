@@ -29,7 +29,7 @@ function center($text, $width = 32) {
     return str_repeat(' ', $pad) . $text;
 }
 
-function buildEscPos($order, $order_items) {
+function buildEscPos($order, $order_items, $order_fees) {
     $ESC       = "\x1B";
     $GS        = "\x1D";
     $INIT      = $ESC . "@";
@@ -84,7 +84,13 @@ function buildEscPos($order, $order_items) {
     $metode     = ($order['payment'] == 1) ? 'Kasir' : 'Online';
 
     $data .= justify("Subtotal :",        "Rp " . fmt($order['subtotal'])) . $LF;
-    $data .= justify("Pajak (12%) :",     "Rp " . fmt($order['tax']))      . $LF;
+    foreach ($order_fees as $fee) {
+        $suffix = (int)$fee['type'] === 1
+            ? ' (' . rtrim(rtrim(number_format((float)$fee['rate'], 2), '0'), '.') . '%)'
+            : '';
+        $label = mb_substr($fee['name'] . $suffix . ' :', 0, 16);
+        $data .= justify($label, "Rp " . fmt($fee['amount'])) . $LF;
+    }
     $data .= str_repeat('-', 32) . $LF;
     $data .= $BOLD_ON;
     $data .= justify("TOTAL :",           "Rp " . fmt($order['total']))    . $LF;
@@ -145,8 +151,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmtItems->execute([$order_id]);
                 $orderItems = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
 
+                // Ambil rincian fee snapshot
+                $stmtFee = $pdo->prepare("SELECT * FROM order_fee WHERE order_id = ?");
+                $stmtFee->execute([$order_id]);
+                $orderFees = $stmtFee->fetchAll(PDO::FETCH_ASSOC);
+
+                // Fallback order lama sebelum migrasi
+                if (empty($orderFees)) {
+                    $feeStmt = $pdo->prepare("SELECT * FROM fee_setting");
+                    $feeStmt->execute();
+                    foreach ($feeStmt->fetchAll(PDO::FETCH_ASSOC) as $f) {
+                        $amt = (int)$f['type'] === 1
+                            ? (int) round($orderData['subtotal'] * ((float)$f['value'] / 100))
+                            : (int) round((float)$f['value']);
+                        $orderFees[] = ['name' => $f['name'], 'type' => $f['type'], 'rate' => $f['value'], 'amount' => $amt];
+                    }
+                }
+
                 // 1. Format teks struk
-                $escpos = buildEscPos($orderData, $orderItems);
+                $escpos = buildEscPos($orderData, $orderItems, $orderFees);
 
                 // 2. Simpan teks struk ke Session untuk dilempar ke BroadcastChannel
                 $_SESSION['print_payload'] = base64_encode($escpos);

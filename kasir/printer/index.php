@@ -95,7 +95,7 @@ include '../layout/sidebar.php';
 
     saluranPrinter.onmessage = async (event) => {
         if (!writeCharacteristic) {
-            showAlert('Menerima pesanan cetak, tapi printer belum disambungkan di tab ini!', false);
+            showAlert('⚠️ Ada struk masuk, tapi printer belum terhubung. Klik tombol <strong>Pilih & Sambungkan</strong> terlebih dahulu.', false);
             return;
         }
         
@@ -107,10 +107,10 @@ include '../layout/sidebar.php';
             // Gunakan fungsi chunking di sini
             await sendDataToPrinter(data);
             
-            showAlert('Struk kasir berhasil dicetak!', true);
+            showAlert('✅ Struk kasir berhasil dicetak!', true);
         } catch (error) {
             console.error("Gagal mencetak struk:", error);
-            showAlert('Gagal mencetak struk dari kasir: ' + error.message, false);
+            showAlert(friendlyError(error, 'print'), false);
         }
     };
     // -----------------------------------------------------
@@ -147,9 +147,49 @@ include '../layout/sidebar.php';
         writeCharacteristic = null;
     }
 
+    // Terjemahkan error teknis ke pesan ramah pengguna
+    function friendlyError(error, context) {
+        const msg = (error.message || '').toLowerCase();
+        const name = (error.name || '').toLowerCase();
+
+        if (!navigator.bluetooth) {
+            return 'Browser Anda tidak mendukung Bluetooth. Gunakan Google Chrome versi terbaru di komputer.';
+        }
+
+        if (name === 'notfounderror' || msg.includes('user cancelled') || msg.includes('no device selected')) {
+            return 'Tidak ada printer yang dipilih. Silakan klik tombol sambungkan dan pilih printer dari daftar.';
+        }
+
+        if (name === 'securityerror' || msg.includes('bluetooth permission') || msg.includes('permission')) {
+            return 'Akses Bluetooth ditolak oleh browser. Pastikan izin Bluetooth sudah diaktifkan untuk halaman ini.';
+        }
+
+        if (msg.includes('gatt') && msg.includes('connect')) {
+            return 'Tidak bisa terhubung ke printer. Pastikan printer menyala dan berada dalam jangkauan Bluetooth (± 10 meter).';
+        }
+
+        if (msg.includes('network error') || msg.includes('connection') || msg.includes('disconnected')) {
+            return 'Koneksi ke printer terputus. Pastikan printer masih menyala lalu coba sambungkan kembali.';
+        }
+
+        if (msg.includes('karakteristik') || msg.includes('write') || msg.includes('characteristic')) {
+            return 'Printer ini tidak kompatibel atau tidak mendukung mode cetak. Coba pilih printer thermal yang berbeda.';
+        }
+
+        if (msg.includes('timeout')) {
+            return 'Printer tidak merespons. Pastikan printer menyala dan coba lagi.';
+        }
+
+        if (context === 'print') {
+            return 'Gagal mencetak struk. Pastikan printer masih terhubung dan coba cetak ulang.';
+        }
+
+        return 'Terjadi kesalahan saat menghubungkan printer. Pastikan Bluetooth aktif dan printer dalam jangkauan.';
+    }
+
     async function connectBluetooth() {
         if (!navigator.bluetooth) {
-            showAlert('Browser Anda tidak mendukung Web Bluetooth API.', false);
+            showAlert('Browser Anda tidak mendukung Bluetooth. Gunakan Google Chrome versi terbaru di komputer.', false);
             return;
         }
 
@@ -176,13 +216,16 @@ include '../layout/sidebar.php';
                 } catch (e) {}
             }
 
-            if (!writeCharacteristic) throw new Error('Karakteristik penulisan (Write) tidak ditemukan.');
+            if (!writeCharacteristic) {
+                showAlert('Printer berhasil ditemukan, tapi tidak bisa digunakan untuk mencetak. Pastikan printer thermal Anda kompatibel dengan Web Bluetooth.', false);
+                return;
+            }
 
             updateUIConnected(bluetoothDevice.name || 'Printer Thermal');
-            showAlert('Printer siap menerima struk dari tab kasir!', true);
+            showAlert('✅ Printer terhubung dan siap menerima struk dari tab kasir!', true);
 
         } catch (error) {
-            showAlert('Gagal menyambung: ' + error.message, false);
+            showAlert(friendlyError(error, 'connect'), false);
         }
     }
 
@@ -207,10 +250,10 @@ include '../layout/sidebar.php';
             
             // Gunakan fungsi chunking di sini juga
             await sendDataToPrinter(data);
-            showAlert('Test print sukses!', true);
+            showAlert('✅ Test print berhasil! Struk sudah tercetak.', true);
             
         } catch (error) {
-            showAlert('Gagal test print: ' + error.message, false);
+            showAlert(friendlyError(error, 'print'), false);
         }
     }
 

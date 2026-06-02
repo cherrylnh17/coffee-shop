@@ -10,19 +10,18 @@ require_once __DIR__ . '/../../config.php';
 if (isset($_GET['id'])) {
     try {
         $id = (int)$_GET['id'];
-        
-        $stmt = $pdo->prepare("DELETE FROM tax WHERE id = ?");
+
+        $stmt = $pdo->prepare("DELETE FROM fee_setting WHERE id = ?");
         $stmt->execute([$id]);
-        
-        header("Location: index.php?status=success&msg=" . urlencode("Data Pajak berhasil dihapus."));
+
+        header("Location: index.php?status=success&msg=" . urlencode("Data berhasil dihapus."));
         exit;
-        
+
     } catch (PDOException $e) {
-        header("Location: index.php?status=error&msg=" . urlencode("Gagal menghapus pajak: " . $e->getMessage()));
+        header("Location: index.php?status=error&msg=" . urlencode("Gagal menghapus data: " . $e->getMessage()));
         exit;
     }
 } else {
     header("Location: index.php");
     exit;
 }
-?>

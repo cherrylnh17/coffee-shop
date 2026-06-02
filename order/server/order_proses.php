@@ -62,7 +62,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $detail_summary = implode(", ", $summary_list);
-        $tax = $subtotal * 0.12;
+
+        // Ambil fee dari database
+        $feeStmt = $pdo->prepare("SELECT * FROM fee_setting");
+        $feeStmt->execute();
+        $fee_settings = $feeStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Hitung total fee (persen atau fixed)
+        $tax = 0;
+        $fee_lines = []; // simpan untuk di-insert ke order_fee
+        foreach ($fee_settings as $fee) {
+            if ((int)$fee['type'] === 1) {
+                $amount = (int) round($subtotal * ((float)$fee['value'] / 100));
+            } else {
+                $amount = (int) round((float)$fee['value']);
+            }
+            $tax += $amount;
+            $fee_lines[] = [
+                'name'   => $fee['name'],
+                'type'   => $fee['type'],
+                'rate'   => $fee['value'],
+                'amount' => $amount,
+            ];
+        }
+
         $total_bayar = $subtotal + $tax;
         $created_at = date('Y-m-d H:i:s');
         $expired_at = date('Y-m-d H:i:s', strtotime('+10 minutes'));
@@ -120,6 +143,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $item['qty'],
                 $item_subtotal,
                 $item['note'] ?? ''
+            ]);
+        }
+
+        // insert rincian fee ke order_fee (snapshot saat order dibuat)
+        $sqlFee = "INSERT INTO order_fee (order_id, name, type, rate, amount) VALUES (?, ?, ?, ?, ?)";
+        $stmtFee = $pdo->prepare($sqlFee);
+        foreach ($fee_lines as $f) {
+            $stmtFee->execute([
+                $order_id,
+                $f['name'],
+                $f['type'],
+                $f['rate'],
+                $f['amount'],
             ]);
         }
 

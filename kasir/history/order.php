@@ -268,52 +268,81 @@ include '../layout/sidebar.php';
   </div>
 </main>
 <div id="detail-modal" class="fixed inset-0 z-[1050] hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm overflow-y-auto p-4">
-  <div class="relative w-full max-w-2xl bg-white rounded-xl shadow-2xl flex flex-col max-h-full">
-    
-    <div class="flex-shrink-0 flex items-center justify-between border-b border-gray-100 p-4 md:p-5">
-      <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-        <i class="fa-solid fa-receipt text-blue-600"></i> Detail Transaksi
-      </h3>
-      <button type="button" onclick="closeDetailModal()" class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-200 hover:text-gray-900 transition-colors">
-        <i class="fa-solid fa-xmark text-lg"></i>
+  <div class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+
+
+    <div class="flex-shrink-0 flex items-center justify-between border-b border-gray-100 px-5 py-4">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+          <i class="fa-solid fa-receipt text-blue-600 text-sm"></i>
+        </div>
+        <h3 class="text-base font-bold text-gray-900">Detail Transaksi</h3>
+      </div>
+      <button type="button" onclick="closeDetailModal()" class="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors">
+        <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
 
-    <div class="overflow-y-auto p-4 md:p-5 space-y-4">
-      
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
-          <span class="block text-xs text-gray-500 uppercase font-semibold mb-1">Kode Pesanan</span>
-          <span id="det-code" class="text-sm font-bold text-gray-900">-</span>
+    <div class="overflow-y-auto p-5 space-y-4">
+
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div class="bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
+          <span class="block text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-1">Kode Pesanan</span>
+          <span id="det-code" class="text-sm font-bold text-gray-900 truncate block">-</span>
         </div>
-        <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
-          <span class="block text-xs text-gray-500 uppercase font-semibold mb-1">Kasir / User</span>
-          <span id="det-user" class="text-sm font-bold text-gray-900">-</span>
+        <div class="bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
+          <span class="block text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-1">Kasir / User</span>
+          <span id="det-user" class="text-sm font-bold text-gray-900 block">-</span>
         </div>
-        <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
-          <span class="block text-xs text-gray-500 uppercase font-semibold mb-1">Meja</span>
-          <span id="det-table" class="text-sm font-bold text-gray-900">-</span>
+        <div class="bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
+          <span class="block text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-1">Meja</span>
+          <span id="det-table" class="text-sm font-bold text-gray-900 block">-</span>
         </div>
-        <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
-          <span class="block text-xs text-gray-500 uppercase font-semibold mb-1">Nama Pelanggan</span>
-          <span id="det-customer" class="text-sm font-bold text-gray-900">-</span>
+        <div class="bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
+          <span class="block text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-1">Nama Pelanggan</span>
+          <span id="det-customer" class="text-sm font-bold text-gray-900 block">-</span>
         </div>
       </div>
 
+
+      <div class="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl border border-gray-100">
+        <div class="flex items-center gap-2.5 flex-1">
+          <div id="det-status-icon" class="w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+            <i class="fa-solid fa-check text-green-600 text-xs"></i>
+          </div>
+          <div>
+            <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Status</p>
+            <p id="det-status" class="text-sm font-bold text-green-600">-</p>
+          </div>
+        </div>
+        <div class="w-px h-8 bg-gray-200"></div>
+        <div class="flex items-center gap-2.5 flex-1">
+          <div class="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+            <i class="fa-solid fa-cash-register text-blue-500 text-xs"></i>
+          </div>
+          <div>
+            <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Metode Bayar</p>
+            <p id="det-payment" class="text-sm font-bold text-blue-600">-</p>
+          </div>
+        </div>
+      </div>
+
+
       <div>
-        <span class="block text-xs text-gray-500 uppercase font-semibold mb-2 flex items-center gap-1.5">
-          <i class="fa-solid fa-bowl-food text-gray-400"></i> Item Pesanan
-        </span>
-        <div id="det-items-wrap" class="border border-gray-200 rounded-lg overflow-hidden">
+        <p class="text-[11px] text-gray-400 uppercase tracking-wider font-semibold mb-2 flex items-center gap-1.5">
+          <i class="fa-solid fa-bowl-food"></i> Item Pesanan
+        </p>
+        <div class="border border-gray-200 rounded-xl overflow-hidden">
           <div id="det-items-loading" class="px-4 py-6 text-center text-sm text-gray-400">
             <i class="fa-solid fa-spinner fa-spin mr-1"></i> Memuat item...
           </div>
           <table id="det-items-table" class="w-full text-sm text-left hidden">
-            <thead class="bg-gray-50 border-b border-gray-200 text-gray-500 uppercase text-[10px] tracking-wider font-semibold">
+            <thead class="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th class="px-4 py-2.5">Menu</th>
-                <th class="px-4 py-2.5 text-center">Qty</th>
-                <th class="px-4 py-2.5 text-right">Subtotal</th>
+                <th class="px-4 py-2.5 text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Menu</th>
+                <th class="px-4 py-2.5 text-[10px] text-gray-400 uppercase tracking-wider font-semibold text-center">Qty</th>
+                <th class="px-4 py-2.5 text-[10px] text-gray-400 uppercase tracking-wider font-semibold text-right">Subtotal</th>
               </tr>
             </thead>
             <tbody id="det-items-body" class="divide-y divide-gray-100 bg-white"></tbody>
@@ -324,46 +353,47 @@ include '../layout/sidebar.php';
         </div>
       </div>
 
-      <div class="border border-gray-200 rounded-lg overflow-hidden">
-        <table class="w-full text-sm text-left text-gray-500">
-          <tbody class="divide-y divide-gray-200">
-            <tr class="bg-white">
-              <th class="px-4 py-3 font-medium text-gray-900 bg-gray-50 w-1/3">Subtotal</th>
-              <td class="px-4 py-3" id="det-subtotal">Rp 0</td>
-            </tr>
-            <tr class="bg-white">
-              <th class="px-4 py-3 font-medium text-gray-900 bg-gray-50">Pajak</th>
-              <td class="px-4 py-3" id="det-tax">Rp 0</td>
-            </tr>
-            <tr class="bg-blue-50">
-              <th class="px-4 py-3 font-bold text-blue-900">Total Tagihan</th>
-              <td class="px-4 py-3 font-bold text-blue-700" id="det-total">Rp 0</td>
-            </tr>
-            <tr class="bg-white">
-              <th class="px-4 py-3 font-medium text-gray-900 bg-gray-50">Metode Bayar</th>
-              <td class="px-4 py-3" id="det-payment">-</td>
-            </tr>
-            <tr class="bg-white">
-              <th class="px-4 py-3 font-medium text-gray-900 bg-gray-50">Status</th>
-              <td class="px-4 py-3" id="det-status">-</td>
-            </tr>
-          </tbody>
-        </table>
+
+      <div class="border border-gray-200 rounded-xl overflow-hidden">
+
+        <div class="flex justify-between items-center px-4 py-3 bg-white">
+          <span class="text-sm text-gray-500">Subtotal</span>
+          <span id="det-subtotal" class="text-sm font-semibold text-gray-800">Rp 0</span>
+        </div>
+
+
+        <div id="det-fees-wrap">
+
+        </div>
+
+
+        <div class="border-t border-dashed border-gray-200 mx-4"></div>
+
+
+        <div class="flex justify-between items-center px-4 py-3.5 bg-blue-50">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-coins text-blue-500 text-sm"></i>
+            <span class="text-sm font-bold text-blue-900">Total Tagihan</span>
+          </div>
+          <span id="det-total" class="text-base font-bold text-blue-600">Rp 0</span>
+        </div>
       </div>
 
     </div>
 
-    <div class="flex-shrink-0 p-4 border-t border-gray-100 bg-gray-50 rounded-b-xl flex flex-wrap justify-end gap-3">
-        <button type="button" onclick="closeDetailModal()" class="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 text-sm font-bold transition-colors">
-            Tutup
+
+    <div class="flex-shrink-0 px-5 py-4 border-t border-gray-100 bg-gray-50 rounded-b-2xl flex justify-end gap-3">
+      <button type="button" onclick="closeDetailModal()" class="px-5 py-2.5 bg-white border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-100 text-sm font-semibold transition-colors">
+        Tutup
+      </button>
+      <form action="struk" method="POST" id="print-form">
+        <input type="hidden" name="order_id" id="print-order-id" value="">
+        <button type="submit" id="btn-print" class="px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2">
+          <i class="fa-solid fa-print"></i> Cetak Struk
         </button>
-        <form action="struk" method="POST" id="print-form">
-            <input type="hidden" name="order_id" id="print-order-id" value="">
-            <button type="submit" id="btn-print" class="px-5 py-2.5 rounded-lg text-sm font-bold transition-colors shadow-sm flex items-center gap-2">
-                <i class="fa-solid fa-print"></i> Cetak Struk
-            </button>
-        </form>
+      </form>
     </div>
+
   </div>
 </div>
 
@@ -377,6 +407,7 @@ include '../layout/sidebar.php';
 
   function openDetail(index, orderId) {
     const o = pageOrders[index];
+    const s = parseInt(o.status);
 
     // Info dasar
     document.getElementById("det-code").innerText     = o.code          || "-";
@@ -384,32 +415,48 @@ include '../layout/sidebar.php';
     document.getElementById("det-table").innerText    = o.table_name    || "-";
     document.getElementById("det-customer").innerText = o.customer_name || "-";
     document.getElementById("det-subtotal").innerText = rp(o.subtotal);
-    document.getElementById("det-tax").innerText      = rp(o.tax);
     document.getElementById("det-total").innerText    = rp(o.total);
 
+    // Status badge (inline, bukan HTML tag)
+    const statusEl   = document.getElementById("det-status");
+    const statusIcon = document.getElementById("det-status-icon");
+    if (s === 1) {
+      statusEl.innerText = "Sukses";
+      statusEl.className = "text-sm font-bold text-green-600";
+      statusIcon.className = "w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0";
+      statusIcon.innerHTML = '<i class="fa-solid fa-check text-green-600 text-xs"></i>';
+    } else if (s === 2) {
+      statusEl.innerText = "Pending";
+      statusEl.className = "text-sm font-bold text-yellow-600";
+      statusIcon.className = "w-7 h-7 rounded-lg bg-yellow-100 flex items-center justify-center flex-shrink-0";
+      statusIcon.innerHTML = '<i class="fa-solid fa-hourglass-half text-yellow-500 text-xs"></i>';
+    } else {
+      statusEl.innerText = "Expired";
+      statusEl.className = "text-sm font-bold text-red-500";
+      statusIcon.className = "w-7 h-7 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0";
+      statusIcon.innerHTML = '<i class="fa-solid fa-xmark text-red-500 text-xs"></i>';
+    }
+
+    // Metode bayar
     const pm = o.payment == 1 ? "Kasir" : o.payment == 2 ? "Online" : "Lainnya";
     document.getElementById("det-payment").innerText = pm;
 
-    const s  = parseInt(o.status);
-    const sc = s === 1
-      ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-bold border border-green-200">Sukses</span>'
-      : s === 2
-        ? '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-bold border border-yellow-200">Pending</span>'
-        : '<span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-bold border border-red-200">Expired</span>';
-    document.getElementById("det-status").innerHTML = sc;
-    
-    // Logika Tombol Print
+    // Tombol Print
     const btnPrint = document.getElementById("btn-print");
     document.getElementById("print-order-id").value = orderId;
-    if(s === 1) {
-        btnPrint.disabled = false;
-        btnPrint.className = "px-5 py-2.5 bg-gray-800 hover:bg-black text-white rounded-lg text-sm font-bold transition-colors shadow-sm flex items-center gap-2";
+    if (s === 1) {
+      btnPrint.disabled = false;
+      btnPrint.className = "px-5 py-2.5 bg-gray-900 hover:bg-black text-white rounded-xl text-sm font-semibold transition-colors flex items-center gap-2";
     } else {
-        btnPrint.disabled = true;
-        btnPrint.className = "px-5 py-2.5 bg-gray-200 text-gray-400 cursor-not-allowed rounded-lg text-sm font-bold transition-colors flex items-center gap-2";
+      btnPrint.disabled = true;
+      btnPrint.className = "px-5 py-2.5 bg-gray-200 text-gray-400 cursor-not-allowed rounded-xl text-sm font-semibold flex items-center gap-2";
     }
 
-    // Reset state items
+    // Reset fee wrap
+    document.getElementById("det-fees-wrap").innerHTML =
+      '<div class="px-4 py-2.5 text-xs text-gray-400 italic flex items-center gap-1"><i class="fa-solid fa-spinner fa-spin"></i> Memuat biaya...</div>';
+
+    // Reset items
     document.getElementById("det-items-loading").classList.remove("hidden");
     document.getElementById("det-items-table").classList.add("hidden");
     document.getElementById("det-items-empty").classList.add("hidden");
@@ -419,19 +466,17 @@ include '../layout/sidebar.php';
     const modal = document.getElementById("detail-modal");
     modal.classList.remove("hidden");
     modal.classList.add("flex");
-    document.body.classList.add("overflow-hidden"); // Prevent background scroll
+    document.body.classList.add("overflow-hidden");
 
-    // Fetch order items via AJAX
+    // Fetch items
     fetch(BASE_URL_JS + "kasir/history/items?order_id=" + orderId)
       .then(r => r.json())
       .then(items => {
         document.getElementById("det-items-loading").classList.add("hidden");
-
         if (!items || items.length === 0) {
           document.getElementById("det-items-empty").classList.remove("hidden");
           return;
         }
-
         const tbody = document.getElementById("det-items-body");
         items.forEach(item => {
           const hasNote = item.notes && item.notes.trim() !== "";
@@ -442,22 +487,59 @@ include '../layout/sidebar.php';
               <div class="font-semibold text-gray-800">${item.menu_name}</div>
               ${hasNote ? `<div class="mt-1 flex items-start gap-1.5">
                 <i class="fa-solid fa-note-sticky text-amber-400 text-xs mt-0.5 flex-shrink-0"></i>
-                <span class="text-xs text-amber-600 italic leading-relaxed">${item.notes}</span>
+                <span class="text-xs text-amber-600 italic">${item.notes}</span>
               </div>` : ""}
             </td>
             <td class="px-4 py-3 text-center">
-              <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-blue-50 text-blue-700 text-xs font-black border border-blue-100">${item.qty}</span>
+              <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-blue-50 text-blue-600 text-xs font-bold border border-blue-100">${item.qty}</span>
             </td>
             <td class="px-4 py-3 text-right font-semibold text-gray-800">${rp(item.subtotal)}</td>
           `;
           tbody.appendChild(row);
         });
-
         document.getElementById("det-items-table").classList.remove("hidden");
       })
       .catch(() => {
         document.getElementById("det-items-loading").classList.add("hidden");
         document.getElementById("det-items-empty").classList.remove("hidden");
+      });
+
+    // Fetch fees
+    fetch(BASE_URL_JS + "kasir/history/items?order_id=" + orderId + "&fees=1")
+      .then(r => r.json())
+      .then(data => {
+        const wrap = document.getElementById("det-fees-wrap");
+        const fees = data.fees || [];
+
+        if (fees.length === 0) {
+          wrap.innerHTML = `
+            <div class="flex justify-between items-center px-4 py-3 border-t border-gray-100">
+              <span class="text-sm text-gray-400 italic">Tidak ada biaya tambahan</span>
+              <span class="text-sm text-gray-400">-</span>
+            </div>`;
+          return;
+        }
+
+        let html = `<div class="border-t border-gray-100 px-4 pt-2.5 pb-1">
+          <p class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold mb-1.5">Biaya tambahan</p>`;
+        fees.forEach(fee => {
+          const badge = parseInt(fee.type) === 1
+            ? `<span class="ml-1.5 text-[10px] bg-gray-100 text-gray-500 border border-gray-200 rounded px-1.5 py-0.5">${parseFloat(fee.rate) % 1 === 0 ? parseInt(fee.rate) : parseFloat(fee.rate).toFixed(1)}%</span>`
+            : '';
+          html += `
+            <div class="flex justify-between items-center py-1.5">
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-full bg-gray-300 flex-shrink-0"></span>
+                <span class="text-sm text-gray-500">${fee.name}${badge}</span>
+              </div>
+              <span class="text-sm text-gray-600">${rp(fee.amount)}</span>
+            </div>`;
+        });
+        html += `</div>`;
+        wrap.innerHTML = html;
+      })
+      .catch(() => {
+        document.getElementById("det-fees-wrap").innerHTML = "";
       });
   }
 
@@ -468,7 +550,6 @@ include '../layout/sidebar.php';
     document.body.classList.remove("overflow-hidden");
   }
 
-  // Tutup klik di luar modal (area background gelap)
   document.getElementById("detail-modal").addEventListener("click", function(e) {
     if (e.target === this) closeDetailModal();
   });

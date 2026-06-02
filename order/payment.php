@@ -15,18 +15,51 @@ if (!isset($_GET['code']) || empty($_GET['code'])) {
 }
 
 try {
-    // Ambil data Order utama
-    $stmt = $pdo->prepare("SELECT * FROM `order` WHERE code = ? AND `status` = 2");
+    // Ambil data Order utama tanpa filter status, agar bisa cek expired
+    $stmt = $pdo->prepare("SELECT * FROM `order` WHERE code = ?");
     $stmt->execute([$order_code]);
     $order = $stmt->fetch(PDO::FETCH_ASSOC);
+
     if (empty($order)) {
+        // Order tidak ditemukan sama sekali → ke index
         header("Location: " . BASE_URL . "order/" . $table_code . "/index");
         exit();
     }
+
+    // Jika order sudah expired (status = 3) → redirect ke halaman expired
+    if ((int)$order['status'] === 3) {
+        header("Location: " . BASE_URL . "order/" . $table_code . "/expired/" . $order_code);
+        exit();
+    }
+
+    // Jika bukan pending (status = 2) dan bukan expired → ke index
+    if ((int)$order['status'] !== 2) {
+        header("Location: " . BASE_URL . "order/" . $table_code . "/index");
+        exit();
+    }
+
     // Ambil rincian menu yang dibeli
     $stmtItem = $pdo->prepare("SELECT * FROM order_item WHERE order_id = ?");
     $stmtItem->execute([$order['id']]);
     $order_items = $stmtItem->fetchAll(PDO::FETCH_ASSOC);
+
+    // Ambil rincian fee per baris
+    $stmtFee = $pdo->prepare("SELECT * FROM order_fee WHERE order_id = ?");
+    $stmtFee->execute([$order['id']]);
+    $order_fees = $stmtFee->fetchAll(PDO::FETCH_ASSOC);
+
+    // Fallback: jika order_fee kosong (order lama sebelum migrasi), pakai fee_setting langsung
+    if (empty($order_fees)) {
+        $feeStmt = $pdo->prepare("SELECT * FROM fee_setting");
+        $feeStmt->execute();
+        $fee_settings_raw = $feeStmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($fee_settings_raw as $f) {
+            $amt = (int)$f['type'] === 1
+                ? (int) round($order['subtotal'] * ((float)$f['value'] / 100))
+                : (int) round((float)$f['value']);
+            $order_fees[] = ['name' => $f['name'], 'type' => $f['type'], 'rate' => $f['value'], 'amount' => $amt];
+        }
+    }
 } catch (PDOException $e) {
     die("Error pada query: " . $e->getMessage());
 }
@@ -117,10 +150,13 @@ include __DIR__ . '/layout/header.php';
                     <span class="text-gray-500">Subtotal</span>
                     <span class="font-medium text-gray-800">Rp <?= number_format($order['subtotal'], 0, ',', '.') ?></span>
                 </div>
+                <?php foreach ($order_fees as $fee): ?>
+                <?php $suffix = (int)$fee['type'] === 1 ? ' (' . rtrim(rtrim(number_format((float)$fee['rate'], 2), '0'), '.') . '%)' : ''; ?>
                 <div class="flex justify-between text-sm">
-                    <span class="text-gray-500">Pajak (12%)</span>
-                    <span class="font-medium text-gray-800">Rp <?= number_format($order['tax'], 0, ',', '.') ?></span>
+                    <span class="text-gray-500"><?= htmlspecialchars($fee['name']) . $suffix ?></span>
+                    <span class="font-medium text-gray-800">Rp <?= number_format($fee['amount'], 0, ',', '.') ?></span>
                 </div>
+                <?php endforeach; ?>
             </div>
             <div class="dashed-line my-3"></div>
             <div class="flex justify-between items-center">
@@ -204,21 +240,46 @@ include __DIR__ . '/layout/header.php';
         }
     }, 3000); // 3000ms = 3 detik
 
+    // Panggil endpoint expire_order via AJAX (POST)
+    async function triggerExpireOrders() {
+        try {
+            const response = await fetch('<?= BASE_URL ?>order/server/expire_order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            const data = await response.json();
+            console.log('[Expire]', data.message);
+        } catch (err) {
+            console.error('[Expire] Gagal menandai order expired:', err);
+        }
+    }
+
     function startCountdown() {
         const display = document.getElementById('display-countdown');
         const expireTime = new Date(display.getAttribute('data-expire')).getTime();
 
         // Update setiap 1 detik
-        const timer = setInterval(function() {
+        const timer = setInterval(async function() {
             const now = new Date().getTime();
             const distance = expireTime - now;
 
             // Jika waktu sudah habis atau lewat
             if (distance <= 0) {
                 clearInterval(timer);
+                clearInterval(checkInterval); // hentikan juga polling cek_status
+
                 display.innerHTML = "Kadaluarsa";
                 display.classList.remove('text-blue-600');
-                display.classList.add('text-red-600'); // Ubah warna jadi merahss
+                display.classList.add('text-red-600');
+
+                // Tandai semua order expired di server
+                await triggerExpireOrders();
+
+                // Redirect ke halaman kadaluarsa
+                localStorage.removeItem('cart');
+                localStorage.removeItem('buyer_data');
+                window.location.href = '<?= BASE_URL ?>order/<?= $table_code ?>/expired/<?= $order_code ?>';
+
                 return;
             }
 

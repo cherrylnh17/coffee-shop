@@ -33,6 +33,23 @@ try {
     $stmtItem->execute([$order['id']]);
     $order_items = $stmtItem->fetchAll(PDO::FETCH_ASSOC);
 
+    // 3. Ambil rincian fee per baris (snapshot saat order dibuat)
+    $stmtFee = $pdo->prepare("SELECT * FROM order_fee WHERE order_id = ?");
+    $stmtFee->execute([$order['id']]);
+    $order_fees = $stmtFee->fetchAll(PDO::FETCH_ASSOC);
+
+    // Fallback order lama (sebelum migrasi order_fee)
+    if (empty($order_fees)) {
+        $feeStmt = $pdo->prepare("SELECT * FROM fee_setting");
+        $feeStmt->execute();
+        foreach ($feeStmt->fetchAll(PDO::FETCH_ASSOC) as $f) {
+            $amt = (int)$f['type'] === 1
+                ? (int) round($order['subtotal'] * ((float)$f['value'] / 100))
+                : (int) round((float)$f['value']);
+            $order_fees[] = ['name' => $f['name'], 'type' => $f['type'], 'rate' => $f['value'], 'amount' => $amt];
+        }
+    }
+
 } catch(PDOException $e) {
     die("Error: " . $e->getMessage());
 }
@@ -126,10 +143,13 @@ include 'layout/sidebar.php';
                   <span class="text-gray-500">Subtotal</span>
                   <span class="font-medium text-gray-800">Rp <?= number_format($order['subtotal'], 0, ',', '.') ?></span>
                 </div>
+                <?php foreach ($order_fees as $fee): ?>
+                <?php $suffix = (int)$fee['type'] === 1 ? ' (' . rtrim(rtrim(number_format((float)$fee['rate'], 2), '0'), '.') . '%)' : ''; ?>
                 <div class="flex justify-between text-sm">
-                  <span class="text-gray-500">Pajak (12%)</span>
-                  <span class="font-medium text-gray-800">Rp <?= number_format($order['tax'], 0, ',', '.') ?></span>
+                  <span class="text-gray-500"><?= htmlspecialchars($fee['name']) . $suffix ?></span>
+                  <span class="font-medium text-gray-800">Rp <?= number_format($fee['amount'], 0, ',', '.') ?></span>
                 </div>
+                <?php endforeach; ?>
                 <div class="pt-3 border-t border-dashed border-gray-200 flex justify-between items-center">
                   <span class="font-bold text-gray-900">Total Tagihan</span>
                   <span class="text-2xl font-black text-blue-600">Rp <?= number_format($order['total'], 0, ',', '.') ?></span>

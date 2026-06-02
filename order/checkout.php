@@ -12,6 +12,11 @@ try {
     $stmt = $pdo->prepare($query);
     $stmt->execute();
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Ambil semua fee dari fee_setting
+    $feeStmt = $pdo->prepare("SELECT * FROM fee_setting");
+    $feeStmt->execute();
+    $fee_settings = $feeStmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     die("Error pada query: " . $e->getMessage());
 }
@@ -104,10 +109,7 @@ include __DIR__ . '/layout/header.php';
                     </div>
                     <div id="order-summary" class="divide-y divide-gray-100 bg-white"></div>
                     <div class="bg-gray-50 px-4 py-3 space-y-2 border-t border-gray-100">
-                        <div class="flex justify-between text-xs text-gray-500">
-                            <span>Pajak (12%)</span>
-                            <span id="tax-price" class="font-semibold">Rp 0</span>
-                        </div>
+                        <div id="fee-lines" class="space-y-1"></div>
                         <div class="flex justify-between items-center pt-1 border-t border-dashed border-gray-200">
                             <span class="font-bold text-gray-900 text-sm">Total</span>
                             <span class="font-black text-blue-600 text-base" id="summary-total">Rp 0</span>
@@ -135,6 +137,20 @@ include __DIR__ . '/layout/header.php';
 </main>
 <script>
     const MENU_DATA = <?php echo json_encode($result); ?>;
+    const FEE_SETTINGS = <?php echo json_encode($fee_settings); ?>;
+
+    function calculateFees(subtotal) {
+        let totalFee = 0;
+        const feeLines = [];
+        FEE_SETTINGS.forEach(fee => {
+            let amount = parseInt(fee.type) === 1
+                ? subtotal * (parseFloat(fee.value) / 100)
+                : parseFloat(fee.value);
+            totalFee += amount;
+            feeLines.push({ name: fee.name, type: parseInt(fee.type), value: parseFloat(fee.value), amount });
+        });
+        return { totalFee, feeLines };
+    }
 
     function getCart() {
         return JSON.parse(localStorage.getItem('cart')) || [];
@@ -185,9 +201,22 @@ include __DIR__ . '/layout/header.php';
             `;
             listEl.appendChild(row);
         });
-        const tax = total * 0.12;
-        document.getElementById('tax-price').innerText = formatRupiah(tax);
-        document.getElementById('summary-total').innerText = formatRupiah(total + tax);
+        const { totalFee, feeLines } = calculateFees(total);
+
+        // Render baris fee satu per satu
+        const feeLinesEl = document.getElementById('fee-lines');
+        feeLinesEl.innerHTML = '';
+        feeLines.forEach(f => {
+            const suffix = f.type === 1 ? ` (${f.value}%)` : '';
+            const row = document.createElement('div');
+            row.className = 'flex justify-between text-xs text-gray-500';
+            row.innerHTML = `
+                <span>${f.name}${suffix}</span>
+                <span class="font-semibold">${formatRupiah(f.amount)}</span>`;
+            feeLinesEl.appendChild(row);
+        });
+
+        document.getElementById('summary-total').innerText = formatRupiah(total + totalFee);
 
         // Pre-fill dari localStorage jika ada
         const saved = JSON.parse(localStorage.getItem('buyer_data'));

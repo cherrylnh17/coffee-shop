@@ -1,25 +1,20 @@
 RewriteEngine On
 
+# Blokir akses file sensitif
 RewriteRule ^(env\.php|coffee\.sql|path\.php|config\.php)$ - [F,L,NC]
 
-
+# Root  index.php
 RewriteRule ^$ index.php [L]
 
-# Menghilangkan ekstensi .php
+# Menghilangkan ekstensi .php (hanya untuk file, bukan direktori)
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}\.php -f
 RewriteRule ^([^\.]+)$ $1.php [NC,L]
 
-# redirect url ke route php
+# Semua request yang bukan file nyata ke route.php
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}\.php !-f
 RewriteRule ^(.*)$ route.php [L,NC]
-
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} -d
-RewriteCond %{REQUEST_FILENAME}\.php !-f
-RewriteRule ^(.*)$ 404.php [L,NC]
 
 php_flag display_errors On
 php_value error_reporting 32767

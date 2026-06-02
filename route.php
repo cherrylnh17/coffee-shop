@@ -18,7 +18,8 @@ function loadPage($file, $fallback = 'order/404.php')
     exit;
 }
 
-/* 
+
+/*
 order server
 */
 if (preg_match('~^/order/server/([a-zA-Z0-9_-]+)$~', $route, $matches)) {
@@ -29,7 +30,7 @@ if (preg_match('~^/order/server/([a-zA-Z0-9_-]+)$~', $route, $matches)) {
 }
 
 /*
-order code + table
+order code + table  →  /order/{table}/{page}/{code}
 */
 if (preg_match('~^/order/([a-zA-Z0-9]+)/([a-zA-Z0-9_-]+)/([^/]+)$~', $route, $matches)) {
 
@@ -43,7 +44,7 @@ if (preg_match('~^/order/([a-zA-Z0-9]+)/([a-zA-Z0-9_-]+)/([^/]+)$~', $route, $ma
 }
 
 /*
-order
+order  →  /order/{table}/{page}
 */
 if (preg_match('~^/order/([a-zA-Z0-9]+)/(\w+)$~', $route, $matches)) {
 
@@ -56,8 +57,19 @@ if (preg_match('~^/order/([a-zA-Z0-9]+)/(\w+)$~', $route, $matches)) {
 }
 
 /*
-kasir
+kasir  →  /kasir  atau  /kasir/{page}
+Urutan penting: rule spesifik (dengan sub-path) duluan,
+baru rule umum (/kasir saja), supaya tidak short-circuit.
 */
+
+if (preg_match('~^/kasir/?$~', $route)) {
+
+    loadPage(
+        'kasir/index.php',
+        'kasir/index.php'
+    );
+}
+
 if (preg_match('~^/kasir/([a-zA-Z0-9_-]+)$~', $route, $matches)) {
 
     loadPage(
@@ -66,15 +78,21 @@ if (preg_match('~^/kasir/([a-zA-Z0-9_-]+)$~', $route, $matches)) {
     );
 }
 
-
-
 /*
-admin
+admin  →  /admin  atau  /admin/{page}
 */
 if (preg_match('~^/admin/([a-zA-Z0-9_-]+)$~', $route, $matches)) {
 
     loadPage(
         'admin/' . $matches[1] . '.php',
+        'admin/index.php'
+    );
+}
+
+if (preg_match('~^/admin/?$~', $route)) {
+
+    loadPage(
+        'admin/index.php',
         'admin/index.php'
     );
 }

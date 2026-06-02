@@ -27,6 +27,23 @@ try {
   $stmtItem = $pdo->prepare("SELECT * FROM order_item WHERE order_id = ?");
   $stmtItem->execute([$order['id']]);
   $order_items = $stmtItem->fetchAll(PDO::FETCH_ASSOC);
+
+  // Ambil rincian fee per baris
+  $stmtFee = $pdo->prepare("SELECT * FROM order_fee WHERE order_id = ?");
+  $stmtFee->execute([$order['id']]);
+  $order_fees = $stmtFee->fetchAll(PDO::FETCH_ASSOC);
+
+  // Fallback untuk order lama sebelum migrasi
+  if (empty($order_fees)) {
+      $feeStmt = $pdo->prepare("SELECT * FROM fee_setting");
+      $feeStmt->execute();
+      foreach ($feeStmt->fetchAll(PDO::FETCH_ASSOC) as $f) {
+          $amt = (int)$f['type'] === 1
+              ? (int) round($order['subtotal'] * ((float)$f['value'] / 100))
+              : (int) round((float)$f['value']);
+          $order_fees[] = ['name' => $f['name'], 'type' => $f['type'], 'rate' => $f['value'], 'amount' => $amt];
+      }
+  }
 } catch (PDOException $e) {
   die("Error pada query: " . $e->getMessage());
 }
@@ -129,10 +146,13 @@ include __DIR__ . '/layout/header.php';
             <span>Subtotal</span>
             <span class="font-medium text-gray-700">Rp <?= number_format($order['subtotal'], 0, ',', '.') ?></span>
           </div>
+          <?php foreach ($order_fees as $fee): ?>
+          <?php $suffix = (int)$fee['type'] === 1 ? ' (' . rtrim(rtrim(number_format((float)$fee['rate'], 2), '0'), '.') . '%)' : ''; ?>
           <div class="flex justify-between text-sm text-gray-500">
-            <span>Pajak (12%)</span>
-            <span class="font-medium text-gray-700">Rp <?= number_format($order['tax'], 0, ',', '.') ?></span>
+            <span><?= htmlspecialchars($fee['name']) . $suffix ?></span>
+            <span class="font-medium text-gray-700">Rp <?= number_format($fee['amount'], 0, ',', '.') ?></span>
           </div>
+          <?php endforeach; ?>
           <div class="flex justify-between items-center pt-1.5 border-t border-gray-100">
             <span class="font-black text-gray-900">Total Pembayaran</span>
             <span class="font-black text-blue-500 text-base">Rp <?= number_format($order['total'], 0, ',', '.') ?></span>
