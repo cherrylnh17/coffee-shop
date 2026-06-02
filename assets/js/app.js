@@ -132,6 +132,9 @@ function initQRScanner() {
       return;
     }
 
+    var oldRetryBtn = document.getElementById('retry-qr-btn');
+    if (oldRetryBtn) oldRetryBtn.remove();
+
     scanner = new Html5Qrcode("qr-reader");
     var config = {
       fps: 10,
@@ -145,23 +148,53 @@ function initQRScanner() {
       function (decodedText) {
         var tableNumber = decodedText.trim();
 
-        // Bangun URL dari env yang sudah di-inject PHP
-        var baseUrl = (window.BASE_URL || "").replace(/\/$/, "");
-        var redirectOrder = (window.APP_REDIRECT || "order").replace(
-          /^\/|\/$/g,
-          "",
-        );
-        var redirectUrl =
-          baseUrl + "/" + redirectOrder + "/" + tableNumber + "/menu";
-
         stopScanner();
-        statusEl.textContent =
-          "✅ QR berhasil dibaca! Mengalihkan ke Meja " + tableNumber + "...";
-        setTimeout(function () {
-          window.location.href = redirectUrl;
-        }, 800);
-      },
+        statusEl.innerHTML = '<span class="text-blue-600 font-bold">⏳ Mengecek validasi QR...</span>';
+
+        var baseUrl = (window.BASE_URL || "").replace(/\/$/, "");
+        var redirectOrder = (window.APP_REDIRECT || "order").replace(/^\/|\/$/g, "");
+        var redirectUrl = baseUrl + "/" + redirectOrder + "/" + tableNumber + "/menu";
+
+        fetch(baseUrl + "/check_table.php?table_name=" + encodeURIComponent(tableNumber))
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(data) {
+            if (data.status === 'success') {
+              statusEl.innerHTML = '<span class="text-green-600 font-bold">✅ QR Valid! Mengalihkan ke Meja ' + tableNumber + '...</span>';
+              setTimeout(function () {
+                window.location.href = redirectUrl;
+              }, 800);
+            } else {
+              showQRInvalidError();
+            }
+          })
+          .catch(function(error) {
+            console.error("Error:", error);
+            showQRInvalidError("Terjadi kesalahan jaringan.");
+          });
+      }
     );
+  }
+
+  function showQRInvalidError(customMsg) {
+    var errorMsg = customMsg || "QR Tidak Valid atau Meja Tidak Ditemukan.";
+    statusEl.innerHTML = '<span class="text-red-600 font-bold">❌ ' + errorMsg + '</span>';
+    
+    if (!document.getElementById("retry-qr-btn")) {
+      var retryBtn = document.createElement("button");
+      retryBtn.id = "retry-qr-btn";
+      retryBtn.className = "mt-4 bg-red-50 border border-red-200 text-red-600 hover:bg-red-600 hover:text-white font-semibold px-6 py-2 rounded-full transition-all duration-300 block mx-auto";
+      retryBtn.innerText = "Coba Lagi Scanner";
+      
+      retryBtn.onclick = function() {
+        this.remove();
+        statusEl.textContent = "Menginisialisasi kamera...";
+        startScanner();
+      };
+      
+      statusEl.parentNode.appendChild(retryBtn);
+    }
   }
 
   function stopScanner() {
