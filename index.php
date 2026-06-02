@@ -343,7 +343,7 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
     <div class="text-center mt-16 scroll-reveal">
       <button id="open-qr-scanner-menu"
         class="group inline-flex items-center justify-center gap-3 bg-white border-2 border-slate-200 hover:border-blue-600 text-slate-800 hover:text-blue-600 font-bold px-10 py-4 rounded-full transition-all duration-300 hover:shadow-lg w-full sm:w-auto">
-        Lihat Semua Menu via QR
+        Lihat Semua Menu
         <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
         </svg>

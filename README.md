@@ -52,9 +52,9 @@ tambahan tabel printer dimana user bisa langsung komfigurasi di dalam laptop nya
 
 
 
-<!-- perintah dump isinya 
+perintah dump isinya 
 
-drop if exist dan isinya foreign key foreign key -->
+drop if exist dan isinya foreign key foreign key
 
 
 
@@ -84,21 +84,21 @@ identitas di ganti -> checkout
 checkout diganti -> payment
 
 
-<!-- jika batas pembayaran lewat akan memanggil cron job yang akan membuat data tersebut menjadi expired
-dengan cron job di buat 30 menit setelah dimulai -->
+jika batas pembayaran lewat akan memanggil cron job yang akan membuat data tersebut menjadi expired
+dengan cron job di buat 30 menit setelah dimulai
 
 
 
-<!-- mulai halaman
+mulai halaman
 order/1/menu --
 order/1/cart --
 order/1/checkout --
 order/1/payment
 report/cron/order =  pakai ajax untuk ubah expired dan membuat cron job 
 order/1/success --
-  -->
+ 
 
-<!-- url kasir ubah dari /kasir/index jadi /kasir  -->
+url kasir ubah dari /kasir/index jadi /kasir 
 
 ////
 
