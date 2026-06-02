@@ -132,7 +132,7 @@ include __DIR__ . '/../layout/sidebar.php';
                             <th scope="col" class="px-6 py-4">Nama Menu</th>
                             <th scope="col" class="px-6 py-4">Kategori</th>
                             <th scope="col" class="px-6 py-4">Harga</th>
-                            <th scope="col" class="px-6 py-4">Deskripsi</th> 
+                            <th scope="col" class="px-6 py-4">Terjual</th> 
                             <th scope="col" class="px-6 py-4 text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -166,7 +166,7 @@ include __DIR__ . '/../layout/sidebar.php';
                             
                             <td class="px-6 py-4">
                                 <p class="max-w-[200px] truncate text-xs text-gray-500">
-                                    <?php echo htmlspecialchars($row['description']); ?>
+                                    <?= $row['sold'] ?>
                                 </p>
                             </td>
 
