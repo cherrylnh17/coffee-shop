@@ -151,6 +151,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmtItems->execute([$order_id]);
                 $orderItems = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
 
+                // ── 1. Update kolom sold di tabel menu ──────────────────
+                $stmtSold = $pdo->prepare("UPDATE menu SET sold = sold + ? WHERE id = ?");
+                foreach ($orderItems as $item) {
+                    if (!empty($item['menu_id'])) {
+                        $stmtSold->execute([$item['qty'], $item['menu_id']]);
+                    }
+                }
+
+                // ── 2. Insert ke sales_report untuk laporan & export ────
+                $stmtReport = $pdo->prepare("
+                    INSERT INTO sales_report
+                        (order_id, menu_id, menu_name, qty, subtotal, sold_at)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                ");
+                $soldAt = $orderData['created_at'];
+
+                foreach ($orderItems as $item) {
+                    if (!empty($item['menu_id'])) {
+                        $stmtReport->execute([
+                            $order_id,
+                            $item['menu_id'],
+                            $item['menu_name'],
+                            $item['qty'],
+                            $item['subtotal'],
+                            $soldAt
+                        ]);
+                    }
+                }
+
                 // Ambil rincian fee snapshot
                 $stmtFee = $pdo->prepare("SELECT * FROM order_fee WHERE order_id = ?");
                 $stmtFee->execute([$order_id]);

@@ -74,9 +74,9 @@ dikasih alert di scan qr nya, dan ada tanda coba lagi
 pesanan ganti cart
 
 
-pajak semua persen
+<!-- pajak semua persen
 tabel tax diganti dengan graduity
-kasih kolom tipe dengan tiny int
+kasih kolom tipe dengan tiny int -->
 
 
 identitas di ganti -> checkout
