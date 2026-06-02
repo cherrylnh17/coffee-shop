@@ -141,6 +141,9 @@ filter dari tanggal berapa sampai berapa , dan ekspor excel
 tabel report 
 export berdasarkan item semisalnya tanggal segini menu ini laku berapa -->
 
+<!-- tabel report  -->
+export berdasarkan item semisalnya tanggal segini menu ini laku berapa
+
 
 <!-- tentang akun ganti profile saya menjadi icon menu -->
 

@@ -5,11 +5,11 @@ require_once '../path.php';
 
 if (isset($_SESSION['role'])) {
     if ($_SESSION['role'] == 1) {
-        header("Location: " . BASE_URL . "kasir/index"); 
+        header("Location: " . BASE_URL . "kasir"); 
         exit;
     } 
     elseif ($_SESSION['role'] == 2) {
-        header("Location: " . BASE_URL . "admin/index");
+        header("Location: " . BASE_URL . "admin");
         exit;
     }
 }
@@ -36,9 +36,9 @@ if (isset($_POST['login'])) {
             $_SESSION['username'] = $user['username'];
             
             if ($user['role'] === 2) {
-                header("Location: " . BASE_URL . "admin/index"); 
+                header("Location: " . BASE_URL . "admin"); 
             } else {
-                header("Location: " . BASE_URL . "kasir/index");
+                header("Location: " . BASE_URL . "kasir");
             }
             exit;
         } else {
@@ -98,13 +98,6 @@ if (isset($_POST['login'])) {
               <div class="mb-5">
                 <input type="password" name="password" id="password" placeholder="Password" required 
                        class="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:text-gray-700" />
-              </div>
-              <div class="mb-6 flex flex-wrap items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <input type="checkbox" id="customCheckc1" checked 
-                         class="h-4 w-4 cursor-pointer rounded border-gray-300 text-blue-600 transition-all focus:ring-2 focus:ring-blue-500" />
-                  <label for="customCheckc1" class="cursor-pointer text-sm text-gray-500 dark:text-gray-400">Remember me?</label>
-                </div>
               </div>
               <div class="mt-4">
                 <button type="submit" name="login" 

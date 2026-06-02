@@ -48,9 +48,9 @@ CREATE TABLE `order` (
   `expired_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=81 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=82 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `order` VALUES (67,'ORD-tsvdt9Rt',NULL,NULL,2,'7','122','',1,18000,2160,0,0,20160,1,'1 Avocado Juice',1,'2026-05-20 11:15:53',NULL,'2026-05-20 11:25:53'),(72,'ORD-wJhBPDAv',1,'q',1,'1','qal','',4,34888,4187,40000,925,39075,1,'1 Lemon Tea Ice, 1 Es Kopi Susu Gula Aren, 2 sfsdfsfd',1,'2026-05-21 10:57:25',NULL,'2026-05-21 11:07:25'),(73,'ORD-1wCeCCTn',1,'q',1,'1','a','',1,12000,1440,15000,1560,13440,1,'1 Lemon Tea Ice',1,'2026-05-21 12:44:40',NULL,'2026-05-21 12:54:40'),(74,'ORD-nVREaVZD',1,'q',1,'1','aa','',1,12000,1440,1000000000,999986560,13440,1,'1 Lemon Tea Ice',1,'2026-05-21 13:37:19',NULL,'2026-05-21 13:47:19'),(75,'ORD-cgEFKT8f',1,'q',1,'1','sss','',2,40000,4800,50000,5200,44800,1,'1 Mie Goreng Jawa, 1 Avocado Juice',1,'2026-05-22 10:14:04',NULL,'2026-05-22 10:24:04'),(76,'ORD-lUcmitlt',NULL,NULL,1,'1','aaa','',1,25000,3000,0,0,28000,1,'1 Nasi Goreng Special',3,'2026-06-02 06:55:39',NULL,'2026-06-02 07:05:39'),(77,'ORD-4DwArBZ4',1,'q',1,'1','Cihuy','',1,20000,2700,23000,300,22700,1,'1 Green Tea Latte',1,'2026-06-02 08:37:49',NULL,'2026-06-02 08:47:49'),(78,'ORD-Ar2iHdad',1,'q',1,'1','aaa','',2,43000,49930,100000,7070,92930,1,'1 Nasi Goreng Special, 1 Ayam Geprek Sambal Bawang',1,'2026-06-02 13:44:58',NULL,'2026-06-02 13:54:58'),(79,'ORD-Tk6Vi4CR',1,'q',1,'1','Taufiq','',8,179000,187290,500000,133710,366290,1,'2 Nasi Goreng Special, 2 Sandwich Gandum, 1 Pasta Carbonara, 3 Es Kopi Susu Gula Aren',1,'2026-06-02 13:57:47',NULL,'2026-06-02 14:07:47'),(80,'ORD-RJmsBbgz',1,'q',1,'1','ssss','',9,215000,223650,600000,161350,438650,1,'7 Nasi Goreng Special, 1 Ayam Geprek Sambal Bawang, 1 Mie Goreng Jawa',1,'2026-06-02 14:12:51',NULL,'2026-06-02 14:22:51');
+INSERT INTO `order` VALUES (67,'ORD-tsvdt9Rt',NULL,NULL,2,'7','122','',1,18000,2160,0,0,20160,1,'1 Avocado Juice',1,'2026-05-20 11:15:53',NULL,'2026-05-20 11:25:53'),(72,'ORD-wJhBPDAv',1,'q',1,'1','qal','',4,34888,4187,40000,925,39075,1,'1 Lemon Tea Ice, 1 Es Kopi Susu Gula Aren, 2 sfsdfsfd',1,'2026-05-21 10:57:25',NULL,'2026-05-21 11:07:25'),(73,'ORD-1wCeCCTn',1,'q',1,'1','a','',1,12000,1440,15000,1560,13440,1,'1 Lemon Tea Ice',1,'2026-05-21 12:44:40',NULL,'2026-05-21 12:54:40'),(74,'ORD-nVREaVZD',1,'q',1,'1','aa','',1,12000,1440,1000000000,999986560,13440,1,'1 Lemon Tea Ice',1,'2026-05-21 13:37:19',NULL,'2026-05-21 13:47:19'),(75,'ORD-cgEFKT8f',1,'q',1,'1','sss','',2,40000,4800,50000,5200,44800,1,'1 Mie Goreng Jawa, 1 Avocado Juice',1,'2026-05-22 10:14:04',NULL,'2026-05-22 10:24:04'),(76,'ORD-lUcmitlt',NULL,NULL,1,'1','aaa','',1,25000,3000,0,0,28000,1,'1 Nasi Goreng Special',3,'2026-06-02 06:55:39',NULL,'2026-06-02 07:05:39'),(77,'ORD-4DwArBZ4',1,'q',1,'1','Cihuy','',1,20000,2700,23000,300,22700,1,'1 Green Tea Latte',1,'2026-06-02 08:37:49',NULL,'2026-06-02 08:47:49'),(78,'ORD-Ar2iHdad',1,'q',1,'1','aaa','',2,43000,49930,100000,7070,92930,1,'1 Nasi Goreng Special, 1 Ayam Geprek Sambal Bawang',1,'2026-06-02 13:44:58',NULL,'2026-06-02 13:54:58'),(79,'ORD-Tk6Vi4CR',1,'q',1,'1','Taufiq','',8,179000,187290,500000,133710,366290,1,'2 Nasi Goreng Special, 2 Sandwich Gandum, 1 Pasta Carbonara, 3 Es Kopi Susu Gula Aren',1,'2026-06-02 13:57:47',NULL,'2026-06-02 14:07:47'),(80,'ORD-RJmsBbgz',1,'q',1,'1','ssss','',9,215000,223650,600000,161350,438650,1,'7 Nasi Goreng Special, 1 Ayam Geprek Sambal Bawang, 1 Mie Goreng Jawa',1,'2026-06-02 14:12:51',NULL,'2026-06-02 14:22:51'),(81,'ORD-qAH5c8nJ',NULL,NULL,1,'1','aa','',2,42000,48920,0,0,90920,1,'1 Green Tea Latte, 1 Mie Goreng Jawa',3,'2026-06-02 15:31:25',NULL,'2026-06-02 15:32:05');
 DROP TABLE IF EXISTS `order_fee`;
 CREATE TABLE `order_fee` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -63,9 +63,9 @@ CREATE TABLE `order_fee` (
   PRIMARY KEY (`id`),
   KEY `fk_order_fee_order` (`order_id`),
   CONSTRAINT `fk_order_fee_order` FOREIGN KEY (`order_id`) REFERENCES `order` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `order_fee` VALUES (1,77,'Biaya layanan',2,500.00,500,'2026-06-02 08:37:49'),(2,77,'PPN',1,11.00,2200,'2026-06-02 08:37:49'),(3,78,'Biaya layanan',2,500.00,500,'2026-06-02 13:44:58'),(4,78,'PPN',1,11.00,4730,'2026-06-02 13:44:58'),(5,78,'Biaya Pemerintah',1,90.00,38700,'2026-06-02 13:44:58'),(6,78,'Biaya APBN',2,6000.00,6000,'2026-06-02 13:44:58'),(7,79,'Biaya layanan',2,500.00,500,'2026-06-02 13:57:47'),(8,79,'PPN',1,11.00,19690,'2026-06-02 13:57:47'),(9,79,'Biaya Pemerintah',1,90.00,161100,'2026-06-02 13:57:47'),(10,79,'Biaya APBN',2,6000.00,6000,'2026-06-02 13:57:47'),(11,80,'Biaya layanan',2,500.00,500,'2026-06-02 14:12:51'),(12,80,'PPN',1,11.00,23650,'2026-06-02 14:12:51'),(13,80,'Biaya Pemerintah',1,90.00,193500,'2026-06-02 14:12:51'),(14,80,'Biaya APBN',2,6000.00,6000,'2026-06-02 14:12:51');
+INSERT INTO `order_fee` VALUES (1,77,'Biaya layanan',2,500.00,500,'2026-06-02 08:37:49'),(2,77,'PPN',1,11.00,2200,'2026-06-02 08:37:49'),(3,78,'Biaya layanan',2,500.00,500,'2026-06-02 13:44:58'),(4,78,'PPN',1,11.00,4730,'2026-06-02 13:44:58'),(5,78,'Biaya Pemerintah',1,90.00,38700,'2026-06-02 13:44:58'),(6,78,'Biaya APBN',2,6000.00,6000,'2026-06-02 13:44:58'),(7,79,'Biaya layanan',2,500.00,500,'2026-06-02 13:57:47'),(8,79,'PPN',1,11.00,19690,'2026-06-02 13:57:47'),(9,79,'Biaya Pemerintah',1,90.00,161100,'2026-06-02 13:57:47'),(10,79,'Biaya APBN',2,6000.00,6000,'2026-06-02 13:57:47'),(11,80,'Biaya layanan',2,500.00,500,'2026-06-02 14:12:51'),(12,80,'PPN',1,11.00,23650,'2026-06-02 14:12:51'),(13,80,'Biaya Pemerintah',1,90.00,193500,'2026-06-02 14:12:51'),(14,80,'Biaya APBN',2,6000.00,6000,'2026-06-02 14:12:51'),(15,81,'Biaya layanan',2,500.00,500,'2026-06-02 15:31:25'),(16,81,'PPN',1,11.00,4620,'2026-06-02 15:31:25'),(17,81,'Biaya Pemerintah',1,90.00,37800,'2026-06-02 15:31:25'),(18,81,'Biaya APBN',2,6000.00,6000,'2026-06-02 15:31:25');
 DROP TABLE IF EXISTS `order_item`;
 CREATE TABLE `order_item` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -80,9 +80,9 @@ CREATE TABLE `order_item` (
   PRIMARY KEY (`id`),
   KEY `fk_order` (`order_id`),
   CONSTRAINT `fk_order` FOREIGN KEY (`order_id`) REFERENCES `order` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=127 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=129 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `order_item` VALUES (99,67,15,'Avocado Juice',1,18000,'','2026-05-20 11:15:53',NULL),(109,72,12,'Lemon Tea Ice',1,12000,'','2026-05-21 10:57:25',NULL),(110,72,9,'Es Kopi Susu Gula Aren',1,18000,'','2026-05-21 10:57:25',NULL),(111,72,17,'sfsdfsfd',2,4888,'','2026-05-21 10:57:25',NULL),(112,73,12,'Lemon Tea Ice',1,12000,'cihuy','2026-05-21 12:44:40',NULL),(113,74,12,'Lemon Tea Ice',1,12000,'','2026-05-21 13:37:19',NULL),(114,75,2,'Mie Goreng Jawa',1,22000,'','2026-05-22 10:14:04',NULL),(115,75,15,'Avocado Juice',1,18000,'','2026-05-22 10:14:04',NULL),(116,76,1,'Nasi Goreng Special',1,25000,'','2026-06-02 06:55:39',NULL),(117,77,11,'Green Tea Latte',1,20000,'','2026-06-02 08:37:49',NULL),(118,78,1,'Nasi Goreng Special',1,25000,'','2026-06-02 13:44:58',NULL),(119,78,3,'Ayam Geprek Sambal Bawang',1,18000,'','2026-06-02 13:44:58',NULL),(120,79,1,'Nasi Goreng Special',2,50000,'','2026-06-02 13:57:47',NULL),(121,79,4,'Sandwich Gandum',2,40000,'','2026-06-02 13:57:47',NULL),(122,79,5,'Pasta Carbonara',1,35000,'','2026-06-02 13:57:47',NULL),(123,79,9,'Es Kopi Susu Gula Aren',3,54000,'','2026-06-02 13:57:47',NULL),(124,80,1,'Nasi Goreng Special',7,175000,'','2026-06-02 14:12:51',NULL),(125,80,3,'Ayam Geprek Sambal Bawang',1,18000,'','2026-06-02 14:12:51',NULL),(126,80,2,'Mie Goreng Jawa',1,22000,'','2026-06-02 14:12:51',NULL);
+INSERT INTO `order_item` VALUES (99,67,15,'Avocado Juice',1,18000,'','2026-05-20 11:15:53',NULL),(109,72,12,'Lemon Tea Ice',1,12000,'','2026-05-21 10:57:25',NULL),(110,72,9,'Es Kopi Susu Gula Aren',1,18000,'','2026-05-21 10:57:25',NULL),(111,72,17,'sfsdfsfd',2,4888,'','2026-05-21 10:57:25',NULL),(112,73,12,'Lemon Tea Ice',1,12000,'cihuy','2026-05-21 12:44:40',NULL),(113,74,12,'Lemon Tea Ice',1,12000,'','2026-05-21 13:37:19',NULL),(114,75,2,'Mie Goreng Jawa',1,22000,'','2026-05-22 10:14:04',NULL),(115,75,15,'Avocado Juice',1,18000,'','2026-05-22 10:14:04',NULL),(116,76,1,'Nasi Goreng Special',1,25000,'','2026-06-02 06:55:39',NULL),(117,77,11,'Green Tea Latte',1,20000,'','2026-06-02 08:37:49',NULL),(118,78,1,'Nasi Goreng Special',1,25000,'','2026-06-02 13:44:58',NULL),(119,78,3,'Ayam Geprek Sambal Bawang',1,18000,'','2026-06-02 13:44:58',NULL),(120,79,1,'Nasi Goreng Special',2,50000,'','2026-06-02 13:57:47',NULL),(121,79,4,'Sandwich Gandum',2,40000,'','2026-06-02 13:57:47',NULL),(122,79,5,'Pasta Carbonara',1,35000,'','2026-06-02 13:57:47',NULL),(123,79,9,'Es Kopi Susu Gula Aren',3,54000,'','2026-06-02 13:57:47',NULL),(124,80,1,'Nasi Goreng Special',7,175000,'','2026-06-02 14:12:51',NULL),(125,80,3,'Ayam Geprek Sambal Bawang',1,18000,'','2026-06-02 14:12:51',NULL),(126,80,2,'Mie Goreng Jawa',1,22000,'','2026-06-02 14:12:51',NULL),(127,81,11,'Green Tea Latte',1,20000,'','2026-06-02 15:31:25',NULL),(128,81,2,'Mie Goreng Jawa',1,22000,'','2026-06-02 15:31:25',NULL);
 DROP TABLE IF EXISTS `printer`;
 CREATE TABLE `printer` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -128,16 +128,6 @@ CREATE TABLE `table` (
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 INSERT INTO `table` VALUES (1,'1','2026-04-21 10:20:20',NULL),(2,'7','2026-04-28 09:52:47',NULL),(3,'A1','2026-05-21 08:42:42',NULL),(4,'2','2026-05-21 10:37:11',NULL);
-DROP TABLE IF EXISTS `tax`;
-CREATE TABLE `tax` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) NOT NULL,
-  `amount` decimal(10,0) unsigned NOT NULL,
-  `created_at` datetime NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-INSERT INTO `tax` VALUES (1,'pajak ppn',12,'2026-05-20 06:02:30'),(4,'asuransi',8,'2026-05-22 10:34:01');
 DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,

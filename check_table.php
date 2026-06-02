@@ -22,4 +22,4 @@ if (isset($_GET['table_name'])) {
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Data tidak lengkap']);
 }
-?>
+?> 
