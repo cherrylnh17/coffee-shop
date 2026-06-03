@@ -11,13 +11,19 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
 $limit         = 10;
 $page          = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $filter_status = isset($_GET['status']) ? $_GET['status'] : 'all';
+$search_code   = isset($_GET['search_code']) ? trim($_GET['search_code']) : '';
 
 // Menangkap parameter rentang tanggal
 $start_date    = isset($_GET['start_date']) ? $_GET['start_date'] : '';
 $end_date      = isset($_GET['end_date']) ? $_GET['end_date'] : '';
 
+// Tangani request export Excel (sebelum output HTML)
+$is_export = isset($_GET['export']) && $_GET['export'] === 'excel';
+
 // WHERE
 $where_conditions = [];
+$bind_params      = [];
+
 if ($filter_status === 'success') {
   $where_conditions[] = "o.status = 1";
 } elseif ($filter_status === 'pending') {
@@ -26,11 +32,19 @@ if ($filter_status === 'success') {
   $where_conditions[] = "o.status = 3";
 }
 
-// Menambahkan filter tanggal jika diisi
+// Filter tanggal
 if (!empty($start_date) && !empty($end_date)) {
   $sd = date('Y-m-d', strtotime($start_date));
   $ed = date('Y-m-d', strtotime($end_date));
-  $where_conditions[] = "DATE(o.created_at) BETWEEN '$sd' AND '$ed'";
+  $where_conditions[] = "DATE(o.created_at) BETWEEN :sd AND :ed";
+  $bind_params[':sd']  = $sd;
+  $bind_params[':ed']  = $ed;
+}
+
+// Filter pencarian kode pesanan
+if (!empty($search_code)) {
+  $where_conditions[] = "o.code LIKE :search_code";
+  $bind_params[':search_code'] = '%' . $search_code . '%';
 }
 
 $where_sql = $where_conditions ? "WHERE " . implode(" AND ", $where_conditions) : "";
@@ -41,8 +55,53 @@ $order_sql = "ORDER BY o.created_at DESC";
 // Query langsung ke tabel order
 $from_sql  = "FROM `order` o";
 
+// ── EXPORT EXCEL ──────────────────────────────────────────────────────────────
+if ($is_export) {
+  try {
+    $exp_stmt = $pdo->prepare("SELECT o.code, o.customer_name, o.table_name, o.qty, o.subtotal, o.tax, o.total, o.payment, o.status, o.created_at $from_sql $where_sql $order_sql");
+    foreach ($bind_params as $k => $v) $exp_stmt->bindValue($k, $v);
+    $exp_stmt->execute();
+    $exp_rows = $exp_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $status_map  = [1 => 'Sukses', 2 => 'Pending', 3 => 'Expired'];
+    $payment_map = [1 => 'Kasir', 2 => 'Online'];
+
+    $filename = 'Riwayat_Pesanan_' . date('Ymd_His') . '.csv';
+    header('Content-Type: text/csv; charset=UTF-8');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Pragma: no-cache');
+
+    $out = fopen('php://output', 'w');
+    // BOM untuk Excel agar UTF-8 terbaca dengan benar
+    fputs($out, "\xEF\xBB\xBF");
+    fputcsv($out, ['Kode Pesanan', 'Nama Pelanggan', 'No Meja', 'Jumlah Item', 'Subtotal', 'Pajak & Biaya', 'Total Tagihan', 'Metode Bayar', 'Status', 'Waktu Dibuat']);
+    foreach ($exp_rows as $r) {
+      fputcsv($out, [
+        $r['code'],
+        $r['customer_name'],
+        $r['table_name'],
+        $r['qty'],
+        $r['subtotal'],
+        $r['tax'],
+        $r['total'],
+        $payment_map[(int)$r['payment']] ?? $r['payment'],
+        $status_map[(int)$r['status']]   ?? $r['status'],
+        $r['created_at'],
+      ]);
+    }
+    fclose($out);
+    exit;
+  } catch (PDOException $e) {
+    http_response_code(500);
+    exit('Export gagal.');
+  }
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 try {
-  $count_stmt    = $pdo->query("SELECT COUNT(*) $from_sql $where_sql");
+  $count_stmt = $pdo->prepare("SELECT COUNT(*) $from_sql $where_sql");
+  foreach ($bind_params as $k => $v) $count_stmt->bindValue($k, $v);
+  $count_stmt->execute();
   $total_records = $count_stmt->fetchColumn();
   $total_pages   = $total_records ? ceil($total_records / $limit) : 0;
   if ($page > $total_pages && $total_pages > 0) $page = $total_pages;
@@ -52,6 +111,7 @@ try {
   $query = "SELECT o.* $from_sql $where_sql $order_sql LIMIT :limit OFFSET :offset";
 
   $stmt = $pdo->prepare($query);
+  foreach ($bind_params as $k => $v) $stmt->bindValue($k, $v);
   $stmt->bindValue(':limit',  $limit,  PDO::PARAM_INT);
   $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
   $stmt->execute();
@@ -64,7 +124,7 @@ try {
 }
 
 // Untuk mempertahankan query saat berpindah halaman
-$query_string = "&status=$filter_status&start_date=$start_date&end_date=$end_date";
+$query_string = "&status=$filter_status&start_date=$start_date&end_date=$end_date&search_code=" . urlencode($search_code);
 ?>
 
 <?php
@@ -104,19 +164,41 @@ include '../layout/sidebar.php';
           </div>
 
           <div class="flex flex-wrap items-center gap-3">
-             <div class="relative w-full sm:w-auto">
-                 <input type="text" disabled placeholder="Cari pesanan..." 
-                        class="w-full sm:w-64 bg-gray-50 border border-gray-200 text-gray-400 py-2.5 pl-10 pr-4 rounded-xl cursor-not-allowed text-sm focus:outline-none">
-                 <i class="fa-solid fa-search absolute left-3.5 top-3 text-gray-400"></i>
-             </div>
-             <button disabled type="button" class="w-full sm:w-auto px-4 py-2.5 bg-gray-50 text-gray-400 border border-gray-200 rounded-xl cursor-not-allowed font-semibold text-sm flex items-center justify-center gap-2">
-                 <i class="fa-solid fa-file-export"></i> Export
-             </button>
+             <form method="GET" id="search-form" class="relative w-full sm:w-auto flex gap-2">
+                 <?php /* Pertahankan filter aktif saat search */ ?>
+                 <input type="hidden" name="status"     value="<?php echo htmlspecialchars($filter_status); ?>">
+                 <input type="hidden" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>">
+                 <input type="hidden" name="end_date"   value="<?php echo htmlspecialchars($end_date); ?>">
+                 <input type="hidden" name="page"       value="1">
+                 <div class="relative flex-1 sm:flex-none">
+                     <input type="text" name="search_code"
+                            value="<?php echo htmlspecialchars($search_code); ?>"
+                            placeholder="Cari kode pesanan..."
+                            class="w-full sm:w-64 bg-white border border-gray-300 text-gray-700 py-2.5 pl-10 pr-10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                     <i class="fa-solid fa-search absolute left-3.5 top-3 text-gray-400 pointer-events-none"></i>
+                     <?php if (!empty($search_code)): ?>
+                     <a href="?status=<?php echo urlencode($filter_status); ?>&start_date=<?php echo urlencode($start_date); ?>&end_date=<?php echo urlencode($end_date); ?>"
+                        class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 transition-colors"
+                        title="Hapus pencarian">
+                       <i class="fa-solid fa-xmark"></i>
+                     </a>
+                     <?php endif; ?>
+                 </div>
+                 <button type="submit" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 whitespace-nowrap">
+                     <i class="fa-solid fa-magnifying-glass"></i> Cari
+                 </button>
+             </form>
+             <a href="?export=excel<?php echo '&status=' . urlencode($filter_status) . '&start_date=' . urlencode($start_date) . '&end_date=' . urlencode($end_date) . '&search_code=' . urlencode($search_code); ?>"
+                class="w-full sm:w-auto px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white border border-green-600 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-colors"
+                title="Export data sesuai filter aktif ke Excel/CSV">
+                 <i class="fa-solid fa-file-excel"></i> Export Excel
+             </a>
           </div>
         </div>
 
         <form method="GET" id="filter-form" class="flex flex-col sm:flex-row flex-wrap gap-3 mb-6 bg-gray-50/50 p-4 rounded-xl border border-gray-100 items-end">
             <input type="hidden" name="page" id="page-input" value="1">
+            <input type="hidden" name="search_code" value="<?php echo htmlspecialchars($search_code); ?>">
             
             <div class="w-full sm:w-auto flex-1 sm:flex-none">
                 <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Status</label>
@@ -151,7 +233,7 @@ include '../layout/sidebar.php';
                 </button>
             </div>
             
-            <?php if(!empty($start_date) || $filter_status !== 'all'): ?>
+            <?php if(!empty($start_date) || $filter_status !== 'all' || !empty($search_code)): ?>
             <div class="w-full sm:w-auto flex-1 sm:flex-none mt-2 sm:mt-0">
                 <a href="order" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-2.5 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
                     <i class="fa-solid fa-rotate-right"></i> Reset
@@ -159,6 +241,17 @@ include '../layout/sidebar.php';
             </div>
             <?php endif; ?>
         </form>
+
+        <?php if (!empty($search_code)): ?>
+        <div class="mb-4 flex items-center gap-2 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-700">
+          <i class="fa-solid fa-magnifying-glass text-blue-400"></i>
+          Hasil pencarian untuk kode: <span class="font-bold">"<?php echo htmlspecialchars($search_code); ?>"</span>
+          — ditemukan <span class="font-bold"><?php echo $total_records; ?></span> pesanan.
+          <a href="?status=<?php echo urlencode($filter_status); ?>&start_date=<?php echo urlencode($start_date); ?>&end_date=<?php echo urlencode($end_date); ?>" class="ml-auto flex items-center gap-1 text-blue-500 hover:text-blue-700 font-semibold">
+            <i class="fa-solid fa-xmark"></i> Hapus
+          </a>
+        </div>
+        <?php endif; ?>
 
         <div class="overflow-x-auto rounded-xl border border-gray-200">
           <table class="w-full text-sm text-left whitespace-nowrap min-w-max">
