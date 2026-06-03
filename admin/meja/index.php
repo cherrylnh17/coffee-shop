@@ -104,7 +104,7 @@ include '../layout/sidebar.php';
                 </div>
               </div>
 
-              <div id="tambah-meja-modal" tabindex="-1" aria-hidden="true" class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-900/50 backdrop-blur-sm">
+              <div id="tambah-meja-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-gray-900/50 backdrop-blur-md">
                 <div class="relative max-h-full w-full max-w-md p-4">
                     <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
                         <div class="flex items-center justify-between border-b border-gray-100 p-4 md:p-5">
@@ -206,7 +206,7 @@ include '../layout/sidebar.php';
     </main>
 
     <button id="trigger-edit-meja-modal" data-modal-target="edit-meja-modal" data-modal-toggle="edit-meja-modal" class="hidden"></button>
-    <div id="edit-meja-modal" tabindex="-1" aria-hidden="true" class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-900/50 backdrop-blur-sm">
+    <div id="edit-meja-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-gray-900/50 backdrop-blur-md">
         <div class="relative max-h-full w-full max-w-md p-4">
             <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
                 <div class="flex items-center justify-between border-b border-gray-100 p-4 md:p-5">

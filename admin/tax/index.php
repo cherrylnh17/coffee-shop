@@ -128,7 +128,7 @@ include __DIR__ . '/../layout/sidebar.php';
 
 <!-- Modal Tambah -->
 <div id="tambah-fee-modal" tabindex="-1" aria-hidden="true"
-    class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-900/50 backdrop-blur-sm">
+    class="fixed left-0 right-0 top-0 z-[9999] hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-900/50 backdrop-blur-md">
     <div class="relative max-h-full w-full max-w-md p-4">
         <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
             <div class="flex items-center justify-between border-b border-gray-100 p-4 md:p-5">
@@ -208,7 +208,7 @@ include __DIR__ . '/../layout/sidebar.php';
 <!-- Modal Edit -->
 <button id="trigger-edit-modal" data-modal-target="edit-fee-modal" data-modal-toggle="edit-fee-modal" class="hidden"></button>
 <div id="edit-fee-modal" tabindex="-1" aria-hidden="true"
-    class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-900/50 backdrop-blur-sm">
+    class="fixed left-0 right-0 top-0 z-[9999] hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-900/50 backdrop-blur-md">
     <div class="relative max-h-full w-full max-w-md p-4">
         <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
             <div class="flex items-center justify-between border-b border-gray-100 p-4 md:p-5">
