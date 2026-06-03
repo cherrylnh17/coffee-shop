@@ -7,11 +7,11 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 2) {
     exit;
 }
 
-
 $limit = 10;
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 $category_filter = isset($_GET['category']) ? $_GET['category'] : '';
+$sort_filter = isset($_GET['sort']) ? $_GET['sort'] : 'default';
 $offset = ($page - 1) * $limit;
 $where_conditions = [];
 $params = [];
@@ -31,6 +31,14 @@ if (count($where_conditions) > 0) {
     $where_sql = " WHERE " . implode(" AND ", $where_conditions);
 }
 
+// Sort logic
+$order_sql = " ORDER BY id DESC"; // default
+if ($sort_filter === 'sold_desc') {
+    $order_sql = " ORDER BY sold DESC, id DESC";
+} elseif ($sort_filter === 'sold_asc') {
+    $order_sql = " ORDER BY sold ASC, id DESC";
+}
+
 $count_sql = "SELECT COUNT(*) FROM menu" . $where_sql;
 $total_stmt = $pdo->prepare($count_sql);
 $total_stmt->execute($params);
@@ -41,7 +49,7 @@ if ($page > $total_pages && $total_pages > 0) {
     $page = $total_pages;
 }
 
-$fetch_sql = "SELECT * FROM menu" . $where_sql . " ORDER BY id DESC LIMIT :limit OFFSET :offset";
+$fetch_sql = "SELECT * FROM menu" . $where_sql . $order_sql . " LIMIT :limit OFFSET :offset";
 $stmt = $pdo->prepare($fetch_sql);
 
 foreach ($params as $key => $val) {
@@ -51,19 +59,16 @@ $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
 $menu = $stmt->fetchAll();
-$query_string = "&search=" . urlencode($search) . "&category=" . urlencode($category_filter);
+$query_string = "&search=" . urlencode($search) . "&category=" . urlencode($category_filter) . "&sort=" . urlencode($sort_filter);
 ?>
 
 <?php
-
 $pageTitle = "Manajemen Menu";
 $currentPage = "menu";
 
 include __DIR__ . '/../layout/header.php';
 include __DIR__ . '/../layout/sidebar.php';
-
 ?>
-
 
     <main class="relative min-h-screen pt-[74px] transition-all duration-300 lg:ml-[280px] pc-main">
       <div class="p-4 sm:p-6 lg:p-8">  
@@ -71,13 +76,23 @@ include __DIR__ . '/../layout/sidebar.php';
           <?php if(isset($_GET['status'])): ?>
               <?php if($_GET['status'] == 'success'): ?>
                   <div id="alert-message" class="mb-4 flex items-center justify-between rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800 transition-opacity duration-500" role="alert">
-                      <div><span class="font-medium">Berhasil!</span> Data menu Trafa Coffee telah diperbarui.</div>
+                      <div><span class="font-medium">Berhasil!</span> <?php echo isset($_GET['msg']) ? htmlspecialchars($_GET['msg']) : 'Data menu telah diperbarui.'; ?></div>
                       <button type="button" onclick="document.getElementById('alert-message').remove()" class="text-green-800 hover:text-green-900"><i class="fa-solid fa-xmark"></i></button>
                   </div>
               <?php elseif($_GET['status'] == 'error'): ?>
                   <div id="alert-message" class="mb-4 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800 transition-opacity duration-500" role="alert">
                       <div><span class="font-medium">Gagal!</span> <?php echo isset($_GET['msg']) ? htmlspecialchars($_GET['msg']) : 'Terjadi kesalahan pada database.'; ?></div>
                       <button type="button" onclick="document.getElementById('alert-message').remove()" class="text-red-800 hover:text-red-900"><i class="fa-solid fa-xmark"></i></button>
+                  </div>
+              <?php elseif($_GET['status'] == 'import_success'): ?>
+                  <div id="alert-message" class="mb-4 flex items-center justify-between rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800 transition-opacity duration-500" role="alert">
+                      <div><span class="font-medium">Import Berhasil!</span> <?php echo isset($_GET['imported']) ? (int)$_GET['imported'] . ' menu berhasil diimpor.' : 'Data menu berhasil diimpor.'; ?></div>
+                      <button type="button" onclick="document.getElementById('alert-message').remove()" class="text-green-800 hover:text-green-900"><i class="fa-solid fa-xmark"></i></button>
+                  </div>
+              <?php elseif($_GET['status'] == 'import_partial'): ?>
+                  <div id="alert-message" class="mb-4 flex items-center justify-between rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800 transition-opacity duration-500" role="alert">
+                      <div><span class="font-medium">Import Sebagian!</span> <?php echo isset($_GET['msg']) ? htmlspecialchars($_GET['msg']) : ''; ?></div>
+                      <button type="button" onclick="document.getElementById('alert-message').remove()" class="text-yellow-800 hover:text-yellow-900"><i class="fa-solid fa-xmark"></i></button>
                   </div>
               <?php endif; ?>
               <script>
@@ -87,15 +102,15 @@ include __DIR__ . '/../layout/sidebar.php';
                           alertBox.style.opacity = '0';
                           setTimeout(() => alertBox.remove(), 500);
                       }
-                  }, 4000);
+                  }, 5000);
               </script>
           <?php endif; ?>
 
           <div class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
             <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <h3 class="text-xl font-bold text-gray-800">Manajemen Menu & Harga</h3>
-                <div class="flex items-center gap-4">
-                    <form method="GET" class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                <div class="flex items-center gap-3 flex-wrap">
+                    <form method="GET" class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto" id="filter-form">
                         
                         <!-- Search Bar -->
                         <div class="relative w-full sm:w-auto">
@@ -113,11 +128,20 @@ include __DIR__ . '/../layout/sidebar.php';
                             <option value="1" <?php echo ($category_filter == '1') ? 'selected' : ''; ?>>Makanan</option>
                             <option value="2" <?php echo ($category_filter == '2') ? 'selected' : ''; ?>>Minuman</option>
                         </select>
+
+                        <!-- Dropdown Sort Terjual -->
+                        <select name="sort" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none block w-full sm:w-44 p-2">
+                            <option value="default" <?php echo ($sort_filter == 'default') ? 'selected' : ''; ?>>Urutan Default</option>
+                            <option value="sold_desc" <?php echo ($sort_filter == 'sold_desc') ? 'selected' : ''; ?>>Terjual Terbanyak</option>
+                            <option value="sold_asc" <?php echo ($sort_filter == 'sold_asc') ? 'selected' : ''; ?>>Terjual Tersedikit</option>
+                        </select>
                         
                         <input type="hidden" name="page" value="1">
                         <button type="submit" class="hidden">Cari</button>
                     </form>
-                    <button type="button" data-modal-target="crud-modal" data-modal-toggle="crud-modal" class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700">
+
+                    <!-- Tombol Tambah Menu — buka modal pilihan -->
+                    <button type="button" onclick="openChoiceModal()" class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 whitespace-nowrap">
                         <i class="fa-solid fa-plus mr-2"></i>Tambah Menu
                     </button>
                 </div>
@@ -132,7 +156,14 @@ include __DIR__ . '/../layout/sidebar.php';
                             <th scope="col" class="px-6 py-4">Nama Menu</th>
                             <th scope="col" class="px-6 py-4">Kategori</th>
                             <th scope="col" class="px-6 py-4">Harga</th>
-                            <th scope="col" class="px-6 py-4">Terjual</th> 
+                            <th scope="col" class="px-6 py-4">
+                                Terjual
+                                <?php if ($sort_filter === 'sold_desc'): ?>
+                                    <i class="fa-solid fa-arrow-down text-blue-500 ml-1"></i>
+                                <?php elseif ($sort_filter === 'sold_asc'): ?>
+                                    <i class="fa-solid fa-arrow-up text-blue-500 ml-1"></i>
+                                <?php endif; ?>
+                            </th>
                             <th scope="col" class="px-6 py-4 text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -165,9 +196,19 @@ include __DIR__ . '/../layout/sidebar.php';
                             <td class="px-6 py-4 font-medium text-gray-700">Rp <?php echo number_format($row['price'], 0, ',', '.'); ?></td>
                             
                             <td class="px-6 py-4">
-                                <p class="max-w-[200px] truncate text-xs text-gray-500">
-                                    <?= $row['sold'] ?>
-                                </p>
+                                <?php
+                                $sold = (int)$row['sold'];
+                                if ($sold >= 10) {
+                                    $badge = 'bg-green-100 text-green-700';
+                                } elseif ($sold > 0) {
+                                    $badge = 'bg-yellow-100 text-yellow-700';
+                                } else {
+                                    $badge = 'bg-gray-100 text-gray-500';
+                                }
+                                ?>
+                                <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium <?= $badge ?>">
+                                    <?= $sold ?>x
+                                </span>
                             </td>
 
                             <td class="px-6 py-4 text-center">
@@ -206,24 +247,24 @@ include __DIR__ . '/../layout/sidebar.php';
                 
                 <div class="flex space-x-1">
                     <?php if ($page > 1): ?>
-                        <a href="?page=<?php echo $page - 1; ?>&limit=<?php echo $limit; ?>" 
+                        <a href="?page=<?php echo $page - 1; ?>&limit=<?php echo $limit; ?><?php echo $query_string; ?>" 
                           class="rounded border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></a>
                     <?php else: ?>
-                        <button disabled class="rounded border border-gray-200/50 px-3 py-1.5 text-sm text-gray-600/50 hover:bg-gray-50/50 transition-colors"><i class="fa-solid fa-chevron-left text-xs cursor-not-allowed"></i></button>
-                          <?php endif; ?>
+                        <button disabled class="rounded border border-gray-200/50 px-3 py-1.5 text-sm text-gray-600/50 cursor-not-allowed"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                    <?php endif; ?>
 
                     <?php for($i = 1; $i <= $total_pages; $i++): ?>
-                        <a href="?page=<?php echo $i; ?>&limit=<?php echo $limit; ?>" 
+                        <a href="?page=<?php echo $i; ?>&limit=<?php echo $limit; ?><?php echo $query_string; ?>" 
                           class="rounded border px-3 py-1.5 text-sm transition-colors <?php echo ($i == $page) ? 'border-blue-600 bg-blue-600 text-white shadow-sm' : 'border-gray-200 text-gray-600 hover:bg-gray-50'; ?>">
                           <?php echo $i; ?>
                         </a>
                     <?php endfor; ?>
 
                     <?php if ($page < $total_pages): ?>
-                        <a href="?page=<?php echo $page + 1; ?>&limit=<?php echo $limit; ?>" 
+                        <a href="?page=<?php echo $page + 1; ?>&limit=<?php echo $limit; ?><?php echo $query_string; ?>" 
                           class="rounded border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></a>
-                          <?php else: ?>
-                            <button disabled class="rounded border border-gray-200/50 px-3 py-1.5 text-sm text-gray-600/50 hover:bg-gray-50/50 transition-colors"><i class="fa-solid fa-chevron-right text-xs cursor-not-allowed"></i></button>
+                    <?php else: ?>
+                        <button disabled class="rounded border border-gray-200/50 px-3 py-1.5 text-sm text-gray-600/50 cursor-not-allowed"><i class="fa-solid fa-chevron-right text-xs"></i></button>
                     <?php endif; ?>
                 </div>
             </div>
@@ -232,12 +273,118 @@ include __DIR__ . '/../layout/sidebar.php';
       </div>
     </main>
 
-    <div id="crud-modal" tabindex="-1" aria-hidden="true" class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-900/50 backdrop-blur-sm">
-        <div class="relative max-h-full w-full max-w-md p-4">
+
+    <!-- ====================================================
+         MODAL 1: PILIHAN — Import Excel atau Input Manual
+    ===================================================== -->
+    <div id="choice-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm">
+        <div class="relative w-full max-w-sm p-4">
+            <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
+                <div class="flex items-center justify-between border-b border-gray-100 p-4 md:p-5">
+                    <h3 class="text-lg font-semibold text-gray-900">Tambah Menu</h3>
+                    <button type="button" onclick="closeChoiceModal()" class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-200 hover:text-gray-900">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+                <div class="p-5 space-y-3">
+                    <p class="text-sm text-gray-500 mb-4">Pilih cara menambahkan menu:</p>
+
+                    <!-- Pilihan Import Excel -->
+                    <button type="button" onclick="openImportModal()" class="w-full flex items-center gap-4 rounded-xl border-2 border-gray-200 p-4 text-left transition-all hover:border-green-400 hover:bg-green-50 group">
+                        <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-green-100 group-hover:bg-green-200 transition-colors">
+                            <i class="fa-solid fa-file-excel text-xl text-green-600"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-800 text-sm">Import dari Excel</p>
+                            <p class="text-xs text-gray-500 mt-0.5">Upload file .xlsx berisi banyak menu sekaligus</p>
+                        </div>
+                    </button>
+
+                    <!-- Pilihan Input Manual -->
+                    <button type="button" onclick="openManualModal()" class="w-full flex items-center gap-4 rounded-xl border-2 border-gray-200 p-4 text-left transition-all hover:border-blue-400 hover:bg-blue-50 group">
+                        <div class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100 group-hover:bg-blue-200 transition-colors">
+                            <i class="fa-solid fa-pen-to-square text-xl text-blue-600"></i>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-800 text-sm">Input Manual</p>
+                            <p class="text-xs text-gray-500 mt-0.5">Tambah menu satu per satu melalui form</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ====================================================
+         MODAL 2: IMPORT EXCEL
+    ===================================================== -->
+    <div id="import-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm">
+        <div class="relative w-full max-w-md p-4">
+            <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
+                <div class="flex items-center justify-between border-b border-gray-100 p-4 md:p-5">
+                    <h3 class="text-lg font-semibold text-gray-900">Import Menu dari Excel</h3>
+                    <button type="button" onclick="closeImportModal()" class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-200 hover:text-gray-900">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <div class="p-4 md:p-5">
+                    <!-- Download Template -->
+                    <div class="mb-5 flex items-center justify-between rounded-lg bg-blue-50 border border-blue-200 p-3">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle-info text-blue-500"></i>
+                            <span class="text-xs text-blue-700">Belum punya template?</span>
+                        </div>
+                        <a href="download_template.php" class="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 transition-colors">
+                            <i class="fa-solid fa-download"></i> Download Template
+                        </a>
+                    </div>
+
+                    <form action="import_excel.php" method="POST" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <label class="mb-2 block text-sm font-medium text-gray-900">Upload File Excel (.xlsx)</label>
+                            
+                            <!-- Dropzone -->
+                            <label for="excel-file" id="dropzone" class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6" id="dropzone-placeholder">
+                                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400 mb-2"></i>
+                                    <p class="text-sm text-gray-500"><span class="font-semibold">Klik untuk upload</span> atau drag & drop</p>
+                                    <p class="text-xs text-gray-400 mt-1">Format: .xlsx — Maks. 2MB</p>
+                                </div>
+                                <div class="hidden flex-col items-center justify-center" id="dropzone-preview">
+                                    <i class="fa-solid fa-file-excel text-3xl text-green-500 mb-2"></i>
+                                    <p class="text-sm font-medium text-gray-700" id="file-name-label">-</p>
+                                    <p class="text-xs text-gray-400 mt-1">Klik untuk ganti file</p>
+                                </div>
+                                <input id="excel-file" name="excel_file" type="file" class="hidden" accept=".xlsx" required onchange="handleFileSelect(this)">
+                            </label>
+                        </div>
+
+                        <div class="flex items-center gap-3 pt-2">
+                            <button type="submit" class="inline-flex flex-1 items-center justify-center rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-green-700">
+                                <i class="fa-solid fa-file-import mr-2"></i> Import Sekarang
+                            </button>
+                            <button type="button" onclick="closeImportModal()" class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+                                Batal
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ====================================================
+         MODAL 3: INPUT MANUAL (tambah menu)
+    ===================================================== -->
+    <div id="crud-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm">
+        <div class="relative max-h-full w-full max-w-md p-4 overflow-y-auto">
             <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
                 <div class="flex items-center justify-between border-b border-gray-100 p-4 md:p-5">
                     <h3 class="text-lg font-semibold text-gray-900">Tambah Menu Baru</h3>
-                    <button type="button" class="ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900" data-modal-toggle="crud-modal">
+                    <button type="button" onclick="closeManualModal()" class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-200 hover:text-gray-900">
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
                 </div>
@@ -265,7 +412,7 @@ include __DIR__ . '/../layout/sidebar.php';
                         
                         <div class="col-span-2">
                             <label for="image" class="mb-2 block text-sm font-medium text-gray-900">Gambar</label>
-                            <input type="file" name="image" id="image"  accept="image/*" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required>
+                            <input type="file" name="image" id="image" accept="image/*" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required>
                         </div>
                         
                         <div class="col-span-2">
@@ -282,13 +429,16 @@ include __DIR__ . '/../layout/sidebar.php';
         </div>
     </div>
 
-    <button id="trigger-edit-modal" data-modal-target="edit-crud-modal" data-modal-toggle="edit-crud-modal" class="hidden"></button>
-    <div id="edit-crud-modal" tabindex="-1" aria-hidden="true" class="fixed left-0 right-0 top-0 z-50 hidden h-[calc(100%-1rem)] max-h-full w-full items-center justify-center overflow-y-auto overflow-x-hidden bg-gray-900/50 backdrop-blur-sm">
-        <div class="relative max-h-full w-full max-w-md p-4">
+
+    <!-- ====================================================
+         MODAL EDIT (tidak berubah, hanya perbaikan duplikat field image)
+    ===================================================== -->
+    <div id="edit-crud-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm">
+        <div class="relative max-h-full w-full max-w-md p-4 overflow-y-auto">
             <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
                 <div class="flex items-center justify-between border-b border-gray-100 p-4 md:p-5">
                     <h3 class="text-lg font-semibold text-gray-900">Edit Menu</h3>
-                    <button type="button" class="ms-auto inline-flex h-8 w-8 items-center justify-center rounded-lg bg-transparent text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900" data-modal-hide="edit-crud-modal">
+                    <button type="button" onclick="closeEditModal()" class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-200 hover:text-gray-900">
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
                 </div>
@@ -314,16 +464,9 @@ include __DIR__ . '/../layout/sidebar.php';
                             </select>
                         </div>
                         <div class="col-span-2">
-
-
-                            <label class="mb-2 block text-sm font-medium text-gray-900">Ganti Gambar (Opsional)</label>
-                            <input type="file" name="image" accept="image/*" class="block w-full cursor-pointer rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100">
-                            <p class="mt-1 text-xs text-gray-500">Biarkan kosong jika tidak ingin mengubah gambar saat ini.</p>
-
-                            <label class="mb-2 block text-sm font-medium text-gray-900">Link URL Gambar</label>
-                            <input type="file" name="image" id="edit-image" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" required>
-
-
+                            <label class="mb-2 block text-sm font-medium text-gray-900">Ganti Gambar <span class="text-gray-400 font-normal">(Opsional)</span></label>
+                            <input type="file" name="image" id="edit-image-file" accept="image/*" class="block w-full cursor-pointer rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 file:mr-4 file:rounded-md file:border-0 file:bg-blue-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-blue-700 hover:file:bg-blue-100">
+                            <p class="mt-1 text-xs text-gray-500">Biarkan kosong jika tidak ingin mengubah gambar.</p>
                         </div>
                         <div class="col-span-2">
                             <label class="mb-2 block text-sm font-medium text-gray-900">Deskripsi Menu</label>
@@ -331,11 +474,11 @@ include __DIR__ . '/../layout/sidebar.php';
                         </div>
                     </div>
                     
-                    <div class="flex items-center space-x-3 border-t border-gray-100 pt-4 md:pt-5">
+                    <div class="flex items-center space-x-3 border-t border-gray-100 pt-4">
                         <button type="submit" name="update" class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700">
                             <i class="fa-solid fa-floppy-disk mr-2"></i> Simpan
                         </button>
-                        <button data-modal-hide="edit-crud-modal" type="button" class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900">
+                        <button type="button" onclick="closeEditModal()" class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-gray-900">
                             Batal
                         </button>
                     </div>
@@ -344,53 +487,70 @@ include __DIR__ . '/../layout/sidebar.php';
         </div>
     </div>
 
-    
 
     <script>
+    // ── Search debounce ──
     const searchInput = document.getElementById('search-input');
-        let debounceTimer;
+    let debounceTimer;
+    if (searchInput) {
+        const val = searchInput.value;
+        if (val) { searchInput.focus(); searchInput.setSelectionRange(val.length, val.length); }
+        searchInput.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                const form = searchInput.closest('form');
+                if (form) { document.querySelector('input[name="page"]').value = 1; form.submit(); }
+            }, 500);
+        });
+    }
 
-        if (searchInput) {
-            const val = searchInput.value;
-            if (val) {
-                searchInput.focus();
-                searchInput.setSelectionRange(val.length, val.length);
-            }
+    // ── Modal helpers ──
+    function showModal(id)  { document.getElementById(id).classList.replace('hidden', 'flex'); }
+    function hideModal(id)  { document.getElementById(id).classList.replace('flex', 'hidden'); }
 
-            searchInput.addEventListener('input', function() {
-                clearTimeout(debounceTimer);
-                
-                debounceTimer = setTimeout(() => {
-                    const pageInput = document.getElementById('page-input') || document.querySelector('input[name="page"]');
-                    if (pageInput) pageInput.value = 1;
-                    
-                    const form = document.getElementById('filter-form') || searchInput.closest('form');
-                    if (form) form.submit();
-                }, 500); 
-            });
+    function openChoiceModal()  { showModal('choice-modal'); }
+    function closeChoiceModal() { hideModal('choice-modal'); }
+
+    function openImportModal()  { hideModal('choice-modal'); showModal('import-modal'); }
+    function closeImportModal() { hideModal('import-modal'); }
+
+    function openManualModal()  { hideModal('choice-modal'); showModal('crud-modal'); }
+    function closeManualModal() { hideModal('crud-modal'); }
+
+    function closeEditModal()   { hideModal('edit-crud-modal'); }
+
+    // Close modal on backdrop click
+    ['choice-modal','import-modal','crud-modal','edit-crud-modal'].forEach(id => {
+        document.getElementById(id).addEventListener('click', function(e) {
+            if (e.target === this) { hideModal(id); }
+        });
+    });
+
+    // ── File select preview ──
+    function handleFileSelect(input) {
+        const placeholder = document.getElementById('dropzone-placeholder');
+        const preview     = document.getElementById('dropzone-preview');
+        const nameLabel   = document.getElementById('file-name-label');
+        if (input.files && input.files[0]) {
+            nameLabel.textContent = input.files[0].name;
+            placeholder.classList.add('hidden');
+            preview.classList.remove('hidden');
+            preview.classList.add('flex');
         }
-    </script>
+    }
 
-    <script>
+    // ── Edit modal ──
     function openEditModal(button) {
-      const id = button.getAttribute('data-id');
-      const name = button.getAttribute('data-name');
-      const category = button.getAttribute('data-category');
-      const price = button.getAttribute('data-price');
-      const image = button.getAttribute('data-image');
-      const description = button.getAttribute('data-description'); 
-
-      document.getElementById('edit-id').value = id;
-      document.getElementById('edit-name').value = name;
-      document.getElementById('edit-category').value = category;
-      document.getElementById('edit-price').value = price;
-      document.getElementById('edit-image').value = image;
-      document.getElementById('edit-description').value = description; 
-
-      document.getElementById('trigger-edit-modal').click();
+        document.getElementById('edit-id').value          = button.getAttribute('data-id');
+        document.getElementById('edit-name').value        = button.getAttribute('data-name');
+        document.getElementById('edit-category').value    = button.getAttribute('data-category');
+        document.getElementById('edit-price').value       = button.getAttribute('data-price');
+        document.getElementById('edit-old-image').value   = button.getAttribute('data-image');
+        document.getElementById('edit-description').value = button.getAttribute('data-description');
+        showModal('edit-crud-modal');
     }
     </script>
 
- <?php 
+<?php 
 include '../layout/footer.php'; 
 ?>
