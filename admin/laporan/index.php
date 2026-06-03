@@ -235,13 +235,14 @@ include '../layout/sidebar.php';
                     ?>
                     <tr class="hover:bg-blue-50/50 transition-colors group">
                       <td class="px-5 py-4 text-center font-medium text-gray-500"><?php echo $no++; ?></td>
-                      <td class="px-5 py-4 font-bold text-gray-900">
-                        <!-- Nama kasir jadi tombol buka modal -->
+                      <td class="px-5 py-4">
                         <button type="button"
                                 onclick="openDetail(<?php echo $index; ?>, <?php echo (int)$o['id']; ?>)"
-                                class="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline transition-colors">
-                          <i class="fa-solid fa-user-tie text-gray-300 group-hover:text-blue-400 transition-colors"></i>
-                          <?php echo htmlspecialchars($o['user_name'] ?? '-'); ?>
+                                class="inline-flex items-center gap-2 bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 hover:border-blue-600 px-3 py-1.5 rounded-lg shadow-sm transition-all duration-200 cursor-pointer"
+                                title="Klik untuk melihat detail transaksi">
+                          <i class="fa-solid fa-user-tie"></i>
+                          <span class="font-bold"><?php echo htmlspecialchars($o['user_name'] ?? '-'); ?></span>
+                          <i class="fa-solid fa-chevron-right text-[10px] ml-1 opacity-70"></i>
                         </button>
                       </td>
                       <td class="px-5 py-4 text-gray-600 max-w-[200px] truncate" title="<?php echo htmlspecialchars($detail_text); ?>">
@@ -250,7 +251,7 @@ include '../layout/sidebar.php';
                       <td class="px-5 py-4 text-gray-700"><?php echo htmlspecialchars($o['customer_name'] ?? '-'); ?></td>
                       <td class="px-5 py-4 font-bold text-green-600">Rp <?php echo number_format((float)$o['total'], 0, ',', '.'); ?></td>
                       <td class="px-5 py-4">
-                        <span class="inline-flex items-center gap-1.5 px-2 py-1 rounded text-xs font-semibold <?php echo ($payment === 'Online') ? 'bg-purple-50 text-purple-600 border border-purple-200' : 'bg-blue-50 text-blue-600 border border-blue-200'; ?>">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-bold <?php echo ($payment === 'Online') ? 'bg-purple-100 text-purple-700/70' : 'bg-teal-100 text-teal-700/70'; ?>">
                           <?php echo ($payment === 'Online') ? '<i class="fa-solid fa-globe"></i>' : '<i class="fa-solid fa-cash-register"></i>'; ?>
                           <?php echo $payment; ?>
                         </span>
