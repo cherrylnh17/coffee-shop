@@ -188,11 +188,11 @@ include '../layout/sidebar.php';
                      <i class="fa-solid fa-magnifying-glass"></i> Cari
                  </button>
              </form>
-             <a href="?export=excel<?php echo '&status=' . urlencode($filter_status) . '&start_date=' . urlencode($start_date) . '&end_date=' . urlencode($end_date) . '&search_code=' . urlencode($search_code); ?>"
+             <!-- <a href="?export=excel<?php echo '&status=' . urlencode($filter_status) . '&start_date=' . urlencode($start_date) . '&end_date=' . urlencode($end_date) . '&search_code=' . urlencode($search_code); ?>"
                 class="w-full sm:w-auto px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white border border-green-600 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-colors"
                 title="Export data sesuai filter aktif ke Excel/CSV">
                  <i class="fa-solid fa-file-excel"></i> Export Excel
-             </a>
+             </a> -->
           </div>
         </div>
 
