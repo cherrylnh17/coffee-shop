@@ -85,21 +85,42 @@ include '../layout/sidebar.php';
                         <form action="tambah" method="POST" class="p-4 md:p-5">
                             <div class="mb-4">
                                 <label for="name" class="mb-2 block text-sm font-medium text-gray-900">Nama Lengkap</label>
-                                <input type="text" name="name" id="name" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="Masukkan Nama Lengkap" required />
+                                <input type="text" name="name" id="name" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="Masukkan Nama Lengkap" required oninput="validateForm()" />
                             </div>
                             <div class="mb-4">
                                 <label for="username" class="mb-2 block text-sm font-medium text-gray-900">Username</label>
-                                <input type="text" name="username" id="username" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="Contoh: kasir_budi" required />
+                                <input type="text" name="username" id="username" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="Contoh: kasir_budi" required oninput="validateForm()" />
                             </div>
                             <div class="mb-4">
                                 <label for="password" class="mb-2 block text-sm font-medium text-gray-900">Password</label>
-                                <input type="password" name="password" id="password" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="•••••••••" required />
+                                <div class="relative">
+                                    <input type="password" name="password" id="password" 
+                                           class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 pr-10 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" 
+                                           placeholder="•••••••••" required oninput="validateForm()" />
+                                    <button type="button" onclick="togglePassword('password', 'eye-password')"
+                                            class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600 transition-colors">
+                                        <i id="eye-password" class="fa-solid fa-eye text-sm"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="mb-6">
+                            <div class="mb-2">
                                 <label for="konfirmasi_password" class="mb-2 block text-sm font-medium text-gray-900">Ulangi Password</label>
-                                <input type="password" name="konfirmasi_password" id="konfirmasi_password" class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" placeholder="•••••••••" required />
+                                <div class="relative">
+                                    <input type="password" name="konfirmasi_password" id="konfirmasi_password" 
+                                           class="block w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2.5 pr-10 text-sm text-gray-900 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" 
+                                           placeholder="•••••••••" required oninput="validateForm()" />
+                                    <button type="button" onclick="togglePassword('konfirmasi_password', 'eye-konfirmasi')"
+                                            class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600 transition-colors">
+                                        <i id="eye-konfirmasi" class="fa-solid fa-eye text-sm"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <button type="submit" name="submit" class="inline-flex w-full justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                            <!-- Pesan validasi password -->
+                            <p id="password-msg" class="mb-4 text-xs hidden"></p>
+
+                            <button type="submit" name="submit" id="btn-submit"
+                                    disabled
+                                    class="inline-flex w-full justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-blue-600">
                                 Daftarkan Kasir
                             </button>
                         </form>
@@ -149,6 +170,55 @@ include '../layout/sidebar.php';
 
     
   
+
+    <script>
+    // Show/hide password toggle
+    function togglePassword(inputId, iconId) {
+        const input = document.getElementById(inputId);
+        const icon  = document.getElementById(iconId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    }
+
+    // Validasi form — aktifkan tombol hanya kalau semua terisi & password cocok
+    function validateForm() {
+        const name     = document.getElementById('name').value.trim();
+        const username = document.getElementById('username').value.trim();
+        const pass     = document.getElementById('password').value;
+        const konfirm  = document.getElementById('konfirmasi_password').value;
+        const btn      = document.getElementById('btn-submit');
+        const msg      = document.getElementById('password-msg');
+
+        const allFilled = name && username && pass && konfirm;
+
+        if (!allFilled) {
+            msg.textContent = '';
+            msg.className   = 'mb-4 text-xs hidden';
+            btn.disabled    = true;
+            return;
+        }
+
+        if (pass !== konfirm) {
+            msg.textContent = '⚠ Password dan konfirmasi tidak cocok.';
+            msg.className   = 'mb-4 text-xs text-red-500 block';
+            // Reset border konfirmasi
+            document.getElementById('konfirmasi_password').classList.add('border-red-400');
+            document.getElementById('konfirmasi_password').classList.remove('border-gray-300');
+            btn.disabled = true;
+        } else {
+            msg.textContent = '✓ Password cocok.';
+            msg.className   = 'mb-4 text-xs text-green-600 block';
+            document.getElementById('konfirmasi_password').classList.remove('border-red-400');
+            document.getElementById('konfirmasi_password').classList.add('border-gray-300');
+            btn.disabled = false;
+        }
+    }
+    </script>
 
 <?php 
 include '../layout/footer.php'; 

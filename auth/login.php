@@ -19,10 +19,7 @@ if (isset($_POST['login'])) {
     $password = $_POST['password'];
 
     try {
-
         $stmt = $pdo->prepare("SELECT * FROM user WHERE username = :username AND password = :password");
-       
-
         $stmt->bindParam(':username', $username);
         $stmt->bindParam(':password', $password);
         $stmt->execute();
@@ -54,17 +51,14 @@ if (isset($_POST['login'])) {
 <html lang="en" data-pc-sidebar-caption="true" data-pc-layout="vertical" data-pc-direction="ltr" dir="ltr" data-pc-theme_contrast="" data-pc-theme="light">
   <head>
     <title>Login | Träffa Coffee</title>
-    <!-- [Meta] -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="description" content="Login to Träffa Coffee" />
-
-    <!-- [Favicon] icon -->
     <link rel="icon" href="<?= BASE_URL; ?>assets/image/favicon.svg" type="image/x-icon" />
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   </head> 
 
   <body class="bg-gray-50 text-gray-800">
@@ -82,7 +76,7 @@ if (isset($_POST['login'])) {
               </a>
             </div>
             
-            <h4 class="my-4 text-center text-xl font-semibold text-gray-800 dark:text-gray-900">Login Akun Anda</h4>
+            <h4 class="my-4 text-center text-xl font-semibold text-gray-800">Login Akun Anda</h4>
             
             <?php if(isset($error)): ?>
               <div class="mb-4 rounded-lg bg-red-50 p-3 text-center text-sm text-red-600 border border-red-100">
@@ -93,12 +87,19 @@ if (isset($_POST['login'])) {
             <form action="" method="POST">
               <div class="mb-4">
                 <input type="text" name="username" id="username" placeholder="Username" required 
-                       class="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:text-gray-700" />
+                       class="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
               </div>
-              <div class="mb-5">
+
+              <!-- Password + show/hide -->
+              <div class="mb-5 relative">
                 <input type="password" name="password" id="password" placeholder="Password" required 
-                       class="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:text-gray-700" />
+                       class="block w-full rounded-xl border border-gray-300 bg-white px-4 py-3 pr-11 text-sm text-gray-700 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                <button type="button" onclick="togglePassword()"
+                        class="absolute inset-y-0 right-0 flex items-center px-3.5 text-gray-400 hover:text-gray-600 transition-colors focus:outline-none">
+                    <i id="eye-icon" class="fa-solid fa-eye text-sm"></i>
+                </button>
               </div>
+
               <div class="mt-4">
                 <button type="submit" name="login" 
                         class="inline-block w-full rounded-full bg-blue-600 px-5 py-3 text-center text-base font-medium text-white shadow-sm transition-all duration-200 ease-in-out hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-800">
@@ -111,6 +112,20 @@ if (isset($_POST['login'])) {
 
       </div>
     </div>
+
+    <script>
+    function togglePassword() {
+        const input = document.getElementById('password');
+        const icon  = document.getElementById('eye-icon');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    }
+    </script>
 
   </body>
 </html>
