@@ -148,7 +148,7 @@ include '../layout/sidebar.php';
 </main>
 
 <!--  MODAL 1: Pilih Tipe  -->
-<div id="modal-type-picker" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm">
+<div id="modal-type-picker" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-gray-900/50 backdrop-blur-md">
   <div class="relative w-full max-w-sm p-4">
     <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
       <div class="flex items-center justify-between border-b border-gray-100 p-4 md:p-5">
@@ -197,7 +197,7 @@ include '../layout/sidebar.php';
 </div>
 
 <!--  MODAL 2: Form Tambah / Edit Printer  -->
-<div id="modal-form" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm">
+<div id="modal-form" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-gray-900/50 backdrop-blur-md">
   <div class="relative w-full max-w-lg p-4 max-h-screen overflow-y-auto">
     <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
 
@@ -326,7 +326,7 @@ include '../layout/sidebar.php';
 </div>
 
 <!--  MODAL: Konfirmasi Hapus  -->
-<div id="modal-delete" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm">
+<div id="modal-delete" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-gray-900/50 backdrop-blur-md">
   <div class="relative w-full max-w-sm p-4">
     <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
       <div class="p-6 text-center">
@@ -469,13 +469,17 @@ function hideModal(id) {
 }
 
 // Tutup modal klik luar
-['modal-type-picker','modal-form','modal-delete'].forEach(id => {
-    document.getElementById(id).addEventListener('click', function(e) {
-        if (e.target === this) {
-            hideModal(id);
-            if (id === 'modal-form') hideModal('modal-type-picker');
-        }
-    });
+['modal-type-picker', 'modal-form', 'modal-delete'].forEach(id => {
+    const modalElement = document.getElementById(id);
+    if (modalElement) {
+        modalElement.addEventListener('click', function(e) {
+            const modalContent = this.querySelector('.bg-white');
+            
+            if (modalContent && !modalContent.contains(e.target)) {
+                hideModal(id);
+            }
+        });
+    }
 });
 
 // Auto-dismiss flash

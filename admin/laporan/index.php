@@ -309,7 +309,7 @@ include '../layout/sidebar.php';
     <!-- ══════════════════════════════════════════════════════
          MODAL DETAIL (mengikuti order.php)
     ══════════════════════════════════════════════════════ -->
-    <div id="detail-modal" class="fixed inset-0 z-[1050] hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm overflow-y-auto p-4">
+    <div id="detail-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-gray-900/50 backdrop-blur-md">
       <div class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
 
         <!-- Header Modal -->
@@ -440,7 +440,7 @@ include '../layout/sidebar.php';
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <!-- Modal Export Excel -->
-    <div id="export-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm">
+    <div id="export-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-gray-900/50 backdrop-blur-md">
       <div class="relative w-full max-w-md p-4">
         <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
           <div class="flex items-center justify-between border-b border-gray-100 p-4 md:p-5">

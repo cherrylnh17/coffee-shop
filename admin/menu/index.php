@@ -277,7 +277,7 @@ include __DIR__ . '/../layout/sidebar.php';
     <!-- ====================================================
          MODAL 1: PILIHAN — Import Excel atau Input Manual
     ===================================================== -->
-    <div id="choice-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm">
+    <div id="choice-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-gray-900/50 backdrop-blur-md">
         <div class="relative w-full max-w-sm p-4">
             <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
                 <div class="flex items-center justify-between border-b border-gray-100 p-4 md:p-5">
@@ -319,7 +319,7 @@ include __DIR__ . '/../layout/sidebar.php';
     <!-- ====================================================
          MODAL 2: IMPORT EXCEL
     ===================================================== -->
-    <div id="import-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm">
+    <div id="import-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-gray-900/50 backdrop-blur-md">
         <div class="relative w-full max-w-md p-4">
             <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
                 <div class="flex items-center justify-between border-b border-gray-100 p-4 md:p-5">
@@ -379,7 +379,7 @@ include __DIR__ . '/../layout/sidebar.php';
     <!-- ====================================================
          MODAL 3: INPUT MANUAL (tambah menu)
     ===================================================== -->
-    <div id="crud-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm">
+    <div id="crud-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-gray-900/50 backdrop-blur-md">
         <div class="relative max-h-full w-full max-w-md p-4 overflow-y-auto">
             <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
                 <div class="flex items-center justify-between border-b border-gray-100 p-4 md:p-5">
@@ -433,7 +433,7 @@ include __DIR__ . '/../layout/sidebar.php';
     <!-- ====================================================
          MODAL EDIT (tidak berubah, hanya perbaikan duplikat field image)
     ===================================================== -->
-    <div id="edit-crud-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm">
+    <div id="edit-crud-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-gray-900/50 backdrop-blur-md">
         <div class="relative max-h-full w-full max-w-md p-4 overflow-y-auto">
             <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
                 <div class="flex items-center justify-between border-b border-gray-100 p-4 md:p-5">
