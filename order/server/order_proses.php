@@ -64,14 +64,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $detail_summary = implode(", ", $summary_list);
 
         // Ambil fee dari database
-        $feeStmt = $pdo->prepare("SELECT * FROM fee_setting");
+        $feeStmt = $pdo->prepare("SELECT * FROM gratuity");
         $feeStmt->execute();
-        $fee_settings = $feeStmt->fetchAll(PDO::FETCH_ASSOC);
+        $gratuitys = $feeStmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Hitung total fee (persen atau fixed)
         $tax = 0;
         $fee_lines = []; // simpan untuk di-insert ke order_fee
-        foreach ($fee_settings as $fee) {
+        foreach ($gratuitys as $fee) {
             if ((int)$fee['type'] === 1) {
                 $amount = (int) round($subtotal * ((float)$fee['value'] / 100));
             } else {

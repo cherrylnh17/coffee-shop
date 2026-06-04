@@ -13,10 +13,10 @@ try {
     $stmt->execute();
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Ambil semua fee dari fee_setting
-    $feeStmt = $pdo->prepare("SELECT * FROM fee_setting");
+    // Ambil semua fee dari gratuity
+    $feeStmt = $pdo->prepare("SELECT * FROM gratuity");
     $feeStmt->execute();
-    $fee_settings = $feeStmt->fetchAll(PDO::FETCH_ASSOC);
+    $gratuitys = $feeStmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     die("Error pada query: " . $e->getMessage());
 }
@@ -137,12 +137,12 @@ include __DIR__ . '/layout/header.php';
 </main>
 <script>
     const MENU_DATA = <?php echo json_encode($result); ?>;
-    const FEE_SETTINGS = <?php echo json_encode($fee_settings); ?>;
+    const gratuitys = <?php echo json_encode($gratuitys); ?>;
 
     function calculateFees(subtotal) {
         let totalFee = 0;
         const feeLines = [];
-        FEE_SETTINGS.forEach(fee => {
+        gratuitys.forEach(fee => {
             let amount = parseInt(fee.type) === 1
                 ? subtotal * (parseFloat(fee.value) / 100)
                 : parseFloat(fee.value);

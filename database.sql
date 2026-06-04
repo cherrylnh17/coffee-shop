@@ -1,7 +1,7 @@
 SET foreign_key_checks = 0;
 
-DROP TABLE IF EXISTS `fee_setting`;
-CREATE TABLE `fee_setting` (
+DROP TABLE IF EXISTS `gratuity`;
+CREATE TABLE `gratuity` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `type` tinyint unsigned NOT NULL COMMENT '1 Untuk Persen, 2 Untuk Fix',
@@ -9,7 +9,7 @@ CREATE TABLE `fee_setting` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `fee_setting` VALUES 
+INSERT INTO `gratuity` VALUES 
 (1,'Biaya layanan',2,500.00),
 (2,'PPN',1,11.00),
 (3,'Biaya Pemerintah',1,90.00),

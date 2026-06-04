@@ -35,7 +35,7 @@ try {
 
   // Fallback untuk order lama sebelum migrasi
   if (empty($order_fees)) {
-      $feeStmt = $pdo->prepare("SELECT * FROM fee_setting");
+      $feeStmt = $pdo->prepare("SELECT * FROM gratuity");
       $feeStmt->execute();
       foreach ($feeStmt->fetchAll(PDO::FETCH_ASSOC) as $f) {
           $amt = (int)$f['type'] === 1

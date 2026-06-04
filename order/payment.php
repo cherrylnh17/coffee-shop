@@ -48,12 +48,12 @@ try {
     $stmtFee->execute([$order['id']]);
     $order_fees = $stmtFee->fetchAll(PDO::FETCH_ASSOC);
 
-    // Fallback: jika order_fee kosong (order lama sebelum migrasi), pakai fee_setting langsung
+    // Fallback: jika order_fee kosong (order lama sebelum migrasi), pakai gratuity langsung
     if (empty($order_fees)) {
-        $feeStmt = $pdo->prepare("SELECT * FROM fee_setting");
+        $feeStmt = $pdo->prepare("SELECT * FROM gratuity");
         $feeStmt->execute();
-        $fee_settings_raw = $feeStmt->fetchAll(PDO::FETCH_ASSOC);
-        foreach ($fee_settings_raw as $f) {
+        $gratuitys_raw = $feeStmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($gratuitys_raw as $f) {
             $amt = (int)$f['type'] === 1
                 ? (int) round($order['subtotal'] * ((float)$f['value'] / 100))
                 : (int) round((float)$f['value']);

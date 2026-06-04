@@ -14,10 +14,10 @@ try {
     $stmt->execute();
     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Ambil semua fee dari fee_setting
-    $feeStmt = $pdo->prepare("SELECT * FROM fee_setting");
+    // Ambil semua fee dari gratuity
+    $feeStmt = $pdo->prepare("SELECT * FROM gratuity");
     $feeStmt->execute();
-    $fee_settings = $feeStmt->fetchAll(PDO::FETCH_ASSOC);
+    $gratuitys = $feeStmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     die("Error pada query: " . $e->getMessage());
 }
@@ -142,17 +142,17 @@ include __DIR__ . '/layout/header.php';
     let currentNoteItemId = null;
 
     const MENU_DATA = <?php echo json_encode($result); ?>;
-    const FEE_SETTINGS = <?php echo json_encode($fee_settings); ?>;
+    const gratuitys = <?php echo json_encode($gratuitys); ?>;
 
     /**
-     * Hitung total pajak/biaya dari fee_setting
+     * Hitung total pajak/biaya dari gratuity
      * type=1 → persen dari subtotal, type=2 → nilai fixed
      * Mengembalikan { totalFee, feeLines: [{name, amount}] }
      */
     function calculateFees(subtotal) {
         let totalFee = 0;
         const feeLines = [];
-        FEE_SETTINGS.forEach(fee => {
+        gratuitys.forEach(fee => {
             let amount = 0;
             if (parseInt(fee.type) === 1) {
                 // Persen
