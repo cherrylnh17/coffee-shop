@@ -243,7 +243,7 @@ include __DIR__ . '/layout/header.php';
     // Panggil endpoint expire_order via AJAX (POST)
     async function triggerExpireOrders() {
         try {
-            const response = await fetch('<?= BASE_URL ?>order/server/expire_order', {
+            const response = await fetch('<?= BASE_URL ?>report/cron/order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
             });
