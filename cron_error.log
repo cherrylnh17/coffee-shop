@@ -28,3 +28,5 @@ PHP Warning:  Trying to access array offset on int in Command line code on line 
 /var/www/html/coffee-shop/cron.sh: line 7: /var/log/cron_expire_order.log: Permission denied
 /var/www/html/coffee-shop/cron.sh: line 2: /var/log/cron_expire_order.log: Permission denied
 /var/www/html/coffee-shop/cron.sh: line 2: /var/log/cron_expire_order.log: Permission denied
+/var/www/html/coffee-shop/cron.sh: line 2: /var/log/cron_expire_order.log: Permission denied
+/var/www/html/coffee-shop/cron.sh: line 4: bkin: command not found

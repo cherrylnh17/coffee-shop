@@ -181,3 +181,10 @@ tambah menu bisa import excel , dan di berikan template dari format excelnya
 
 
 import   || 
+
+
+///////////////
+
+bedanya ajax sama post apa
+c panel hanya butuh #!/bin/bash
+curl -s -X POST http://localhost/report/cron/order >> /var/log/cron_expire_order.log 2>&1

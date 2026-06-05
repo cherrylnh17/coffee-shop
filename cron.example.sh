@@ -1,2 +1,2 @@
 #!/bin/bash
-mysql -u nama_user -p'password_database' -D nama_database -e "DELETE FROM nama_tabel WHERE expired_date < NOW();"
+curl -s -X POST http://localhost/report/cron/order >> /var/log/cron_expire_order.log 2>&1
