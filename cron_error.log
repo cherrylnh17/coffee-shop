@@ -26,3 +26,5 @@ mysql: [Warning] Using a password on the command line interface can be insecure.
 ERROR 1064 (42000) at line 1: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'order WHERE expired_date < NOW()' at line 1
 PHP Warning:  Trying to access array offset on int in Command line code on line 3
 /var/www/html/coffee-shop/cron.sh: line 7: /var/log/cron_expire_order.log: Permission denied
+/var/www/html/coffee-shop/cron.sh: line 2: /var/log/cron_expire_order.log: Permission denied
+/var/www/html/coffee-shop/cron.sh: line 2: /var/log/cron_expire_order.log: Permission denied

@@ -159,9 +159,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
 
-                // ── 2. Insert ke sales_report untuk laporan & export ────
+                // ── 2. Insert ke report untuk laporan & export ────
                 $stmtReport = $pdo->prepare("
-                    INSERT INTO sales_report
+                    INSERT INTO report
                         (order_id, menu_id, menu_name, qty, subtotal, sold_at)
                     VALUES (?, ?, ?, ?, ?, ?)
                 ");

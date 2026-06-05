@@ -11,7 +11,7 @@ CREATE TABLE `gratuity` (
 
 INSERT INTO `gratuity` VALUES 
 (1,'Biaya layanan',2,500.00),
-(2,'PPN',1,11.00),
+(2,'PPN',1,11.00);
 
 DROP TABLE IF EXISTS `menu`;
 CREATE TABLE `menu` (
@@ -161,7 +161,7 @@ INSERT INTO `order_fee` VALUES
 (11,80,'Biaya layanan',2,500.00,500,'2026-06-02 14:12:51'),
 (12,80,'PPN',1,11.00,23650,'2026-06-02 14:12:51'),
 (15,81,'Biaya layanan',2,500.00,500,'2026-06-02 15:31:25'),
-(16,81,'PPN',1,11.00,4620,'2026-06-02 15:31:25'),
+(16,81,'PPN',1,11.00,4620,'2026-06-02 15:31:25');
 
 DROP TABLE IF EXISTS `order_item`;
 CREATE TABLE `order_item` (
@@ -242,8 +242,8 @@ CREATE TABLE `printer` (
 INSERT INTO `printer` VALUES 
 (1,'Kasir',1,'DC:0D:51:78:D7:83',1,'/dev/rfcomm0',NULL,NULL,NULL,5,1,NULL,NULL);
 
-DROP TABLE IF EXISTS `sales_report`;
-CREATE TABLE `sales_report` (
+DROP TABLE IF EXISTS `report`;
+CREATE TABLE `report` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `order_id` int unsigned NOT NULL,
   `menu_id` int unsigned NOT NULL,
@@ -256,7 +256,7 @@ CREATE TABLE `sales_report` (
   KEY `idx_menu` (`menu_id`,`sold_at`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Snapshot penjualan per item untuk laporan & export';
 
-INSERT INTO `sales_report` VALUES 
+INSERT INTO `report` VALUES 
 (1,80,1,'Nasi Goreng Special',7,175000,'2026-06-02 14:12:51'),
 (2,80,3,'Ayam Geprek Sambal Bawang',1,18000,'2026-06-02 14:12:51'),
 (3,80,2,'Mie Goreng Jawa',1,22000,'2026-06-02 14:12:51');
