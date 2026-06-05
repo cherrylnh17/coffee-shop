@@ -126,10 +126,10 @@ INSERT INTO `order` VALUES
 (98,'ORD-x1x1x1y7',1,'q',1,'1','Tamu 17','',1,25000,0,25000,0,25000,1,'1 Beef Burger M',1,'2026-06-04 13:20:00',NULL,NULL),
 (99,'ORD-x1x1x1y8',1,'q',1,'1','Tamu 18','',1,28000,0,30000,2000,28000,1,'1 Matcha Frappe',1,'2026-06-04 13:25:00',NULL,NULL),
 (100,'ORD-x1x1x1y9',1,'q',1,'1','Tamu 19','',1,20000,0,20000,0,20000,1,'1 Taro Milk Latte',1,'2026-06-04 13:30:00',NULL,NULL),
-(101,'ORD-x1x1x2y0',1,'q',1,'1','Tamu 20','',0,0,0,0,0,0,1,'',1,'2026-06-04 13:35:00',NULL,NULL),
-(102,'ORD-x1x1x2y1',1,'q',1,'1','Tamu 21','',0,0,0,0,0,0,1,'',1,'2026-06-04 13:40:00',NULL,NULL),
-(103,'ORD-x1x1x2y2',1,'q',1,'1','Tamu 22','',0,0,0,0,0,0,1,'',1,'2026-06-04 13:45:00',NULL,NULL),
-(104,'ORD-x1x1x2y3',1,'q',1,'1','Tamu 23','',0,0,0,0,0,0,1,'',1,'2026-06-04 13:50:00',NULL,NULL),
+(101,'ORD-x1x1x2y0',1,'q',1,'1','Tamu 20','',1,38000,0,40000,2000,38000,1,'1 Red Velvet Latte',1,'2026-06-04 13:35:00',NULL,NULL),
+(102,'ORD-x1x1x2y1',1,'q',1,'1','Tamu 21','',1,5000,0,5000,0,5000,1,'1 Air Mineral Botol',1,'2026-06-04 13:40:00',NULL,NULL),
+(103,'ORD-x1x1x2y2',1,'q',1,'1','Tamu 22','',1,2000,0,2000,0,2000,1,'1 Kerupuk Kaleng',1,'2026-06-04 13:45:00',NULL,NULL),
+(104,'ORD-x1x1x2y3',1,'q',1,'1','Tamu 23','',1,5000,0,5000,0,5000,1,'1 Es Teh Manis',1,'2026-06-04 13:50:00',NULL,NULL),
 (105,'ORD-x1x1x2y4',1,'q',1,'1','Tamu 24','',0,0,0,0,0,0,1,'',1,'2026-06-04 13:55:00',NULL,NULL),
 (106,'ORD-x1x1x2y5',1,'q',1,'1','Tamu 25','',0,0,0,0,0,0,1,'',1,'2026-06-04 14:00:00',NULL,NULL),
 (107,'ORD-x1x1x2y6',1,'q',1,'1','Tamu 26','',0,0,0,0,0,0,1,'',1,'2026-06-04 14:05:00',NULL,NULL),
@@ -177,7 +177,7 @@ CREATE TABLE `order_item` (
   PRIMARY KEY (`id`),
   KEY `fk_order` (`order_id`),
   CONSTRAINT `fk_order` FOREIGN KEY (`order_id`) REFERENCES `order` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=148 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=152 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 INSERT INTO `order_item` VALUES 
 (99,67,15,'Avocado Juice',1,18000,'','2026-05-20 11:15:53',NULL),
@@ -219,7 +219,11 @@ INSERT INTO `order_item` VALUES
 (144,97,34,'Kebab Daging Sapi',1,22000,'','2026-06-04 13:15:00',NULL),
 (145,98,35,'Beef Burger M',1,25000,'','2026-06-04 13:20:00',NULL),
 (146,99,36,'Matcha Frappe',1,28000,'','2026-06-04 13:25:00',NULL),
-(147,100,37,'Taro Milk Latte',1,20000,'','2026-06-04 13:30:00',NULL);
+(147,100,37,'Taro Milk Latte',1,20000,'','2026-06-04 13:30:00',NULL),
+(148,101,38,'Red Velvet Latte',1,22000,'','2026-06-04 13:35:00',NULL),
+(149,102,39,'Air Mineral Botol',1,5000,'','2026-06-04 13:40:00',NULL),
+(150,103,40,'Kerupuk Kaleng',1,2000,'','2026-06-04 13:45:00',NULL),
+(151,104,18,'Es Teh Manis',1,5000,'','2026-06-04 13:50:00',NULL);
 
 DROP TABLE IF EXISTS `printer`;
 CREATE TABLE `printer` (
@@ -254,12 +258,49 @@ CREATE TABLE `report` (
   PRIMARY KEY (`id`),
   KEY `idx_sold_at` (`sold_at`),
   KEY `idx_menu` (`menu_id`,`sold_at`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Snapshot penjualan per item untuk laporan & export';
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Snapshot penjualan per item untuk laporan & export';
 
 INSERT INTO `report` VALUES 
 (1,80,1,'Nasi Goreng Special',7,175000,'2026-06-02 14:12:51'),
 (2,80,3,'Ayam Geprek Sambal Bawang',1,18000,'2026-06-02 14:12:51'),
-(3,80,2,'Mie Goreng Jawa',1,22000,'2026-06-02 14:12:51');
+(3,80,2,'Mie Goreng Jawa',1,22000,'2026-06-02 14:12:51'),
+(4,67,15,'Avocado Juice',1,18000,'2026-05-20 11:15:53'),
+(5,72,12,'Lemon Tea Ice',1,12000,'2026-05-21 10:57:25'),
+(6,72,9,'Es Kopi Susu Gula Aren',1,18000,'2026-05-21 10:57:25'),
+(7,73,12,'Lemon Tea Ice',1,12000,'2026-05-21 12:44:40'),
+(8,74,12,'Lemon Tea Ice',1,12000,'2026-05-21 13:37:19'),
+(9,75,2,'Mie Goreng Jawa',1,22000,'2026-05-22 10:14:04'),
+(10,75,15,'Avocado Juice',1,18000,'2026-05-22 10:14:04'),
+(11,77,11,'Green Tea Latte',1,20000,'2026-06-02 08:37:49'),
+(12,78,1,'Nasi Goreng Special',1,25000,'2026-06-02 13:44:58'),
+(13,78,3,'Ayam Geprek Sambal Bawang',1,18000,'2026-06-02 13:44:58'),
+(14,79,1,'Nasi Goreng Special',2,50000,'2026-06-02 13:57:47'),
+(15,79,4,'Sandwich Gandum',2,40000,'2026-06-02 13:57:47'),
+(16,79,5,'Pasta Carbonara',1,35000,'2026-06-02 13:57:47'),
+(17,79,9,'Es Kopi Susu Gula Aren',3,54000,'2026-06-02 13:57:47'),
+(18,82,19,'Mie Ayam Kampung',1,15000,'2026-06-04 12:00:00'),
+(19,83,20,'Bakso Sapi Kuah',1,20000,'2026-06-04 12:05:00'),
+(20,84,21,'Es Jeruk Peras',1,8000,'2026-06-04 12:10:00'),
+(21,85,22,'Kopi Tubruk Hitam',1,10000,'2026-06-04 12:15:00'),
+(22,86,23,'Tempe Mendoan',1,12000,'2026-06-04 12:20:00'),
+(23,87,24,'Tahu Gejrot Cirebon',1,10000,'2026-06-04 12:25:00'),
+(24,88,25,'Pisang Goreng Keju',1,15000,'2026-06-04 12:30:00'),
+(25,89,26,'Roti Bakar Coklat',1,18000,'2026-06-04 12:35:00'),
+(26,90,27,'Jus Mangga Manis',1,15000,'2026-06-04 12:40:00'),
+(27,91,28,'Jus Melon Susu',1,15000,'2026-06-04 12:45:00'),
+(28,92,29,'Jus Semangka',1,12000,'2026-06-04 12:50:00'),
+(29,93,30,'Sop Iga Sapi',1,45000,'2026-06-04 12:55:00'),
+(30,94,31,'Soto Ayam Lamongan',1,20000,'2026-06-04 13:00:00'),
+(31,95,32,'Nasi Kuning Komplit',1,18000,'2026-06-04 13:05:00'),
+(32,96,33,'Nasi Uduk Spesial',1,17000,'2026-06-04 13:10:00'),
+(33,97,34,'Kebab Daging Sapi',1,22000,'2026-06-04 13:15:00'),
+(34,98,35,'Beef Burger M',1,25000,'2026-06-04 13:20:00'),
+(35,99,36,'Matcha Frappe',1,28000,'2026-06-04 13:25:00'),
+(36,100,37,'Taro Milk Latte',1,20000,'2026-06-04 13:30:00'),
+(37,101,38,'Red Velvet Latte',1,22000,'2026-06-04 13:35:00'),
+(38,102,39,'Air Mineral Botol',1,5000,'2026-06-04 13:40:00'),
+(39,103,40,'Kerupuk Kaleng',1,2000,'2026-06-04 13:45:00'),
+(40,104,18,'Es Teh Manis',1,5000,'2026-06-04 13:50:00');
 
 DROP TABLE IF EXISTS `table`;
 CREATE TABLE `table` (
