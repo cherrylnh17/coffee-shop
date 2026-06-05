@@ -12,8 +12,6 @@ CREATE TABLE `gratuity` (
 INSERT INTO `gratuity` VALUES 
 (1,'Biaya layanan',2,500.00),
 (2,'PPN',1,11.00),
-(3,'Biaya Pemerintah',1,90.00),
-(4,'Biaya APBN',2,6000.00);
 
 DROP TABLE IF EXISTS `menu`;
 CREATE TABLE `menu` (
