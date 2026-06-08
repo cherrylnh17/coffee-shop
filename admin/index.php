@@ -20,40 +20,62 @@ function rupiah($value) {
     return "Rp " . number_format((int)$value, 0, ',', '.');
 }
 
-function getDashboardData($pdo, $start, $end) {
+function getDashboardData($pdo, $start, $end)
+{
+    $params       = [':start' => $start, ':end' => $end];
     $emptySummary = ['revenue' => 0, 'transactions' => 0, 'items_sold' => 0];
 
     try {
-        $summaryStmt = $pdo->prepare("\n            SELECT\n                COALESCE(SUM(o.total), 0) AS revenue,\n                COUNT(DISTINCT o.id) AS transactions,\n                COALESCE(SUM(oi.qty), 0) AS items_sold\n            FROM `order` o\n            LEFT JOIN order_item oi ON o.id = oi.order_id\n            WHERE o.status = 1\n              AND o.created_at BETWEEN :start_date AND :end_date\n        ");
-        $summaryStmt->execute([
-            ':start_date' => $start,
-            ':end_date'   => $end,
-        ]);
+        $summaryStmt = $pdo->prepare('
+            SELECT
+                COALESCE(SUM(total), 0) AS revenue,
+                COUNT(*)                AS transactions,
+                COALESCE(SUM(qty), 0)  AS items_sold
+            FROM `order`
+            WHERE status = 1
+              AND created_at BETWEEN :start AND :end
+        ');
+        $summaryStmt->execute($params);
         $summary = $summaryStmt->fetch(PDO::FETCH_ASSOC) ?: $emptySummary;
 
-        $menuStmt = $pdo->prepare("\n            SELECT\n                oi.menu_id,\n                oi.menu_name,\n                SUM(oi.qty) AS terjual,\n                SUM(oi.subtotal) AS pendapatan\n            FROM order_item oi\n            INNER JOIN `order` o ON o.id = oi.order_id\n            WHERE o.status = 1\n              AND o.created_at BETWEEN :start_date AND :end_date\n            GROUP BY oi.menu_id, oi.menu_name\n            ORDER BY terjual DESC, pendapatan DESC\n        ");
-        $menuStmt->execute([
-            ':start_date' => $start,
-            ':end_date'   => $end,
-        ]);
+        $menuStmt = $pdo->prepare('
+            SELECT
+                menu_id,
+                menu_name,
+                SUM(qty)      AS terjual,
+                SUM(subtotal) AS pendapatan
+            FROM report
+            WHERE sold_at BETWEEN :start AND :end
+            GROUP BY menu_id, menu_name
+            ORDER BY terjual DESC, pendapatan DESC
+        ');
+        $menuStmt->execute($params);
         $menus = $menuStmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $latestStmt = $pdo->prepare("\n            SELECT id, code, customer_name, table_name, qty, total, payment, created_at\n            FROM `order`\n            WHERE status = 1\n              AND created_at BETWEEN :start_date AND :end_date\n            ORDER BY created_at DESC\n            LIMIT 5\n        ");
-        $latestStmt->execute([
-            ':start_date' => $start,
-            ':end_date'   => $end,
-        ]);
+        // 5 transaksi terbaru
+        $latestStmt = $pdo->prepare('
+            SELECT
+                id, code, customer_name, table_name,
+                qty, total, payment, created_at
+            FROM `order`
+            WHERE status = 1
+              AND created_at BETWEEN :start AND :end
+            ORDER BY created_at DESC
+            LIMIT 5
+        ');
+        $latestStmt->execute($params);
         $latest = $latestStmt->fetchAll(PDO::FETCH_ASSOC);
 
         return [
-            'summary' => $summary,
-            'menus' => $menus,
+            'summary'             => $summary,
+            'menus'               => $menus,
             'latest_transactions' => $latest,
         ];
+
     } catch (PDOException $e) {
         return [
-            'summary' => $emptySummary,
-            'menus' => [],
+            'summary'             => $emptySummary,
+            'menus'               => [],
             'latest_transactions' => [],
         ];
     }

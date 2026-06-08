@@ -6,7 +6,7 @@ require_once __DIR__ . '/../../config.php';
 header('Content-Type: application/json');
 
 // Guard: hanya kasir yang login
-if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 2) {
     http_response_code(401);
     echo json_encode([]);
     exit;
