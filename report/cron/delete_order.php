@@ -1,4 +1,4 @@
-// 5 * * * * /usr/bin/curl -s "http://localhost/report/cron/delete_order.php" > /dev/null 2>&1
+// * * 1 * * /usr/bin/curl -s "http://localhost/report/cron/delete_order.php" > /dev/null 2>&1
 <?php
 require_once __DIR__ . '/../../config.php';
 
