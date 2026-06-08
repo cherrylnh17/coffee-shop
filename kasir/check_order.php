@@ -79,7 +79,7 @@ include 'layout/sidebar.php';
       <div class="max-w-5xl mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          <div class="lg:col-span-2 space-y-6">
+          <div class="lg:col-span-2">
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
               <div class="p-5 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
                 <h3 class="font-bold text-gray-800">Item Pesanan</h3>
@@ -104,28 +104,10 @@ include 'layout/sidebar.php';
                 <?php endforeach; ?>
               </div>
             </div>
-
-            <div class="flex flex-col sm:flex-row gap-4">
-                <?php if($order['status'] == 1): ?>
-                <div class="flex-1">
-                    <button name="aksi" value="lunas" disabled class="w-full bg-green-600 hover:bg-green-700 cursor-not-allowed text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-cash-register"></i> Pesanan telah diselesaikan
-                    </button>
-                </div>
-                <?php else: ?>
-                <form action="print_order" method="POST" class="flex-1" id="checkout-form">
-                    <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
-                    <input type="hidden" name="total" value="<?= $order['total'] ?>">
-                    
-                    <button name="aksi" type="submit" id="btn-selesai" disabled value="selesai" class="w-full bg-gray-400 cursor-not-allowed text-white font-bold py-4 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-check-double"></i> Selesaikan Pesanan 
-                    </button>
-                </form>
-                <?php endif; ?>
-            </div>
           </div>
 
-          <div class="space-y-6">
+          <div class="lg:col-span-1 lg:row-span-2 space-y-6">
+            
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               <h3 class="text-sm font-bold text-gray-400 uppercase mb-4">Informasi Meja</h3>
               <div class="flex items-center gap-4 mb-6">
@@ -204,7 +186,31 @@ include 'layout/sidebar.php';
                     </div>
                 </div>
             </div>
+            
           </div>
+
+          <div class="lg:col-span-2">
+            <div class="flex flex-col sm:flex-row gap-4">
+                <?php if($order['status'] == 1): ?>
+                <div class="flex-1">
+                    <button name="aksi" value="lunas" disabled class="w-full bg-green-600 hover:bg-green-700 cursor-not-allowed text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-cash-register"></i> Pesanan telah diselesaikan
+                    </button>
+                </div>
+                <?php else: ?>
+                <form action="print_order" method="POST" class="flex-1" id="checkout-form">
+                    <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
+                    <input type="hidden" name="total" value="<?= $order['total'] ?>">
+                    
+                    <button name="aksi" type="submit" id="btn-selesai" disabled value="selesai" class="w-full bg-gray-400 cursor-not-allowed text-white font-bold py-4 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check-double"></i> Selesaikan Pesanan 
+                    </button>
+                </form>
+                <?php endif; ?>
+            </div>
+          </div>
+
+        </div>
 
         </div>
       </div>

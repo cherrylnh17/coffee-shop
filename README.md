@@ -57,50 +57,7 @@ perintah dump isinya
 drop if exist dan isinya foreign key foreign key
 
 
-<!-- 
-harus ada 1 tombol untuk melakkan sesuatu
-contohnya order di hero hilang terus order di navbar keliatan
-begitu pula sebaliknya -->
 
-
-
-<!-- button di menu di ubah Lihat Semua Menu -->
-
-
-
-<!-- jika qr not found atau tidak di temmukan dikasih alert meja tidak di temukan -->
-<!-- dikasih alert di scan qr nya, dan ada tanda coba lagi -->
-
-<!-- pesanan ganti cart -->
-
-
-<!-- pajak semua persen
-tabel tax diganti dengan graduity
-kasih kolom tipe dengan tiny int -->
-
-<!-- 
-identitas di ganti -> checkout
-
-checkout diganti -> payment
-
-
-jika batas pembayaran lewat akan memanggil cron job yang akan membuat data tersebut menjadi expired
-dengan cron job di buat 30 menit setelah dimulai -->
-
-
-<!-- 
-mulai halaman
-order/1/menu --
-order/1/cart --
-order/1/checkout --
-order/1/payment
-report/cron/order =  pakai ajax untuk ubah expired dan membuat cron job 
-order/1/success -- -->
- 
-
-<!-- url kasir ubah dari /kasir/index jadi /kasir  -->
-
-////
 
 <!-- ui kasir di perbaiki ada 2 tombol , scan dan masukkan kode
 saat muncul nanti kotak buat masukkan qr atau drag qr
@@ -181,3 +138,27 @@ tambah menu bisa import excel , dan di berikan template dari format excelnya
 
 
 import   || 
+
+
+<!-- /////////////////////////////////////////////////////////////////////////////////// -->
+
+
+gratuity 
+tabel fee diganti gratuity
+bagian order bagian report
+alsannya karena seo
+
+
+bagian server di pisah ke folder dipindah
+
+bagian itu di perlukan post
+
+jadi url server expired di jalankan langsuung menjalankan cron
+
+harusnya ga perlu expired 
+
+
+
+<!-- /////////////////////////////////////////////////////////////////////////////////// -->
+
+

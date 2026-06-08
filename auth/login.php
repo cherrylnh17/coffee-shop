@@ -55,7 +55,7 @@ if (isset($_POST['login'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="description" content="Login to Träffa Coffee" />
-    <link rel="icon" href="<?= BASE_URL; ?>assets/image/favicon.svg" type="image/x-icon" />
+    <link rel="icon" href="<?= BASE_URL; ?>assets/image/icon.png" type="image/x-icon" />
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -72,7 +72,7 @@ if (isset($_POST['login'])) {
             
             <div class="my-6 text-center">
               <a href="#" class="block w-full">
-                <img src="<?= BASE_URL; ?>assets/image/logo.svg" alt="Logo Trafa Coffee" class="mx-auto h-auto w-[120px]" />
+                <img src="<?= BASE_URL; ?>assets/image/icon.png" alt="Logo Trafa Coffee" class="mx-auto h-auto w-[120px]" />
               </a>
             </div>
             
