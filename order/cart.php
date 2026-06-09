@@ -76,17 +76,39 @@ include __DIR__ . '/layout/header.php';
         <!-- Ringkasan -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4" id="summary-section">
             <h2 class="font-bold text-gray-900 mb-3">Ringkasan</h2>
-            <div class="space-y-2">
-                <div class="flex justify-between text-sm">
-                    <span class="text-gray-500">Subtotal (<span id="total-qty">0</span> item)</span>
-                    <span class="font-semibold text-gray-800" id="subtotal-price">Rp 0</span>
-                </div>
-                <div id="fee-lines"></div>
-                <div class="border-t border-dashed border-gray-200 pt-2 flex justify-between items-center">
-                    <span class="font-bold text-gray-900">Total</span>
-                    <span class="font-black text-blue-600 text-lg" id="grand-total">Rp 0</span>
-                </div>
-            </div>
+            <table class="w-full text-sm table-fixed">
+                <colgroup>
+                    <col>
+                    <col class="w-36">
+                </colgroup>
+
+                <tbody>
+                    <tr>
+                        <td class="py-1 text-gray-500">
+                            Subtotal (<span id="total-qty">0</span> item)
+                        </td>
+                        <td class="py-1 text-left font-semibold text-gray-800" id="subtotal-price">
+                            Rp. 0
+                        </td>
+                    </tr>
+
+                    <tbody id="fee-lines"></tbody>
+                </tbody>
+
+                <tfoot>
+                    <tr>
+                        <td colspan="2" class="pt-2">
+                            <div class="border-t border-dashed border-gray-200"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="pt-2 font-bold text-gray-900">Total</td>
+                        <td class="pt-2 text-left font-black text-blue-600 text-lg" id="grand-total">
+                            Rp. 0
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
         </div>
 
         <!-- Tambah menu lagi -->
@@ -176,7 +198,7 @@ include __DIR__ . '/layout/header.php';
     }
 
     function formatRupiah(angka) {
-        return 'Rp ' + parseInt(angka).toLocaleString('id-ID');
+        return 'Rp. ' + parseInt(angka).toLocaleString('id-ID');
     }
 
     function renderOrder() {
@@ -264,16 +286,20 @@ include __DIR__ . '/layout/header.php';
 
         // Render baris fee satu per satu
         const feeLinesEl = document.getElementById('fee-lines');
-        feeLinesEl.innerHTML = '';
-        feeLines.forEach(f => {
-            const suffix = f.type === 1 ? ` (${f.value}%)` : '';
-            const row = document.createElement('div');
-            row.className = 'flex justify-between text-sm';
-            row.innerHTML = `
-                <span class="text-gray-500">${f.name}${suffix}</span>
-                <span class="font-semibold text-gray-800">${formatRupiah(f.amount)}</span>`;
-            feeLinesEl.appendChild(row);
-        });
+            feeLinesEl.innerHTML = '';
+            feeLines.forEach(f => {
+                const suffix = f.type === 1 ? ` (${f.value}%)` : '';
+                const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="py-1 text-gray-500">
+                            ${f.name}${suffix}
+                        </td>
+                        <td class="py-1 text-left font-semibold text-gray-800">
+                            ${formatRupiah(f.amount)}
+                        </td>
+                    `;
+                feeLinesEl.appendChild(row);
+            });
 
         document.getElementById('total-qty').innerText      = totalQty;
         document.getElementById('subtotal-price').innerText = formatRupiah(subtotal);

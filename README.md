@@ -185,3 +185,33 @@ harusnya ga perlu expired
 
 cron ada 2 
 
+lewat 1 jam di hapus, lewat 1 menit update status
+
+
+----------------------
+Revisi Perbaikan
+-- order
+- dibagaian scan order di buat menjadi ada button buat scan, jadi tidak langsung open permision scan qr
+- bagian ringkasan di bagian cart order perlu di rapikan lagi
+
+-- kasir
+- di bagian ringkasan keranjang di rapikan, dan ui waktu penginputan harga di buat responsive dimana selesaikan pesanan di paling bawah
+- dibuat kalau scan qr invalid akan auto fokus langsung ke input
+- dibuat case sensitif, agar nantinya bisa tau mana huruf kapital mana bukan
+- mungkin untuk masalah printer bisa di buat dengan sistem iframe dulu
+
+-- admin
+- styling inputan di date tanggal di riwayat pesanan perlu di perbaiki
+- dibagian url get di bagian riwayat pesanan di buat hanya menampilkan yang difilter saja, yang nggak di filter tidak perlu di tampilkan
+- bagian menu terlalir di berikan tanggal
+- warna di bagian terjual dihilangkan saja, setiap pemberian warna harus memiliki makna
+- untuk ui di semua kategori, terjual banyak perlu di styling
+- di manajemen meja di tambahkan show meja yang akan menampilkan qr code
+- hapus semua slash index
+- password perlu di hash waktu penginputan di database
+
+--
+- mencari payment gateway yang sekiranya pendaftarannya cukup mudah
+- bisa menambahkan cashdrawer
+- penghapusan file .sh , karena cron nya langsung curl php
+

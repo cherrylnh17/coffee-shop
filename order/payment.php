@@ -27,6 +27,11 @@ try {
         exit();
     }
 
+    if ($order['status'] == 1) {
+        header("Location: " . BASE_URL . "order/" . $table_code . "/success/" . $order_code);
+        exit();
+    }
+
     if ($expired_at < $now) {
         header("Location: " . BASE_URL . "order/" . $table_code . "/expired/" . $order_code);
         exit();
@@ -139,25 +144,57 @@ include __DIR__ . '/layout/header.php';
 
         <!-- Ringkasan Pembayaran -->
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-            <h2 class="text-sm font-bold text-gray-900 mb-3">Ringkasan Pembayaran</h2>
-            <div class="space-y-2 mb-3">
-                <div class="flex justify-between text-sm">
-                    <span class="text-gray-500">Subtotal</span>
-                    <span class="font-medium text-gray-800">Rp <?= number_format($order['subtotal'], 0, ',', '.') ?></span>
-                </div>
-                <?php foreach ($order_fees as $fee): ?>
-                <?php $suffix = (int)$fee['type'] === 1 ? ' (' . rtrim(rtrim(number_format((float)$fee['rate'], 2), '0'), '.') . '%)' : ''; ?>
-                <div class="flex justify-between text-sm">
-                    <span class="text-gray-500"><?= htmlspecialchars($fee['name']) . $suffix ?></span>
-                    <span class="font-medium text-gray-800">Rp <?= number_format($fee['amount'], 0, ',', '.') ?></span>
-                </div>
-                <?php endforeach; ?>
-            </div>
-            <div class="dashed-line my-3"></div>
-            <div class="flex justify-between items-center">
-                <span class="font-bold text-gray-800">Total Tagihan</span>
-                <span class="font-black text-blue-600 text-xl">Rp <?= number_format($order['total'], 0, ',', '.') ?></span>
-            </div>
+            <h2 class="text-sm font-bold text-gray-900 mb-3">
+                Ringkasan Pembayaran
+            </h2>
+
+            <table class="w-full text-sm table-fixed">
+                <colgroup>
+                    <col>
+                    <col class="w-32">
+                </colgroup>
+
+                <tbody>
+                    <tr>
+                        <td class="py-1 text-gray-500">Subtotal</td>
+                        <td class="py-1 text-left font-medium text-gray-800">
+                            Rp <?= number_format($order['subtotal'], 0, ',', '.') ?>
+                        </td>
+                    </tr>
+
+                    <?php foreach ($order_fees as $fee): ?>
+                        <?php
+                        $suffix = (int)$fee['type'] === 1
+                            ? ' (' . rtrim(rtrim(number_format((float)$fee['rate'], 2), '0'), '.') . '%)'
+                            : '';
+                        ?>
+                        <tr>
+                            <td class="py-1 text-gray-500">
+                                <?= htmlspecialchars($fee['name']) . $suffix ?>
+                            </td>
+                            <td class="py-1 text-left font-medium text-gray-800">
+                                Rp <?= number_format($fee['amount'], 0, ',', '.') ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+
+                <tfoot>
+                    <tr>
+                        <td colspan="2" class="py-2">
+                            <div class="border-t border-dashed border-gray-200"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="font-bold text-gray-800">
+                            Total Tagihan
+                        </td>
+                        <td class="font-black text-blue-600 text-xl">
+                            Rp <?= number_format($order['total'], 0, ',', '.') ?>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
         </div>
     </div>
 
