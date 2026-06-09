@@ -133,7 +133,8 @@ include __DIR__ . '/../layout/sidebar.php';
                     <tr>
                       <th scope="col" class="w-20 px-6 py-4 text-center">No</th>
                       <th scope="col" class="px-6 py-4">Nama Meja</th>
-                      <th scope="col" class="w-32 px-6 py-4 text-center">Aksi</th>
+                      <th scope="col" class="px-6 py-4 text-center">QR Code</th>
+                      <th scope="col" class="px-6 py-4 text-center">Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -148,6 +149,17 @@ include __DIR__ . '/../layout/sidebar.php';
                           <td class="px-6 py-4 text-center"><?php echo $no++; ?></td>
                           <td class="px-6 py-4 font-medium text-gray-900"><?php echo htmlspecialchars($row['name']); ?></td>
                           <td class="px-6 py-4 text-center">
+                            <div class="flex justify-center items-center">
+                              <button type="button"
+                                      data-nama="<?php echo htmlspecialchars($row['name']); ?>"
+                                      onclick="openQrModal(this)"
+                                      class="inline-flex h-8 w-8 items-center justify-center rounded bg-purple-50 text-purple-600 transition-colors hover:bg-purple-100 hover:text-purple-900"
+                                      title="Show QR">
+                                <i class="fa-solid fa-qrcode"></i>
+                              </button>
+                            </div>
+                          </td>
+                          <td class="px-6 py-4 text-center">
                             <div class="flex items-center justify-center gap-2">
                               <button type="button" 
                                       data-id="<?php echo $row['id']; ?>"
@@ -156,14 +168,6 @@ include __DIR__ . '/../layout/sidebar.php';
                                       class="inline-flex h-8 w-8 items-center justify-center rounded bg-blue-50 text-blue-600 transition-colors hover:bg-blue-100 hover:text-blue-900"
                                       title="Edit">
                                   <i class="fa-solid fa-pen-to-square"></i>
-                              </button>
-
-                              <button type="button"
-                                      data-nama="<?php echo htmlspecialchars($row['name']); ?>"
-                                      onclick="openQrModal(this)"
-                                      class="inline-flex h-8 w-8 items-center justify-center rounded bg-purple-50 text-purple-600 transition-colors hover:bg-purple-100 hover:text-purple-900"
-                                      title="Show QR">
-                                  <i class="fa-solid fa-qrcode"></i>
                               </button>
                               
                               <a href="hapus?id=<?php echo $row['id']; ?>" onclick="return confirm('Yakin ingin menghapus meja ini?')" class="inline-flex h-8 w-8 items-center justify-center rounded bg-red-50 text-red-600 transition-colors hover:bg-red-100 hover:text-red-900" title="Hapus">
@@ -214,20 +218,19 @@ include __DIR__ . '/../layout/sidebar.php';
       </div>
     </main>
 
-    <!-- ====================================================
-         MODAL QR CODE MEJA
-    ===================================================== -->
     <div id="qr-meja-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-gray-900/50 backdrop-blur-md">
         <div class="relative w-full max-w-sm p-4">
             <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
-                <div class="flex items-center justify-between border-b border-gray-100 p-4 md:p-5">
+                <div class="flex items-center justify-between mx-1 border-b border-gray-100 p-2 md:p-3">
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-900">QR Code Meja</h3>
-                        <p id="qr-meja-name" class="text-sm text-gray-500 mt-0.5"></p>
+                        <h3 class="text-lg font-semibold text-gray-900">QR Code</h3>
                     </div>
                     <button type="button" onclick="closeQrModal()" class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-200 hover:text-gray-900">
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
+                </div>
+                <div class="py-2 text-center">
+                    <span class="text-md">Meja <p id="qr-meja-name" class="text-xl font-semibold text-gray-800 mt-0.5"></p></span>
                 </div>
                 <div class="flex flex-col items-center p-6 gap-5">
                     <div class="rounded-xl border border-gray-100 bg-gray-50 p-4 shadow-inner">
