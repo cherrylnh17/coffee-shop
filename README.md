@@ -56,7 +56,7 @@ perintah dump isinya
 
 
 
-///////////////
+
 
 bkin ajx untuk curl url untuk update status
  cron job org 
@@ -88,6 +88,7 @@ bkin ajx untuk curl url untuk update status
  di riwayar oesabab
 
  dibagian url get di riwayat pesana dibuat hanya di tampilkan yang di filter saja, yang nggak nggak usah di tampilkan
+
 
  bagian menu terlaris di berikan tangal 
 
@@ -164,5 +165,23 @@ Database
 
 
 
+
+
+gratuity 
+tabel fee diganti gratuity
+bagian order bagian report
+alsannya karena seo
+
+
+bagian server di pisah ke folder dipindah
+
+bagian itu di perlukan post
+
+jadi url server expired di jalankan langsuung menjalankan cron
+
+harusnya ga perlu expired 
+
+
+
 cron ada 2 
-lewat 1 jam di hapus, lewat 1 menit update status
+

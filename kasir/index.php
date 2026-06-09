@@ -30,7 +30,7 @@ include 'layout/sidebar.php';
             <form id="orderForm" action="proses_input.php" method="POST" class="flex flex-col gap-4">
                 <div class="relative w-full">
                     <input type="text" name="code" id="order_code" placeholder="Contoh: ORD-12345678" required
-                        class="w-full text-center tracking-widest uppercase bg-white border border-gray-300 text-gray-900 rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-4 pr-16 outline-none font-bold transition-all shadow-sm">
+                        class="w-full text-center tracking-widest bg-white border border-gray-300 text-gray-900 rounded-xl focus:ring-blue-500 focus:border-blue-500 block p-4 pr-16 outline-none font-bold transition-all shadow-sm">
                     
                     <button type="button" id="btn-scan" class="absolute inset-y-0 right-0 flex items-center justify-center px-4 bg-gray-50 text-gray-500 border border-l-0 border-gray-300 rounded-r-xl hover:bg-gray-100 hover:text-blue-600 transition-colors cursor-pointer group">
                         <i class="fa-solid fa-qrcode text-xl group-hover:scale-110 transition-transform"></i>

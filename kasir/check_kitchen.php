@@ -51,10 +51,6 @@ include 'layout/sidebar.php';
       <h1 class="text-base font-bold text-gray-800 leading-tight">Print Tiket Dapur</h1>
       <span class="text-xs text-gray-400">#<?= htmlspecialchars($order['code']) ?></span>
     </div>
-    <div class="ml-auto flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-600 text-xs font-semibold px-3 py-1.5 rounded-full">
-      <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-      Menunggu konfirmasi
-    </div>
   </div>
 </header>
 
