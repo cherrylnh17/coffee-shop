@@ -24,7 +24,7 @@ $is_export = isset($_GET['export']) && $_GET['export'] === 'excel';
 $where_conditions = [];
 $bind_params      = [];
 
-if ($filter_status === 'success') {
+if ($filter_status === 'success') { 
   $where_conditions[] = "o.status = 1";
 } elseif ($filter_status === 'pending') {
   $where_conditions[] = "o.status = 2";
@@ -130,8 +130,8 @@ $query_string = "&status=$filter_status&start_date=$start_date&end_date=$end_dat
 <?php
 $pageTitle   = "History Pesanan";
 $currentPage = "riwayat";
-include '../layout/header.php';
-include '../layout/sidebar.php';
+include __DIR__ . '/../layout/header.php'; 
+include __DIR__ . '/../layout/sidebar.php'; 
 ?>
 
 <main class="relative min-h-screen pt-[74px] transition-all duration-300 lg:ml-[280px] pc-main">
@@ -662,4 +662,6 @@ include '../layout/sidebar.php';
     <?php unset($_SESSION['print_payload']); // Hapus session agar tidak ke-print dobel saat direfresh ?>
 <?php endif; ?>
 
-<?php include '../layout/footer.php'; ?>
+<?php 
+include __DIR__ . '/../layout/footer.php'; 
+?>

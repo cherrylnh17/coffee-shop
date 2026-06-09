@@ -93,7 +93,7 @@ function buildEscPos($order, $order_items, $order_fees = []) {
 // ============================================================
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: order");
+    header("Location: error");
     exit;
 }
 
@@ -110,7 +110,7 @@ $orderData = $stmtOrder->fetch(PDO::FETCH_ASSOC);
 
 if (!$orderData) {
     $_SESSION['swal_msg'] = ['icon' => 'error', 'title' => 'Gagal', 'text' => 'Data tidak ditemukan.'];
-    header("Location: order");
+    header("Location: error");
     exit;
 }
 
@@ -153,5 +153,5 @@ $_SESSION['swal_msg'] = [
     'text'  => 'Pesanan berhasil disimpan. Mengirim ke printer...'
 ];
 
-header("Location: order");
+header("Location: success");
 exit;

@@ -20,6 +20,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit;
         }
 
+        $hashPassword = password_hash($password, PASSWORD_DEFAULT);
+
         $stmt_check = $pdo->prepare("SELECT COUNT(*) FROM user WHERE username = ?");
         $stmt_check->execute([$username]);
         if ($stmt_check->fetchColumn() > 0) {
@@ -30,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $sql = "INSERT INTO user (name, username, password, role) VALUES (?, ?, ?, 1)";
         $stmt = $pdo->prepare($sql);
         
-        $stmt->execute([$name, $username, $password]);
+        $stmt->execute([$name, $username, $hashPassword]);
         
         header("Location: index?status=success");
         exit;

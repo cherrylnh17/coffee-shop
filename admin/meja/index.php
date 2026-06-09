@@ -49,8 +49,8 @@ $mejas = $stmt->fetchAll();
 $pageTitle = "Manajemen Meja";
 $currentPage = "meja";
 
-include '../layout/header.php';
-include '../layout/sidebar.php';
+include __DIR__ . '/../layout/header.php'; 
+include __DIR__ . '/../layout/sidebar.php';
 
 ?>
 
@@ -277,5 +277,5 @@ include '../layout/sidebar.php';
   
   
 <?php 
-include '../layout/footer.php'; 
+include __DIR__ . '/../layout/footer.php'; 
 ?>

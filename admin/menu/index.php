@@ -81,7 +81,7 @@ if (!empty($params_url)) {
 $pageTitle = "Manajemen Menu";
 $currentPage = "menu";
 
-include __DIR__ . '/../layout/header.php';
+include __DIR__ . '/../layout/header.php'; 
 include __DIR__ . '/../layout/sidebar.php';
 ?>
 
@@ -577,5 +577,5 @@ include __DIR__ . '/../layout/sidebar.php';
     </script>
 
 <?php 
-include '../layout/footer.php'; 
-?>
+include __DIR__ . '/../layout/footer.php'; 
+?> 

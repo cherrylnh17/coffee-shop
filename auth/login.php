@@ -19,14 +19,13 @@ if (isset($_POST['login'])) {
     $password = $_POST['password'];
 
     try {
-        $stmt = $pdo->prepare("SELECT * FROM user WHERE username = :username AND password = :password");
+        $stmt = $pdo->prepare("SELECT * FROM user WHERE username = :username");
         $stmt->bindParam(':username', $username);
-        $stmt->bindParam(':password', $password);
         $stmt->execute();
         
         $user = $stmt->fetch();
 
-        if ($user && $user['password'] === $password) {
+        if ($user && password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['name'] = $user['name'];
             $_SESSION['role'] = $user['role'];
