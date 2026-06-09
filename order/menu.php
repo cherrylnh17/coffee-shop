@@ -241,6 +241,8 @@ include __DIR__ . '/layout/header.php';
     function appendMenuCards(items) {
         const container = document.getElementById('menu-container');
         items.forEach(item => {
+            if (document.getElementById(`card-${item.id}`)) return;
+
             const totalInCart = cart.filter(c => c.id == item.id).reduce((s, c) => s + c.qty, 0);
             const card = buildCard(item, totalInCart);
             container.appendChild(card);
@@ -321,6 +323,7 @@ include __DIR__ . '/layout/header.php';
     }
 
     function changeQty(id, d) {
+        
         const idx = cart.findIndex(i => i.id == id);
         if (idx !== -1) {
             cart[idx].qty += d;

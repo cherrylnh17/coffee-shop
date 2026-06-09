@@ -57,6 +57,7 @@ perintah dump isinya
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
 <!-- ui kasir di perbaiki ada 2 tombol , scan dan masukkan kode
@@ -65,6 +66,9 @@ dibuat menjadi kolom bisa upload atau bisa drag and drop
 scan qr dibuat menjadi auto fill bagian input kode pesanan, dan bisa enter
 =======
 ///////////////
+=======
+
+>>>>>>> 9ec1b749e3c157fafcb1a8fb6e74bb7dcf79074e
 
 bkin ajx untuk curl url untuk update status
  cron job org 
@@ -97,6 +101,7 @@ bkin ajx untuk curl url untuk update status
 
  dibagian url get di riwayat pesana dibuat hanya di tampilkan yang di filter saja, yang nggak nggak usah di tampilkan
 
+
  bagian menu terlaris di berikan tangal 
 
  warna nya di terjual di menu nggak perlu di berikan warna 
@@ -114,7 +119,10 @@ curl -s -X POST http://localhost/report/cron/order >> /var/log/cron_expire_order
  pakai enkripsi buat password, di buat hash enkripsi
 
  ditambahkan tombol scan sebelum scan qr di bagian landing page
+<<<<<<< HEAD
 >>>>>>> e3c7274ba29e3c72c7cb1a040108b6674dda32e9
+=======
+>>>>>>> 9ec1b749e3c157fafcb1a8fb6e74bb7dcf79074e
 
 /////////
  pengembangan bisa kesana
@@ -174,11 +182,14 @@ Database
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 import   || 
 
 
 <!-- /////////////////////////////////////////////////////////////////////////////////// -->
+=======
+>>>>>>> 9ec1b749e3c157fafcb1a8fb6e74bb7dcf79074e
 
 
 gratuity 
@@ -197,10 +208,42 @@ harusnya ga perlu expired
 
 
 
-<!-- /////////////////////////////////////////////////////////////////////////////////// -->
+cron ada 2 
+
+lewat 1 jam di hapus, lewat 1 menit update status
 
 
+<<<<<<< HEAD
 =======
 cron ada 2 
 lewat 1 jam di hapus, lewat 1 menit update status
 >>>>>>> e3c7274ba29e3c72c7cb1a040108b6674dda32e9
+=======
+----------------------
+Revisi Perbaikan
+-- order
+- dibagaian scan order di buat menjadi ada button buat scan, jadi tidak langsung open permision scan qr
+- bagian ringkasan di bagian cart order perlu di rapikan lagi
+
+-- kasir
+- di bagian ringkasan keranjang di rapikan, dan ui waktu penginputan harga di buat responsive dimana selesaikan pesanan di paling bawah
+- dibuat kalau scan qr invalid akan auto fokus langsung ke input
+- dibuat case sensitif, agar nantinya bisa tau mana huruf kapital mana bukan
+- mungkin untuk masalah printer bisa di buat dengan sistem iframe dulu
+
+-- admin
+- styling inputan di date tanggal di riwayat pesanan perlu di perbaiki
+- dibagian url get di bagian riwayat pesanan di buat hanya menampilkan yang difilter saja, yang nggak di filter tidak perlu di tampilkan
+- bagian menu terlalir di berikan tanggal
+- warna di bagian terjual dihilangkan saja, setiap pemberian warna harus memiliki makna
+- untuk ui di semua kategori, terjual banyak perlu di styling
+- di manajemen meja di tambahkan show meja yang akan menampilkan qr code
+- hapus semua slash index
+- password perlu di hash waktu penginputan di database
+
+--
+- mencari payment gateway yang sekiranya pendaftarannya cukup mudah
+- bisa menambahkan cashdrawer
+- penghapusan file .sh , karena cron nya langsung curl php
+
+>>>>>>> 9ec1b749e3c157fafcb1a8fb6e74bb7dcf79074e
