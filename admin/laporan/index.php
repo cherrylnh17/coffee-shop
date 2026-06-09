@@ -95,7 +95,24 @@ try {
     $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) { $orders = []; }
 
-$query_string = "&limit=$limit&filter_date=$filter_date&start_date=" . urlencode($start_date) . "&end_date=" . urlencode($end_date) . "&filter_kasir=" . urlencode($filter_kasir);
+$params = [];
+$params['filter_date'] = $filter_date;
+
+if ($limit != 10) {
+    $params['limit'] = $limit;
+}
+if ($filter_date === 'custom') {
+    if (!empty($start_date)) $params['start_date'] = $start_date;
+    if (!empty($end_date)) $params['end_date'] = $end_date;
+}
+if (!empty($filter_kasir)) {
+    $params['filter_kasir'] = $filter_kasir;
+}
+
+$query_string = "";
+if (!empty($params)) {
+    $query_string = "&" . http_build_query($params);
+}
 
 // Label filter aktif untuk info box
 $filter_labels = ['all'=>'Semua Waktu','harian'=>'Hari Ini','mingguan'=>'Minggu Ini','bulanan'=>'Bulan Ini','tahunan'=>'Tahun Ini','custom'=>'Custom'];
@@ -500,6 +517,40 @@ include '../layout/sidebar.php';
           document.getElementById('end_date').value   = '';
         }
       }
+
+      document.getElementById('filter-form').addEventListener('submit', function(e) {
+        // Ambil elemen input
+        const pageInput = document.getElementById('page-input');
+        const limitInput = document.querySelector('input[name="limit"]');
+        const filterDate = document.getElementById('filter_date_select');
+        const startDate = document.getElementById('start_date');
+        const endDate = document.getElementById('end_date');
+        const filterKasir = document.querySelector('select[name="filter_kasir"]');
+
+        // 1. Matikan 'page' jika nilainya 1 (karena PHP sudah set default 1)
+        if (pageInput && pageInput.value === '1') {
+          pageInput.disabled = true;
+        }
+
+        // 2. Matikan 'limit' jika nilainya 10 (karena PHP sudah set default 10)
+        if (limitInput && limitInput.value === '10') {
+          limitInput.disabled = true;
+        }
+
+        // 3. Matikan tanggal jika filter bukan 'custom' atau jika tanggalnya kosong
+        if (filterDate.value !== 'custom') {
+          if (startDate) startDate.disabled = true;
+          if (endDate) endDate.disabled = true;
+        } else {
+          if (startDate && startDate.value.trim() === '') startDate.disabled = true;
+          if (endDate && endDate.value.trim() === '') endDate.disabled = true;
+        }
+
+        // 4. Matikan kasir jika tidak ada yang dipilih (kosong)
+        if (filterKasir && filterKasir.value.trim() === '') {
+          filterKasir.disabled = true;
+        }
+      });
 
       function rp(val) {
         return "Rp " + parseFloat(val || 0).toLocaleString("id-ID");

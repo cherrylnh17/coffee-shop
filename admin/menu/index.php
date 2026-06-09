@@ -59,7 +59,22 @@ $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
 $menu = $stmt->fetchAll();
-$query_string = "&search=" . urlencode($search) . "&category=" . urlencode($category_filter) . "&sort=" . urlencode($sort_filter);
+$params_url = [];
+
+if (!empty($search)) {
+    $params_url['search'] = $search;
+}
+if (!empty($category_filter)) {
+    $params_url['category'] = $category_filter;
+}
+if ($sort_filter !== 'default') {
+    $params_url['sort'] = $sort_filter;
+}
+
+$query_string = "";
+if (!empty($params_url)) {
+    $query_string = "&" . http_build_query($params_url);
+}
 ?>
 
 <?php
@@ -113,8 +128,8 @@ include __DIR__ . '/../layout/sidebar.php';
                     <form method="GET" class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto" id="filter-form">
                         
                         <!-- Search Bar -->
-                        <div class="relative w-full sm:w-auto">
-                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <div class="relative w-full sm:w-auto p-2">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none">
                                 <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
                             </div>
                             <input type="text" name="search" id="search-input" value="<?php echo htmlspecialchars($search); ?>" 
@@ -123,14 +138,14 @@ include __DIR__ . '/../layout/sidebar.php';
                         </div>
 
                         <!-- Dropdown Kategori -->
-                        <select name="category" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none block w-full sm:w-40 p-2">
+                        <select name="category" onchange="cleanSubmit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none block w-full sm:w-40 p-2">
                             <option value="">Semua Kategori</option>
                             <option value="1" <?php echo ($category_filter == '1') ? 'selected' : ''; ?>>Makanan</option>
                             <option value="2" <?php echo ($category_filter == '2') ? 'selected' : ''; ?>>Minuman</option>
                         </select>
 
                         <!-- Dropdown Sort Terjual -->
-                        <select name="sort" onchange="this.form.submit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none block w-full sm:w-44 p-2">
+                        <select name="sort" onchange="cleanSubmit()" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none block w-full sm:w-40 p-2">
                             <option value="default" <?php echo ($sort_filter == 'default') ? 'selected' : ''; ?>>Urutan Default</option>
                             <option value="sold_desc" <?php echo ($sort_filter == 'sold_desc') ? 'selected' : ''; ?>>Terjual Terbanyak</option>
                             <option value="sold_asc" <?php echo ($sort_filter == 'sold_asc') ? 'selected' : ''; ?>>Terjual Tersedikit</option>
@@ -195,21 +210,7 @@ include __DIR__ . '/../layout/sidebar.php';
                             </td>
                             <td class="px-6 py-4 font-medium text-gray-700">Rp <?php echo number_format($row['price'], 0, ',', '.'); ?></td>
                             
-                            <td class="px-6 py-4">
-                                <?php
-                                $sold = (int)$row['sold'];
-                                if ($sold >= 10) {
-                                    $badge = 'bg-green-100 text-green-700';
-                                } elseif ($sold > 0) {
-                                    $badge = 'bg-yellow-100 text-yellow-700';
-                                } else {
-                                    $badge = 'bg-gray-100 text-gray-500';
-                                }
-                                ?>
-                                <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium <?= $badge ?>">
-                                    <?= $sold ?>x
-                                </span>
-                            </td>
+                            <td class="px-6 py-4 font-medium text-gray-700"> <?php echo (int)$row['sold']; ?>x </td>
 
                             <td class="px-6 py-4 text-center">
                                 <div class="flex items-center justify-center gap-2">
@@ -247,21 +248,21 @@ include __DIR__ . '/../layout/sidebar.php';
                 
                 <div class="flex space-x-1">
                     <?php if ($page > 1): ?>
-                        <a href="?page=<?php echo $page - 1; ?>&limit=<?php echo $limit; ?><?php echo $query_string; ?>" 
+                        <a href="?page=<?php echo $page - 1; ?><?php echo $query_string; ?>" 
                           class="rounded border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"><i class="fa-solid fa-chevron-left text-xs"></i></a>
                     <?php else: ?>
                         <button disabled class="rounded border border-gray-200/50 px-3 py-1.5 text-sm text-gray-600/50 cursor-not-allowed"><i class="fa-solid fa-chevron-left text-xs"></i></button>
                     <?php endif; ?>
 
                     <?php for($i = 1; $i <= $total_pages; $i++): ?>
-                        <a href="?page=<?php echo $i; ?>&limit=<?php echo $limit; ?><?php echo $query_string; ?>" 
+                        <a href="?page=<?php echo $i; ?><?php echo $query_string; ?>" 
                           class="rounded border px-3 py-1.5 text-sm transition-colors <?php echo ($i == $page) ? 'border-blue-600 bg-blue-600 text-white shadow-sm' : 'border-gray-200 text-gray-600 hover:bg-gray-50'; ?>">
                           <?php echo $i; ?>
                         </a>
                     <?php endfor; ?>
 
                     <?php if ($page < $total_pages): ?>
-                        <a href="?page=<?php echo $page + 1; ?>&limit=<?php echo $limit; ?><?php echo $query_string; ?>" 
+                        <a href="?page=<?php echo $page + 1; ?><?php echo $query_string; ?>" 
                           class="rounded border border-gray-200 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"><i class="fa-solid fa-chevron-right text-xs"></i></a>
                     <?php else: ?>
                         <button disabled class="rounded border border-gray-200/50 px-3 py-1.5 text-sm text-gray-600/50 cursor-not-allowed"><i class="fa-solid fa-chevron-right text-xs"></i></button>
@@ -489,6 +490,30 @@ include __DIR__ . '/../layout/sidebar.php';
 
 
     <script>
+    // ── Fungsi Pembersih URL sebelum Submit ──
+    function cleanSubmit() {
+        const form = document.getElementById('filter-form');
+        const searchInput = document.getElementById('search-input');
+        const categorySelect = document.querySelector('select[name="category"]');
+        const sortSelect = document.querySelector('select[name="sort"]');
+        const pageInput = document.querySelector('input[name="page"]');
+
+        if (searchInput && searchInput.value.trim() === '') searchInput.disabled = true;
+        if (categorySelect && categorySelect.value === '') categorySelect.disabled = true;
+        if (sortSelect && sortSelect.value === 'default') sortSelect.disabled = true;
+        if (pageInput && pageInput.value === '1') pageInput.disabled = true;
+
+        form.submit();
+    }
+
+    const filterForm = document.getElementById('filter-form');
+    if (filterForm) {
+        filterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            cleanSubmit();
+        });
+    }
+
     // ── Search debounce ──
     const searchInput = document.getElementById('search-input');
     let debounceTimer;
@@ -498,8 +523,8 @@ include __DIR__ . '/../layout/sidebar.php';
         searchInput.addEventListener('input', function() {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => {
-                const form = searchInput.closest('form');
-                if (form) { document.querySelector('input[name="page"]').value = 1; form.submit(); }
+                document.querySelector('input[name="page"]').value = 1;
+                cleanSubmit(); // Gunakan fungsi pembersih di sini
             }, 500);
         });
     }
