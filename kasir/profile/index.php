@@ -51,8 +51,8 @@ $nama_lengkap = !empty($user['name']) ? $user['name'] : $user['username'];
 $pageTitle = "Check Pesanan";
 $currentPage = "akun";
 
-include '../layout/header.php';
-include '../layout/sidebar.php';
+include __DIR__ . '/../layout/header.php'; 
+include __DIR__ . '/../layout/sidebar.php'; 
 ?>
 
     <div class="mt-12 ml-0 min-h-[calc(100vh-135px)] top-[74px] transition-all duration-200 ease-in-out lg:ml-[280px]">
@@ -195,6 +195,6 @@ include '../layout/sidebar.php';
     </div>
 
 <?php 
+include __DIR__ . '/../layout/footer.php'; 
 
-include '../layout/footer.php'; 
 ?>

@@ -108,8 +108,9 @@ if ($filter_date == 'custom') {
 <?php
 $pageTitle   = "Laporan Penjualan";
 $currentPage = "laporan";
-include '../layout/header.php';
-include '../layout/sidebar.php';
+
+include __DIR__ . '/../layout/header.php'; 
+include __DIR__ . '/../layout/sidebar.php';
 ?>
 
     <main class="relative min-h-screen pt-[74px] transition-all duration-300 lg:ml-[280px] pc-main">
@@ -698,4 +699,6 @@ include '../layout/sidebar.php';
       });
     </script>
 
-<?php include '../layout/footer.php'; ?>
+<?php 
+include __DIR__ . '/../layout/footer.php'; 
+?>
