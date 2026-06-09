@@ -227,17 +227,17 @@ Revisi Perbaikan
 
 -- kasir
 <!-- - di bagian ringkasan keranjang di rapikan, dan ui waktu penginputan harga di buat responsive dimana selesaikan pesanan di paling bawah -->
-- dibuat kalau scan qr invalid akan auto fokus langsung ke input
+<!-- - dibuat kalau scan qr invalid akan auto fokus langsung ke input -->
 <!-- - dibuat case sensitif, agar nantinya bisa tau mana huruf kapital mana bukan -->
 - mungkin untuk masalah printer bisa di buat dengan sistem iframe dulu
 
 -- admin
 - styling inputan di date tanggal di riwayat pesanan perlu di perbaiki
-- dibagian url get di bagian riwayat pesanan di buat hanya menampilkan yang difilter saja, yang nggak di filter tidak perlu di tampilkan
+<!-- - dibagian url get di bagian riwayat pesanan di buat hanya menampilkan yang difilter saja, yang nggak di filter tidak perlu di tampilkan -->
 - bagian menu terlalir di berikan tanggal
-- warna di bagian terjual dihilangkan saja, setiap pemberian warna harus memiliki makna
-- untuk ui di semua kategori, terjual banyak perlu di styling
-- di manajemen meja di tambahkan show meja yang akan menampilkan qr code
+<!-- - warna di bagian terjual dihilangkan saja, setiap pemberian warna harus memiliki makna -->
+<!-- - untuk ui di semua kategori, terjual banyak perlu di styling -->
+<!-- - di manajemen meja di tambahkan show meja yang akan menampilkan qr code -->
 <!-- - hapus semua slash index -->
 <!-- - password perlu di hash waktu penginputan di database -->
 
