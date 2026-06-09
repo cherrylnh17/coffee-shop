@@ -614,7 +614,7 @@ include '../layout/sidebar.php';
         document.body.classList.add("overflow-hidden");
 
         // Fetch items
-        fetch(BASE_URL_JS + "kasir/history/items?order_id=" + orderId)
+        fetch(BASE_URL_JS + "admin/laporan/items?order_id=" + orderId)
           .then(r => r.json())
           .then(items => {
             document.getElementById("det-items-loading").classList.add("hidden");

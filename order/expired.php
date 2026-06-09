@@ -15,12 +15,19 @@ if (!isset($_GET['code']) || empty($_GET['code'])) {
 }
 
 try {
-    // Hanya izinkan order yang sudah expired (status = 3)
-    $stmt = $pdo->prepare("SELECT * FROM `order` WHERE code = ? AND `status` = 3");
+    $stmt = $pdo->prepare("SELECT * FROM `order` WHERE code = ?");
     $stmt->execute([$order_code]);
     $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    $now = time(); 
+    $expired_at = strtotime($order['expired_at']);  
+
     if (empty($order)) {
+        header("Location: " . BASE_URL . "order/" . $table_code . "/index");
+        exit();
+    }
+
+    if ($now < $expired_at) {
         header("Location: " . BASE_URL . "order/" . $table_code . "/index");
         exit();
     }

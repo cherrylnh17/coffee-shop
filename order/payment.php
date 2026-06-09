@@ -19,24 +19,19 @@ try {
     $stmt = $pdo->prepare("SELECT * FROM `order` WHERE code = ?");
     $stmt->execute([$order_code]);
     $order = $stmt->fetch(PDO::FETCH_ASSOC);
+    $now = time(); 
+    $expired_at = strtotime($order['expired_at']);  
 
     if (empty($order)) {
-        // Order tidak ditemukan sama sekali → ke index
         header("Location: " . BASE_URL . "order/" . $table_code . "/index");
         exit();
     }
 
-    // Jika order sudah expired (status = 3) → redirect ke halaman expired
-    if ((int)$order['status'] === 3) {
+    if ($expired_at < $now) {
         header("Location: " . BASE_URL . "order/" . $table_code . "/expired/" . $order_code);
         exit();
     }
 
-    // Jika bukan pending (status = 2) dan bukan expired → ke index
-    if ((int)$order['status'] !== 2) {
-        header("Location: " . BASE_URL . "order/" . $table_code . "/index");
-        exit();
-    }
 
     // Ambil rincian menu yang dibeli
     $stmtItem = $pdo->prepare("SELECT * FROM order_item WHERE order_id = ?");
@@ -240,19 +235,25 @@ include __DIR__ . '/layout/header.php';
         }
     }, 3000); // 3000ms = 3 detik
 
-    // Panggil endpoint expire_order via AJAX (POST)
-    async function triggerExpireOrders() {
-        try {
-            const response = await fetch('<?= BASE_URL ?>report/cron/order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-            });
-            const data = await response.json();
-            console.log('[Expire]', data.message);
-        } catch (err) {
-            console.error('[Expire] Gagal menandai order expired:', err);
-        }
-    }
+
+
+
+
+
+    // async function triggerExpireOrders() {
+    //     try {
+    //         const response = await fetch('<?= BASE_URL ?>report/cron/update_status', {
+    //             headers: { 'Content-Type': 'application/json' },
+    //         });
+    //         const data = await response.json();
+    //         console.log('[Expire]', data.message);
+    //     } catch (err) {
+    //         console.error('[Expire] Gagal menandai order expired:', err);
+    //     }
+    // }
+
+
+
 
     function startCountdown() {
         const display = document.getElementById('display-countdown');
@@ -273,7 +274,7 @@ include __DIR__ . '/layout/header.php';
                 display.classList.add('text-red-600');
 
                 // Tandai semua order expired di server
-                await triggerExpireOrders();
+                // await triggerExpireOrders();
 
                 // Redirect ke halaman kadaluarsa
                 localStorage.removeItem('cart');
