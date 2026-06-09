@@ -56,7 +56,19 @@ perintah dump isinya
 
 
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 
+
+<!-- ui kasir di perbaiki ada 2 tombol , scan dan masukkan kode
+saat muncul nanti kotak buat masukkan qr atau drag qr
+dibuat menjadi kolom bisa upload atau bisa drag and drop
+scan qr dibuat menjadi auto fill bagian input kode pesanan, dan bisa enter
+=======
+///////////////
+=======
+
+>>>>>>> 9ec1b749e3c157fafcb1a8fb6e74bb7dcf79074e
 
 bkin ajx untuk curl url untuk update status
  cron job org 
@@ -107,6 +119,10 @@ curl -s -X POST http://localhost/report/cron/order >> /var/log/cron_expire_order
  pakai enkripsi buat password, di buat hash enkripsi
 
  ditambahkan tombol scan sebelum scan qr di bagian landing page
+<<<<<<< HEAD
+>>>>>>> e3c7274ba29e3c72c7cb1a040108b6674dda32e9
+=======
+>>>>>>> 9ec1b749e3c157fafcb1a8fb6e74bb7dcf79074e
 
 /////////
  pengembangan bisa kesana
@@ -165,6 +181,15 @@ Database
 
 
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+
+import   || 
+
+
+<!-- /////////////////////////////////////////////////////////////////////////////////// -->
+=======
+>>>>>>> 9ec1b749e3c157fafcb1a8fb6e74bb7dcf79074e
 
 
 gratuity 
@@ -188,6 +213,12 @@ cron ada 2
 lewat 1 jam di hapus, lewat 1 menit update status
 
 
+<<<<<<< HEAD
+=======
+cron ada 2 
+lewat 1 jam di hapus, lewat 1 menit update status
+>>>>>>> e3c7274ba29e3c72c7cb1a040108b6674dda32e9
+=======
 ----------------------
 Revisi Perbaikan
 -- order
@@ -215,3 +246,4 @@ Revisi Perbaikan
 - bisa menambahkan cashdrawer
 - penghapusan file .sh , karena cron nya langsung curl php
 
+>>>>>>> 9ec1b749e3c157fafcb1a8fb6e74bb7dcf79074e
