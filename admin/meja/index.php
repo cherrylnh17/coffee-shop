@@ -153,11 +153,20 @@ include __DIR__ . '/../layout/sidebar.php';
                                       data-id="<?php echo $row['id']; ?>"
                                       data-nama="<?php echo htmlspecialchars($row['name']); ?>"
                                       onclick="openEditMejaModal(this)"
-                                      class="inline-flex h-8 w-8 items-center justify-center rounded bg-blue-50 text-blue-600 transition-colors hover:bg-blue-100 hover:text-blue-900">
+                                      class="inline-flex h-8 w-8 items-center justify-center rounded bg-blue-50 text-blue-600 transition-colors hover:bg-blue-100 hover:text-blue-900"
+                                      title="Edit">
                                   <i class="fa-solid fa-pen-to-square"></i>
                               </button>
+
+                              <button type="button"
+                                      data-nama="<?php echo htmlspecialchars($row['name']); ?>"
+                                      onclick="openQrModal(this)"
+                                      class="inline-flex h-8 w-8 items-center justify-center rounded bg-purple-50 text-purple-600 transition-colors hover:bg-purple-100 hover:text-purple-900"
+                                      title="Show QR">
+                                  <i class="fa-solid fa-qrcode"></i>
+                              </button>
                               
-                              <a href="hapus?id=<?php echo $row['id']; ?>" onclick="return confirm('Yakin ingin menghapus meja ini?')" class="inline-flex h-8 w-8 items-center justify-center rounded bg-red-50 text-red-600 transition-colors hover:bg-red-100 hover:text-red-900">
+                              <a href="hapus?id=<?php echo $row['id']; ?>" onclick="return confirm('Yakin ingin menghapus meja ini?')" class="inline-flex h-8 w-8 items-center justify-center rounded bg-red-50 text-red-600 transition-colors hover:bg-red-100 hover:text-red-900" title="Hapus">
                                   <i class="fa-solid fa-trash"></i>
                               </a>
                             </div>
@@ -205,6 +214,34 @@ include __DIR__ . '/../layout/sidebar.php';
       </div>
     </main>
 
+    <!-- ====================================================
+         MODAL QR CODE MEJA
+    ===================================================== -->
+    <div id="qr-meja-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-gray-900/50 backdrop-blur-md">
+        <div class="relative w-full max-w-sm p-4">
+            <div class="relative rounded-xl border border-gray-200 bg-white shadow-xl">
+                <div class="flex items-center justify-between border-b border-gray-100 p-4 md:p-5">
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">QR Code Meja</h3>
+                        <p id="qr-meja-name" class="text-sm text-gray-500 mt-0.5"></p>
+                    </div>
+                    <button type="button" onclick="closeQrModal()" class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-200 hover:text-gray-900">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+                <div class="flex flex-col items-center p-6 gap-5">
+                    <div class="rounded-xl border border-gray-100 bg-gray-50 p-4 shadow-inner">
+                        <div id="qr-canvas-wrapper"></div>
+                    </div>
+                    <p class="text-xs text-gray-400 text-center">Scan QR code ini untuk mengidentifikasi meja</p>
+                    <button type="button" onclick="downloadQr()" class="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-purple-700 focus:outline-none focus:ring-4 focus:ring-purple-300">
+                        <i class="fa-solid fa-download"></i> Download QR
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <button id="trigger-edit-meja-modal" data-modal-target="edit-meja-modal" data-modal-toggle="edit-meja-modal" class="hidden"></button>
     <div id="edit-meja-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-gray-900/50 backdrop-blur-md">
         <div class="relative max-h-full w-full max-w-md p-4">
@@ -238,7 +275,71 @@ include __DIR__ . '/../layout/sidebar.php';
     </div>
 
 
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
     <script>
+      // ── QR Code Modal ──
+      let currentQrNama = '';
+
+      function openQrModal(button) {
+          currentQrNama = button.getAttribute('data-nama');
+          document.getElementById('qr-meja-name').textContent = currentQrNama;
+
+          // Clear previous QR
+          const wrapper = document.getElementById('qr-canvas-wrapper');
+          wrapper.innerHTML = '';
+
+          // Generate QR dengan isi = nama meja
+          new QRCode(wrapper, {
+              text: currentQrNama,
+              width: 200,
+              height: 200,
+              colorDark: '#1e1b4b',
+              colorLight: '#f9fafb',
+              correctLevel: QRCode.CorrectLevel.H
+          });
+
+          document.getElementById('qr-meja-modal').classList.replace('hidden', 'flex');
+      }
+
+      function closeQrModal() {
+          document.getElementById('qr-meja-modal').classList.replace('flex', 'hidden');
+      }
+
+      function downloadQr() {
+          const wrapper = document.getElementById('qr-canvas-wrapper');
+          const canvas  = wrapper.querySelector('canvas');
+          const img     = wrapper.querySelector('img');
+          const safeName = currentQrNama.replace(/\s+/g, '-').toLowerCase();
+
+          if (canvas) {
+              const link = document.createElement('a');
+              link.download = 'qr-' + safeName + '.png';
+              link.href = canvas.toDataURL('image/png');
+              link.click();
+          } else if (img) {
+              const c = document.createElement('canvas');
+              c.width = 200; c.height = 200;
+              const ctx = c.getContext('2d');
+              const tempImg = new Image();
+              tempImg.crossOrigin = 'anonymous';
+              tempImg.onload = function () {
+                  ctx.drawImage(tempImg, 0, 0);
+                  const link = document.createElement('a');
+                  link.download = 'qr-' + safeName + '.png';
+                  link.href = c.toDataURL('image/png');
+                  link.click();
+              };
+              tempImg.src = img.src;
+          }
+      }
+
+      // Tutup modal QR saat klik backdrop
+      document.getElementById('qr-meja-modal').addEventListener('click', function(e) {
+          if (e.target === this) closeQrModal();
+      });
+
       function openEditMejaModal(button) {
         const id = button.getAttribute('data-id');
         const nama = button.getAttribute('data-nama');

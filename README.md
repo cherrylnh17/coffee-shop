@@ -223,12 +223,12 @@ lewat 1 jam di hapus, lewat 1 menit update status
 Revisi Perbaikan
 -- order
 - dibagaian scan order di buat menjadi ada button buat scan, jadi tidak langsung open permision scan qr
-- bagian ringkasan di bagian cart order perlu di rapikan lagi
+<!-- - bagian ringkasan di bagian cart order perlu di rapikan lagi -->
 
 -- kasir
-- di bagian ringkasan keranjang di rapikan, dan ui waktu penginputan harga di buat responsive dimana selesaikan pesanan di paling bawah
+<!-- - di bagian ringkasan keranjang di rapikan, dan ui waktu penginputan harga di buat responsive dimana selesaikan pesanan di paling bawah -->
 - dibuat kalau scan qr invalid akan auto fokus langsung ke input
-- dibuat case sensitif, agar nantinya bisa tau mana huruf kapital mana bukan
+<!-- - dibuat case sensitif, agar nantinya bisa tau mana huruf kapital mana bukan -->
 - mungkin untuk masalah printer bisa di buat dengan sistem iframe dulu
 
 -- admin
@@ -238,12 +238,12 @@ Revisi Perbaikan
 - warna di bagian terjual dihilangkan saja, setiap pemberian warna harus memiliki makna
 - untuk ui di semua kategori, terjual banyak perlu di styling
 - di manajemen meja di tambahkan show meja yang akan menampilkan qr code
-- hapus semua slash index
-- password perlu di hash waktu penginputan di database
+<!-- - hapus semua slash index -->
+<!-- - password perlu di hash waktu penginputan di database -->
 
 --
 - mencari payment gateway yang sekiranya pendaftarannya cukup mudah
 - bisa menambahkan cashdrawer
-- penghapusan file .sh , karena cron nya langsung curl php
+<!-- - penghapusan file .sh , karena cron nya langsung curl php -->
 
 >>>>>>> 9ec1b749e3c157fafcb1a8fb6e74bb7dcf79074e
