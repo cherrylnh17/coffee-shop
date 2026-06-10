@@ -145,7 +145,14 @@ include 'layout/sidebar.php';
                     icon: 'warning',
                     title: 'Gagal',
                     text: data,
-                    confirmButtonColor: '#3b82f6'
+                    confirmButtonColor: '#3b82f6',
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didClose: () => {
+                        orderCodeInput.value = '';
+                        orderCodeInput.focus();
+                    }
+
                 });
             }
         });
