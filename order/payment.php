@@ -304,7 +304,7 @@ include __DIR__ . '/layout/header.php';
             // Jika waktu sudah habis atau lewat
             if (distance <= 0) {
                 clearInterval(timer);
-                clearInterval(checkInterval); // hentikan juga polling cek_status
+                clearInterval(checkInterval); 
 
                 display.innerHTML = "Kadaluarsa";
                 display.classList.remove('text-blue-600');
