@@ -143,6 +143,8 @@ function initQRScanner() {
       aspectRatio: 1.0,
     };
 
+    statusEl.innerHTML = "Menginisialisasi kamera...";
+
     scanner.start(
       { facingMode: "environment" },
       config,
@@ -179,7 +181,16 @@ function initQRScanner() {
             showQRInvalidError("Terjadi kesalahan jaringan.");
           });
       }
-    );
+    ).catch(function(err){
+      console.error("Camera start eror:", err);
+      var msg = "Tidak Bisa Mengakses kamera.";
+      if (err &&(err.name === "NotAllowedError" || /permission/i.test(String(err)))) {
+        msg = "Izin Kamera Ditolak. Mohon izinkan akses kamera lalu klik tombol di bawah.";
+      } else if(err && err.name === "NotFoundError") {
+        msg = "Kamera Tidak Ditemukan di Perangkat Ini.";
+      }
+      showQRInvalidError(msg);
+    });
   }
 
   // Fungsi tambahan untuk menampilkan error dan tombol Coba Lagi
