@@ -3,9 +3,10 @@ session_start();
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../path.php';
 
+// Autentikasi tetap dicek di setiap halaman
 if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
-  header("Location: " . BASE_URL . "auth/login");
-  exit;
+    header("Location: " . BASE_URL . "auth/login");
+    exit;
 }
 
 $limit         = 10;
@@ -24,117 +25,126 @@ $is_export = isset($_GET['export']) && $_GET['export'] === 'excel';
 $where_conditions = [];
 $bind_params      = [];
 
-if ($filter_status === 'success') { 
-  $where_conditions[] = "o.status = 1";
+if ($filter_status === 'success') {
+    $where_conditions[] = "o.status = 1";
 } elseif ($filter_status === 'pending') {
-  $where_conditions[] = "o.status = 2";
+    $where_conditions[] = "o.status = 2";
 } elseif ($filter_status === 'expired') {
-  $where_conditions[] = "o.status = 3";
+    $where_conditions[] = "o.status = 3";
 }
 
 // Filter tanggal
 if (!empty($start_date) && !empty($end_date)) {
-  $sd = date('Y-m-d', strtotime($start_date));
-  $ed = date('Y-m-d', strtotime($end_date));
-  $where_conditions[] = "DATE(o.created_at) BETWEEN :sd AND :ed";
-  $bind_params[':sd']  = $sd;
-  $bind_params[':ed']  = $ed;
+    $sd = date('Y-m-d', strtotime($start_date));
+    $ed = date('Y-m-d', strtotime($end_date));
+    $where_conditions[] = "DATE(o.created_at) BETWEEN :sd AND :ed";
+    $bind_params[':sd']  = $sd;
+    $bind_params[':ed']  = $ed;
 }
 
 // Filter pencarian kode pesanan
 if (!empty($search_code)) {
-  $where_conditions[] = "o.code LIKE :search_code";
-  $bind_params[':search_code'] = '%' . $search_code . '%';
+    $where_conditions[] = "o.code LIKE :search_code";
+    $bind_params[':search_code'] = '%' . $search_code . '%';
 }
 
 $where_sql = $where_conditions ? "WHERE " . implode(" AND ", $where_conditions) : "";
-
-// ORDER BY dipatenkan ke yang paling baru
 $order_sql = "ORDER BY o.created_at DESC";
-
-// Query langsung ke tabel order
 $from_sql  = "FROM `order` o";
 
 // ── EXPORT EXCEL ──────────────────────────────────────────────────────────────
 if ($is_export) {
-  try {
-    $exp_stmt = $pdo->prepare("SELECT o.code, o.customer_name, o.table_name, o.qty, o.subtotal, o.tax, o.total, o.payment, o.status, o.created_at $from_sql $where_sql $order_sql");
-    foreach ($bind_params as $k => $v) $exp_stmt->bindValue($k, $v);
-    $exp_stmt->execute();
-    $exp_rows = $exp_stmt->fetchAll(PDO::FETCH_ASSOC);
+    try {
+        $exp_stmt = $pdo->prepare("SELECT o.code, o.customer_name, o.table_name, o.qty, o.subtotal, o.tax, o.total, o.payment, o.status, o.created_at $from_sql $where_sql $order_sql");
+        foreach ($bind_params as $k => $v) $exp_stmt->bindValue($k, $v);
+        $exp_stmt->execute();
+        $exp_rows = $exp_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $status_map  = [1 => 'Sukses', 2 => 'Pending', 3 => 'Expired'];
-    $payment_map = [1 => 'Kasir', 2 => 'Online'];
+        $status_map  = [1 => 'Sukses', 2 => 'Pending', 3 => 'Expired'];
+        $payment_map = [1 => 'Kasir', 2 => 'Online'];
 
-    $filename = 'Riwayat_Pesanan_' . date('Ymd_His') . '.csv';
-    header('Content-Type: text/csv; charset=UTF-8');
-    header('Content-Disposition: attachment; filename="' . $filename . '"');
-    header('Pragma: no-cache');
+        $filename = 'Riwayat_Pesanan_' . date('Ymd_His') . '.csv';
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Pragma: no-cache');
 
-    $out = fopen('php://output', 'w');
-    // BOM untuk Excel agar UTF-8 terbaca dengan benar
-    fputs($out, "\xEF\xBB\xBF");
-    fputcsv($out, ['Kode Pesanan', 'Nama Pelanggan', 'No Meja', 'Jumlah Item', 'Subtotal', 'Pajak & Biaya', 'Total Tagihan', 'Metode Bayar', 'Status', 'Waktu Dibuat']);
-    foreach ($exp_rows as $r) {
-      fputcsv($out, [
-        $r['code'],
-        $r['customer_name'],
-        $r['table_name'],
-        $r['qty'],
-        $r['subtotal'],
-        $r['tax'],
-        $r['total'],
-        $payment_map[(int)$r['payment']] ?? $r['payment'],
-        $status_map[(int)$r['status']]   ?? $r['status'],
-        $r['created_at'],
-      ]);
+        $out = fopen('php://output', 'w');
+        fputs($out, "\xEF\xBB\xBF");
+        fputcsv($out, ['Kode Pesanan', 'Nama Pelanggan', 'No Meja', 'Jumlah Item', 'Subtotal', 'Pajak & Biaya', 'Total Tagihan', 'Metode Bayar', 'Status', 'Waktu Dibuat']);
+        foreach ($exp_rows as $r) {
+            fputcsv($out, [
+                $r['code'],
+                $r['customer_name'],
+                $r['table_name'],
+                $r['qty'],
+                $r['subtotal'],
+                $r['tax'],
+                $r['total'],
+                $payment_map[(int)$r['payment']] ?? $r['payment'],
+                $status_map[(int)$r['status']]   ?? $r['status'],
+                $r['created_at'],
+            ]);
+        }
+        fclose($out);
+        exit;
+    } catch (PDOException $e) {
+        http_response_code(500);
+        exit('Export gagal.');
     }
-    fclose($out);
-    exit;
-  } catch (PDOException $e) {
-    http_response_code(500);
-    exit('Export gagal.');
-  }
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
 try {
-  $count_stmt = $pdo->prepare("SELECT COUNT(*) $from_sql $where_sql");
-  foreach ($bind_params as $k => $v) $count_stmt->bindValue($k, $v);
-  $count_stmt->execute();
-  $total_records = $count_stmt->fetchColumn();
-  $total_pages   = $total_records ? ceil($total_records / $limit) : 0;
-  if ($page > $total_pages && $total_pages > 0) $page = $total_pages;
+    $count_stmt = $pdo->prepare("SELECT COUNT(*) $from_sql $where_sql");
+    foreach ($bind_params as $k => $v) $count_stmt->bindValue($k, $v);
+    $count_stmt->execute();
+    $total_records = $count_stmt->fetchColumn();
+    $total_pages   = $total_records ? ceil($total_records / $limit) : 0;
+    if ($page > $total_pages && $total_pages > 0) $page = $total_pages;
 
-  $offset = ($page - 1) * $limit;
+    $offset = ($page - 1) * $limit;
 
-  $query = "SELECT o.* $from_sql $where_sql $order_sql LIMIT :limit OFFSET :offset";
+    $query = "SELECT o.* $from_sql $where_sql $order_sql LIMIT :limit OFFSET :offset";
 
-  $stmt = $pdo->prepare($query);
-  foreach ($bind_params as $k => $v) $stmt->bindValue($k, $v);
-  $stmt->bindValue(':limit',  $limit,  PDO::PARAM_INT);
-  $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-  $stmt->execute();
-  $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt = $pdo->prepare($query);
+    foreach ($bind_params as $k => $v) $stmt->bindValue($k, $v);
+    $stmt->bindValue(':limit',  $limit,  PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
+    $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-  $orders        = [];
-  $total_records = 0;
-  $total_pages   = 0;
-  $offset        = 0;
+    $orders        = [];
+    $total_records = 0;
+    $total_pages   = 0;
+    $offset        = 0;
 }
 
 // Untuk mempertahankan query saat berpindah halaman
 $query_string = "&status=$filter_status&start_date=$start_date&end_date=$end_date&search_code=" . urlencode($search_code);
 ?>
+<!doctype html>
+<html lang="id" dir="ltr">
+<head>
+    <title>Riwayat Pesanan | Träffa Coffee</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-<?php
-$pageTitle   = "History Pesanan";
-$currentPage = "riwayat";
-include __DIR__ . '/../layout/header.php'; 
-include __DIR__ . '/../layout/sidebar.php'; 
-?>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="icon" href="<?= BASE_URL ?>assets/image/icon.png" type="image/x-icon" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-<main class="relative min-h-screen pt-[74px] transition-all duration-300 lg:ml-[280px] pc-main">
+    <style>
+        /* Halaman di dalam iframe: tidak ada pt-[74px] / ml-[280px]
+           karena header & sidebar sudah ada di shell (kasir/index.php) */
+        body { background: #f9fafb; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+<main class="relative min-h-screen">
   <div class="p-4 sm:p-6 lg:p-8">
 
     <div class="mb-6">
@@ -144,12 +154,13 @@ include __DIR__ . '/../layout/sidebar.php';
           <p class="text-sm text-gray-500">Pantau status dan kelola pesanan pelanggan hari ini.</p>
         </div>
         <ul class="flex items-center gap-2 text-sm text-gray-500">
-          <li><a href="../index.php" class="hover:text-blue-600 transition-colors"><i class="fa-solid fa-house"></i></a></li>
+          <li><i class="fa-solid fa-file-invoice-dollar text-gray-400"></i></li>
           <li><i class="fa-solid fa-chevron-right text-[10px]"></i></li>
           <li class="text-gray-800 font-medium">Riwayat</li>
         </ul>
       </div>
     </div>
+
     <div class="gap-x-6">
       <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100">
 
@@ -164,47 +175,47 @@ include __DIR__ . '/../layout/sidebar.php';
           </div>
 
           <div class="flex flex-wrap items-center gap-3">
-             <form method="GET" id="search-form" class="relative w-full sm:w-auto flex gap-2">
-                 <?php /* Pertahankan filter aktif saat search */ ?>
-                 <input type="hidden" name="status"     value="<?php echo htmlspecialchars($filter_status); ?>">
-                 <input type="hidden" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>">
-                 <input type="hidden" name="end_date"   value="<?php echo htmlspecialchars($end_date); ?>">
-                 <input type="hidden" name="page"       value="1">
-                 <div class="relative flex-1 sm:flex-none">
-                     <input type="text" name="search_code"
-                            value="<?php echo htmlspecialchars($search_code); ?>"
-                            placeholder="Cari kode pesanan..."
-                            class="w-full sm:w-64 bg-white border border-gray-300 text-gray-700 py-2.5 pl-10 pr-10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                     <i class="fa-solid fa-search absolute left-3.5 top-3 text-gray-400 pointer-events-none"></i>
-                     <?php if (!empty($search_code)): ?>
-                     <a href="?status=<?php echo urlencode($filter_status); ?>&start_date=<?php echo urlencode($start_date); ?>&end_date=<?php echo urlencode($end_date); ?>"
-                        class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 transition-colors"
-                        title="Hapus pencarian">
-                       <i class="fa-solid fa-xmark"></i>
-                     </a>
-                     <?php endif; ?>
-                 </div>
-                 <button type="submit" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 whitespace-nowrap">
-                     <i class="fa-solid fa-magnifying-glass"></i> Cari
-                 </button>
-             </form>
-             <!-- <a href="?export=excel<?php echo '&status=' . urlencode($filter_status) . '&start_date=' . urlencode($start_date) . '&end_date=' . urlencode($end_date) . '&search_code=' . urlencode($search_code); ?>"
-                class="w-full sm:w-auto px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white border border-green-600 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-colors"
-                title="Export data sesuai filter aktif ke Excel/CSV">
-                 <i class="fa-solid fa-file-excel"></i> Export Excel
-             </a> -->
+            <form method="GET" id="search-form" class="relative w-full sm:w-auto flex gap-2">
+                <?php /* Pertahankan filter aktif saat search */ ?>
+                <input type="hidden" name="status"     value="<?php echo htmlspecialchars($filter_status); ?>">
+                <input type="hidden" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>">
+                <input type="hidden" name="end_date"   value="<?php echo htmlspecialchars($end_date); ?>">
+                <input type="hidden" name="page"       value="1">
+                <div class="relative flex-1 sm:flex-none">
+                    <input type="text" name="search_code"
+                           value="<?php echo htmlspecialchars($search_code); ?>"
+                           placeholder="Cari kode pesanan..."
+                           class="w-full sm:w-64 bg-white border border-gray-300 text-gray-700 py-2.5 pl-10 pr-10 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                    <i class="fa-solid fa-search absolute left-3.5 top-3 text-gray-400 pointer-events-none"></i>
+                    <?php if (!empty($search_code)): ?>
+                    <a href="?status=<?php echo urlencode($filter_status); ?>&start_date=<?php echo urlencode($start_date); ?>&end_date=<?php echo urlencode($end_date); ?>"
+                       class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 transition-colors"
+                       title="Hapus pencarian">
+                      <i class="fa-solid fa-xmark"></i>
+                    </a>
+                    <?php endif; ?>
+                </div>
+                <button type="submit" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 whitespace-nowrap">
+                    <i class="fa-solid fa-magnifying-glass"></i> Cari
+                </button>
+            </form>
+            <!-- <a href="?export=excel<?php echo '&status=' . urlencode($filter_status) . '&start_date=' . urlencode($start_date) . '&end_date=' . urlencode($end_date) . '&search_code=' . urlencode($search_code); ?>"
+               class="w-full sm:w-auto px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white border border-green-600 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-colors"
+               title="Export data sesuai filter aktif ke Excel/CSV">
+                <i class="fa-solid fa-file-excel"></i> Export Excel
+            </a> -->
           </div>
         </div>
 
         <form method="GET" id="filter-form" class="flex flex-col sm:flex-row flex-wrap gap-3 mb-6 bg-gray-50/50 p-4 rounded-xl border border-gray-100 items-end">
             <input type="hidden" name="page" id="page-input" value="1">
             <input type="hidden" name="search_code" value="<?php echo htmlspecialchars($search_code); ?>">
-            
+
             <div class="w-full sm:w-auto flex-1 sm:flex-none">
                 <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Status</label>
                 <div class="relative">
                     <select name="status" class="appearance-none w-full sm:w-44 bg-white border border-gray-300 text-gray-700 py-2.5 pl-4 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all cursor-pointer">
-                        <option value="all" <?php echo $filter_status == 'all'     ? 'selected' : ''; ?>>Semua Status</option>
+                        <option value="all"     <?php echo $filter_status == 'all'     ? 'selected' : ''; ?>>Semua Status</option>
                         <option value="success" <?php echo $filter_status == 'success' ? 'selected' : ''; ?>>Sukses</option>
                         <option value="pending" <?php echo $filter_status == 'pending' ? 'selected' : ''; ?>>Pending</option>
                         <option value="expired" <?php echo $filter_status == 'expired' ? 'selected' : ''; ?>>Expired</option>
@@ -217,13 +228,13 @@ include __DIR__ . '/../layout/sidebar.php';
 
             <div class="w-full sm:w-auto flex-1 sm:flex-none">
                 <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Dari Tanggal</label>
-                <input type="date" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>" 
+                <input type="date" name="start_date" value="<?php echo htmlspecialchars($start_date); ?>"
                        class="w-full sm:w-40 bg-white border border-gray-300 text-gray-700 py-2.5 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
             </div>
 
             <div class="w-full sm:w-auto flex-1 sm:flex-none">
                 <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Sampai Tanggal</label>
-                <input type="date" name="end_date" value="<?php echo htmlspecialchars($end_date); ?>" 
+                <input type="date" name="end_date" value="<?php echo htmlspecialchars($end_date); ?>"
                        class="w-full sm:w-40 bg-white border border-gray-300 text-gray-700 py-2.5 px-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
             </div>
 
@@ -232,10 +243,10 @@ include __DIR__ . '/../layout/sidebar.php';
                     <i class="fa-solid fa-filter"></i> Terapkan
                 </button>
             </div>
-            
-            <?php if(!empty($start_date) || $filter_status !== 'all' || !empty($search_code)): ?>
+
+            <?php if (!empty($start_date) || $filter_status !== 'all' || !empty($search_code)): ?>
             <div class="w-full sm:w-auto flex-1 sm:flex-none mt-2 sm:mt-0">
-                <a href="order" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-2.5 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
+                <a href="?" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-2.5 px-4 rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
                     <i class="fa-solid fa-rotate-right"></i> Reset
                 </a>
             </div>
@@ -277,11 +288,11 @@ include __DIR__ . '/../layout/sidebar.php';
                 <?php foreach ($orders as $index => $o):
                   $raw_status = (int)$o['status'];
                   if ($raw_status === 1) {
-                    $statusBadge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border bg-green-50 text-green-600 border-green-200"><i class="fa-solid fa-check-double"></i> Sukses</span>';
+                      $statusBadge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border bg-green-50 text-green-600 border-green-200"><i class="fa-solid fa-check-double"></i> Sukses</span>';
                   } elseif ($raw_status === 2) {
-                    $statusBadge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border bg-yellow-50 text-yellow-600 border-yellow-200"><i class="fa-solid fa-hourglass-half"></i> Pending</span>';
+                      $statusBadge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border bg-yellow-50 text-yellow-600 border-yellow-200"><i class="fa-solid fa-hourglass-half"></i> Pending</span>';
                   } else {
-                    $statusBadge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border bg-red-50 text-red-600 border-red-200"><i class="fa-solid fa-xmark"></i> Expired</span>';
+                      $statusBadge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border bg-red-50 text-red-600 border-red-200"><i class="fa-solid fa-xmark"></i> Expired</span>';
                   }
                 ?>
                   <tr class="hover:bg-blue-50/50 transition-colors group">
@@ -292,7 +303,7 @@ include __DIR__ . '/../layout/sidebar.php';
                       </div>
                     </td>
                     <td class="px-5 py-4">
-                        <button type="button" onclick="openDetail(<?php echo $index; ?>, <?php echo (int)$o['id']; ?>)" 
+                        <button type="button" onclick="openDetail(<?php echo $index; ?>, <?php echo (int)$o['id']; ?>)"
                                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white border border-transparent shadow-sm">
                             <i class="fa-solid fa-receipt"></i> <?php echo htmlspecialchars($o['code']); ?>
                         </button>
@@ -360,9 +371,12 @@ include __DIR__ . '/../layout/sidebar.php';
     </div>
   </div>
 </main>
+
+<!-- ═══════════════════════════════════════════
+     MODAL DETAIL TRANSAKSI
+═══════════════════════════════════════════ -->
 <div id="detail-modal" class="fixed inset-0 z-[1050] hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm overflow-y-auto p-4">
   <div class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
-
 
     <div class="flex-shrink-0 flex items-center justify-between border-b border-gray-100 px-5 py-4">
       <div class="flex items-center gap-2.5">
@@ -377,7 +391,6 @@ include __DIR__ . '/../layout/sidebar.php';
     </div>
 
     <div class="overflow-y-auto p-5 space-y-4">
-
 
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
         <div class="bg-gray-50 rounded-xl border border-gray-100 px-3 py-2.5">
@@ -397,7 +410,6 @@ include __DIR__ . '/../layout/sidebar.php';
           <span id="det-customer" class="text-sm font-bold text-gray-900 block">-</span>
         </div>
       </div>
-
 
       <div class="flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl border border-gray-100">
         <div class="flex items-center gap-2.5 flex-1">
@@ -420,7 +432,6 @@ include __DIR__ . '/../layout/sidebar.php';
           </div>
         </div>
       </div>
-
 
       <div>
         <p class="text-[11px] text-gray-400 uppercase tracking-wider font-semibold mb-2 flex items-center gap-1.5">
@@ -446,22 +457,15 @@ include __DIR__ . '/../layout/sidebar.php';
         </div>
       </div>
 
-
       <div class="border border-gray-200 rounded-xl overflow-hidden">
-
         <div class="flex justify-between items-center px-4 py-3 bg-white">
           <span class="text-sm text-gray-500">Subtotal</span>
           <span id="det-subtotal" class="text-sm font-semibold text-gray-800">Rp 0</span>
         </div>
 
-
-        <div id="det-fees-wrap">
-
-        </div>
-
+        <div id="det-fees-wrap"></div>
 
         <div class="border-t border-dashed border-gray-200 mx-4"></div>
-
 
         <div class="flex justify-between items-center px-4 py-3.5 bg-blue-50">
           <div class="flex items-center gap-2">
@@ -473,7 +477,6 @@ include __DIR__ . '/../layout/sidebar.php';
       </div>
 
     </div>
-
 
     <div class="flex-shrink-0 px-5 py-4 border-t border-gray-100 bg-gray-50 rounded-b-2xl flex justify-end gap-3">
       <button type="button" onclick="closeDetailModal()" class="px-5 py-2.5 bg-white border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-100 text-sm font-semibold transition-colors">
@@ -490,6 +493,10 @@ include __DIR__ . '/../layout/sidebar.php';
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
 <script>
   const pageOrders  = <?php echo json_encode($orders); ?>;
   const BASE_URL_JS = "<?php echo BASE_URL; ?>";
@@ -510,22 +517,22 @@ include __DIR__ . '/../layout/sidebar.php';
     document.getElementById("det-subtotal").innerText = rp(o.subtotal);
     document.getElementById("det-total").innerText    = rp(o.total);
 
-    // Status badge (inline, bukan HTML tag)
+    // Status badge
     const statusEl   = document.getElementById("det-status");
     const statusIcon = document.getElementById("det-status-icon");
     if (s === 1) {
-      statusEl.innerText = "Sukses";
-      statusEl.className = "text-sm font-bold text-green-600";
+      statusEl.innerText   = "Sukses";
+      statusEl.className   = "text-sm font-bold text-green-600";
       statusIcon.className = "w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0";
       statusIcon.innerHTML = '<i class="fa-solid fa-check text-green-600 text-xs"></i>';
     } else if (s === 2) {
-      statusEl.innerText = "Pending";
-      statusEl.className = "text-sm font-bold text-yellow-600";
+      statusEl.innerText   = "Pending";
+      statusEl.className   = "text-sm font-bold text-yellow-600";
       statusIcon.className = "w-7 h-7 rounded-lg bg-yellow-100 flex items-center justify-center flex-shrink-0";
       statusIcon.innerHTML = '<i class="fa-solid fa-hourglass-half text-yellow-500 text-xs"></i>';
     } else {
-      statusEl.innerText = "Expired";
-      statusEl.className = "text-sm font-bold text-red-500";
+      statusEl.innerText   = "Expired";
+      statusEl.className   = "text-sm font-bold text-red-500";
       statusIcon.className = "w-7 h-7 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0";
       statusIcon.innerHTML = '<i class="fa-solid fa-xmark text-red-500 text-xs"></i>';
     }
@@ -538,11 +545,11 @@ include __DIR__ . '/../layout/sidebar.php';
     const btnPrint = document.getElementById("btn-print");
     document.getElementById("print-order-id").value = orderId;
     if (s === 1) {
-      btnPrint.disabled = false;
-      btnPrint.className = "px-5 py-2.5 bg-gray-900 hover:bg-black text-white rounded-xl text-sm font-semibold transition-colors flex items-center gap-2";
+      btnPrint.disabled   = false;
+      btnPrint.className  = "px-5 py-2.5 bg-gray-900 hover:bg-black text-white rounded-xl text-sm font-semibold transition-colors flex items-center gap-2";
     } else {
-      btnPrint.disabled = true;
-      btnPrint.className = "px-5 py-2.5 bg-gray-200 text-gray-400 cursor-not-allowed rounded-xl text-sm font-semibold flex items-center gap-2";
+      btnPrint.disabled   = true;
+      btnPrint.className  = "px-5 py-2.5 bg-gray-200 text-gray-400 cursor-not-allowed rounded-xl text-sm font-semibold flex items-center gap-2";
     }
 
     // Reset fee wrap
@@ -648,20 +655,41 @@ include __DIR__ . '/../layout/sidebar.php';
   });
 </script>
 
-<?php if (isset($_SESSION['print_payload'])): ?>
-    <script>
-        // Sambung ke BroadcastChannel
-        const saluranKirim = new BroadcastChannel('printer_channel');
-        
-        // Ambil data struk dari PHP, ubah kembali dari Base64 ke teks normal
-        const dataStruk = atob("<?= $_SESSION['print_payload'] ?>");
-        
-        // Kirim (Broadcast) ke Tab Printer Server!
-        saluranKirim.postMessage(dataStruk);
-    </script>
-    <?php unset($_SESSION['print_payload']); // Hapus session agar tidak ke-print dobel saat direfresh ?>
+<?php if (isset($_SESSION['swal_msg'])): ?>
+<script>
+    Swal.fire({
+        icon:  '<?= $_SESSION['swal_msg']['icon'] ?>',
+        title: '<?= $_SESSION['swal_msg']['title'] ?>',
+        text:  '<?= $_SESSION['swal_msg']['text'] ?>',
+    });
+</script>
+<?php unset($_SESSION['swal_msg']); ?>
 <?php endif; ?>
 
-<?php 
-include __DIR__ . '/../layout/footer.php'; 
-?>
+<?php if (isset($_SESSION['print_payload'])): ?>
+<script>
+    /**
+     * Kirim perintah cetak ke shell (kasir/index.php) via window.parent.
+     * Shell yang memegang koneksi Bluetooth, bukan halaman ini.
+     */
+    (async () => {
+        try {
+            const dataStruk = atob("<?= $_SESSION['print_payload'] ?>");
+
+            if (window.parent && typeof window.parent.printStruk === 'function') {
+                // Cara utama: panggil langsung fungsi di shell
+                await window.parent.printStruk(dataStruk);
+            } else {
+                // Fallback: BroadcastChannel (jika dibuka di tab terpisah)
+                new BroadcastChannel('printer_channel').postMessage(dataStruk);
+            }
+        } catch (e) {
+            console.error('Gagal mengirim data cetak:', e);
+        }
+    })();
+</script>
+<?php unset($_SESSION['print_payload']); ?>
+<?php endif; ?>
+
+</body>
+</html>
