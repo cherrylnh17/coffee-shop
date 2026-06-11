@@ -26,7 +26,7 @@ include __DIR__ . '/../layout/header.php';
             </p>
         </div>
 
-        <form id="orderForm" action="proses_input.php" method="POST" class="flex flex-col gap-4">
+        <form id="orderForm" action="<?= BASE_URL ?>kasir/dashboard/proses_input" method="POST" class="flex flex-col gap-4">
             <div class="relative w-full">
                 <input type="text" name="code" id="order_code"
                     placeholder="Contoh: ORD-12345678" required
@@ -109,14 +109,14 @@ include __DIR__ . '/../layout/header.php';
 
     orderForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        fetch('proses_input.php', {
+        fetch('<?= BASE_URL ?>kasir/dashboard/proses_input', {
             method: 'POST',
             body: new URLSearchParams(new FormData(this))
         })
         .then(r => r.text())
         .then(data => {
             if (data.includes("SUCCESS:")) {
-                window.location.href = data.split(":")[1];
+                window.location.href = '<?= BASE_URL ?>' + data.split("SUCCESS:")[1];
             } else {
                 Swal.fire({
                     icon: 'warning', title: 'Gagal', text: data,

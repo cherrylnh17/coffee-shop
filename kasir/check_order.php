@@ -11,7 +11,7 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
 $order_code = isset($_GET['code']) ? $_GET['code'] : '';
 
 if (empty($order_code)) {
-    echo "<script>alert('Kode Pesanan Tidak Ditemukan'); window.location.href='index';</script>";
+    echo "<script>alert('Kode Pesanan Tidak Ditemukan'); window.location.href='" . BASE_URL . "kasir/dashboard';</script>";
     exit;
 }
 
@@ -21,7 +21,7 @@ try {
     $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$order) {
-        echo "<script>alert('Pesanan tidak ditemukan'); window.location.href='index';</script>";
+        echo "<script>alert('Pesanan tidak ditemukan'); window.location.href='" . BASE_URL . "kasir/dashboard';</script>";
         exit;
     }
 
@@ -52,7 +52,6 @@ $payment_status = ($order['status'] == 1) ? 'Lunas' : 'Belum Bayar';
 $pageTitle = "Check Pesanan";
 
 include __DIR__ . '/../layout/header.php';
-// TIDAK ada include sidebar.php — sidebar ada di shell (index.php)
 ?>
 
 <main class="min-h-screen p-4 sm:p-6 lg:p-8">
@@ -60,7 +59,7 @@ include __DIR__ . '/../layout/header.php';
 
         <!-- Breadcrumb / back -->
         <div class="flex items-center gap-3 mb-6">
-            <a href="index"
+            <a href="<?= BASE_URL ?>kasir/dashboard"
                class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 hover:bg-blue-50 hover:text-blue-600 text-gray-500 transition-colors">
                 <i class="fa-solid fa-arrow-left text-sm"></i>
             </a>
@@ -189,9 +188,10 @@ include __DIR__ . '/../layout/header.php';
                     <i class="fa-solid fa-cash-register"></i> Pesanan telah diselesaikan
                 </button>
                 <?php else: ?>
-                <form action="print_order" method="POST" class="w-full" id="checkout-form">
-                    <input type="hidden" name="order_id" value="<?= $order['id'] ?>">
-                    <input type="hidden" name="total"    value="<?= $order['total'] ?>">
+                <form action="<?= BASE_URL ?>kasir/dashboard/print_order" method="POST" class="w-full" id="checkout-form">
+                    <input type="hidden" name="order_id"   value="<?= $order['id'] ?>">
+                    <input type="hidden" name="order_code" value="<?= htmlspecialchars($order['code']) ?>">
+                    <input type="hidden" name="total"      value="<?= $order['total'] ?>">
                     <button name="aksi" type="submit" id="btn-selesai" disabled value="selesai"
                         class="w-full bg-gray-400 cursor-not-allowed text-white font-bold py-4 rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2">
                         <i class="fa-solid fa-check-double"></i> Selesaikan Pesanan
@@ -206,11 +206,11 @@ include __DIR__ . '/../layout/header.php';
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const paidInput    = document.getElementById('paid-input');
+    const paidInput     = document.getElementById('paid-input');
     const changeDisplay = document.getElementById('change-display');
-    const changeInput  = document.getElementById('change-input');
-    const btnSelesai   = document.getElementById('btn-selesai');
-    const totalAmount  = <?= (int)$order['total'] ?>;
+    const changeInput   = document.getElementById('change-input');
+    const btnSelesai    = document.getElementById('btn-selesai');
+    const totalAmount   = <?= (int)$order['total'] ?>;
 
     if (!paidInput) return;
 
@@ -225,9 +225,8 @@ document.addEventListener('DOMContentLoaded', function () {
             changeDisplay.className   = 'text-xl font-black text-red-500';
             changeInput.value = 0;
             btnSelesai.disabled = true;
-            btnSelesai.className = btnSelesai.className
-                .replace('bg-blue-600 hover:bg-blue-700', '')
-                + ' bg-gray-400 cursor-not-allowed';
+            btnSelesai.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            btnSelesai.classList.add('bg-gray-400', 'cursor-not-allowed');
         } else {
             changeDisplay.textContent = 'Rp ' + change.toLocaleString('id-ID');
             changeDisplay.className   = 'text-xl font-black text-green-600';

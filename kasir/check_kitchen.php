@@ -11,7 +11,7 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
 $order_code = isset($_GET['code']) ? $_GET['code'] : '';
 
 if (empty($order_code)) {
-    header("Location: index");
+    header("Location: " . BASE_URL . "kasir/dashboard");
     exit;
 }
 
@@ -21,7 +21,7 @@ try {
     $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$order) {
-        echo "<script>alert('Pesanan tidak ditemukan'); window.location.href='index';</script>";
+        echo "<script>alert('Pesanan tidak ditemukan'); window.location.href='" . BASE_URL . "kasir/dashboard';</script>";
         exit;
     }
 
@@ -35,7 +35,6 @@ try {
 
 $pageTitle = "Print Dapur";
 include __DIR__ . '/../layout/header.php';
-// TIDAK ada include sidebar.php
 ?>
 
 <main class="min-h-screen p-4 sm:p-6 lg:p-8">
@@ -43,7 +42,7 @@ include __DIR__ . '/../layout/header.php';
 
         <!-- Back + title -->
         <div class="flex items-center gap-3 mb-6">
-            <a href="check_order?code=<?= htmlspecialchars($order_code) ?>"
+            <a href="<?= BASE_URL ?>kasir/dashboard/check_order?code=<?= htmlspecialchars($order_code) ?>"
                class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 hover:bg-blue-50 hover:text-blue-600 text-gray-500 transition-colors">
                 <i class="fa-solid fa-arrow-left text-sm"></i>
             </a>
@@ -149,7 +148,7 @@ include __DIR__ . '/../layout/header.php';
                 <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 space-y-3">
                     <h3 class="text-sm font-bold text-gray-700 mb-1">Aksi</h3>
 
-                    <form action="print_kitchen" method="POST" id="print-form">
+                    <form action="<?= BASE_URL ?>kasir/dashboard/print_kitchen" method="POST" id="print-form">
                         <input type="hidden" name="order_id"   value="<?= $order['id'] ?>">
                         <input type="hidden" name="order_code" value="<?= htmlspecialchars($order_code) ?>">
                         <button type="submit" id="btn-print"
@@ -163,7 +162,7 @@ include __DIR__ . '/../layout/header.php';
                         </button>
                     </form>
 
-                    <a href="history"
+                    <a href="<?= BASE_URL ?>kasir/history"
                        class="w-full flex items-center justify-center gap-2 border border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-500 hover:text-gray-700 font-semibold text-sm py-3.5 rounded-xl transition-all">
                         <i class="fa-solid fa-file-invoice-dollar"></i> Cek Riwayat Pesanan
                     </a>

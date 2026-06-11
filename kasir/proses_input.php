@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else if ($row['status'] == 1) {
             echo "Pesanan ini sudah dibayar/selesai!";
         } else {
-            echo "SUCCESS:check_order?code=" . $row['code'];
+            echo "SUCCESS:kasir/dashboard/check_order?code=" . $row['code'];
         }
     } else {
         echo "Kode pesanan tidak boleh kosong!";

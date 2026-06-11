@@ -9,7 +9,7 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: index");
+    header("Location: " . BASE_URL . "kasir/dashboard");
     exit;
 }
 
@@ -76,8 +76,8 @@ function buildEscPos($order, $order_items, $order_fees) {
 
     $data .= str_repeat('-', 32) . $LF;
 
-    $uang_bayar = $order['paid']    ?? $order['total'];
-    $kembalian  = $order['change']  ?? 0;
+    $uang_bayar = $order['paid']   ?? $order['total'];
+    $kembalian  = $order['change'] ?? 0;
     $metode     = ($order['payment'] == 1) ? 'Kasir' : 'Online';
 
     $data .= justify("Subtotal :", "Rp " . fmt($order['subtotal'])) . $LF;
@@ -104,7 +104,7 @@ function buildEscPos($order, $order_items, $order_fees) {
     $data .= $LF . "Terima kasih atas kunjungannya!" . $LF;
     $data .= "Layanan Kritik & Saran:" . $LF;
     $data .= "Telp: 0811-1111-1111" . $LF;
-    $data .= $LF . $LF . $LF. $CUT;
+    $data .= $LF . $LF . $LF . $CUT;
 
     return $data;
 }
@@ -131,7 +131,6 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'selesai') {
         $stmt = $pdo->prepare("UPDATE `order` SET `paid`=?, `change`=?, `status`=1, `payment`=1, `user_id`=?, `user_name`=? WHERE id=?");
         $stmt->execute([$paid, $change, $user_id, $user_name, $order_id]);
 
-        // Ambil data lengkap untuk struk
         $stmtCode = $pdo->prepare("SELECT code FROM `order` WHERE id = ?");
         $stmtCode->execute([$order_id]);
         $orderCode = $stmtCode->fetchColumn();
@@ -191,7 +190,6 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'selesai') {
             }
         }
 
-        // Simpan payload struk ke session — footer.php di halaman tujuan yang akan mengirimnya
         $_SESSION['print_payload'] = base64_encode(buildEscPos($orderData, $orderItems, $orderFees));
 
         $_SESSION['swal_msg'] = [
@@ -200,8 +198,7 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'selesai') {
             'text'  => 'Pesanan diselesaikan & struk sedang dikirim ke printer...'
         ];
 
-        // Redirect ke check_kitchen — ini berjalan di dalam iframe, tidak reload shell
-        header("Location: check_kitchen?code=" . urlencode($orderCode));
+        header("Location: " . BASE_URL . "kasir/dashboard/check_kitchen?code=" . urlencode($orderCode));
         exit;
 
     } catch (PDOException $e) {
@@ -210,7 +207,7 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'selesai') {
             'title' => 'Gagal!',
             'text'  => 'Gagal menyimpan ke database! Error: ' . $e->getMessage()
         ];
-        header("Location: check_order?code=" . urlencode($_POST['order_code'] ?? ''));
+        header("Location: " . BASE_URL . "kasir/dashboard/check_order?code=" . urlencode($_POST['order_code'] ?? ''));
         exit;
     }
 
@@ -233,6 +230,6 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'selesai') {
         ];
     }
 
-    header("Location: index");
+    header("Location: " . BASE_URL . "kasir/dashboard");
     exit;
 }

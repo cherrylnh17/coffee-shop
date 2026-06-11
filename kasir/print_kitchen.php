@@ -9,7 +9,7 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: index");
+    header("Location: " . BASE_URL . "kasir/dashboard");
     exit;
 }
 
@@ -81,7 +81,7 @@ $order_id   = $_POST['order_id']   ?? null;
 $order_code = $_POST['order_code'] ?? '';
 
 if (!$order_id) {
-    header("Location: index");
+    header("Location: " . BASE_URL . "kasir/dashboard");
     exit;
 }
 
@@ -108,7 +108,6 @@ try {
     $stmtItems->execute([$order_id]);
     $orderItems = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
 
-    // Simpan payload ke session — footer.php akan mengirimnya ke window.parent.printStruk()
     $_SESSION['print_payload'] = base64_encode(buildKitchenTicket($orderData, $orderItems));
 
     $_SESSION['print_msg'] = [
@@ -124,6 +123,5 @@ try {
     ];
 }
 
-// Redirect ke check_kitchen — footer.php di halaman itu yang akan trigger cetak
-header("Location: check_kitchen?code=" . urlencode($order_code));
+header("Location: " . BASE_URL . "kasir/dashboard/check_kitchen?code=" . urlencode($order_code));
 exit;
