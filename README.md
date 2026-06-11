@@ -222,14 +222,14 @@ lewat 1 jam di hapus, lewat 1 menit update status
 ----------------------
 Revisi Perbaikan
 -- order
-- dibagaian scan order di buat menjadi ada button buat scan, jadi tidak langsung open permision scan qr
+<!-- - dibagaian scan order di buat menjadi ada button buat scan, jadi tidak langsung open permision scan qr -->
 <!-- - bagian ringkasan di bagian cart order perlu di rapikan lagi -->
 
 -- kasir
 <!-- - di bagian ringkasan keranjang di rapikan, dan ui waktu penginputan harga di buat responsive dimana selesaikan pesanan di paling bawah -->
 <!-- - dibuat kalau scan qr invalid akan auto fokus langsung ke input -->
 <!-- - dibuat case sensitif, agar nantinya bisa tau mana huruf kapital mana bukan -->
-- mungkin untuk masalah printer bisa di buat dengan sistem iframe dulu
+<!-- - mungkin untuk masalah printer bisa di buat dengan sistem iframe dulu -->
 
 -- admin
 - styling inputan di date tanggal di riwayat pesanan perlu di perbaiki

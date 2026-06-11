@@ -109,7 +109,7 @@ include __DIR__ . '/../layout/header.php';
 
     orderForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        fetch('proses_input.php', {
+        fetch('dashboard/proses_input.php', {
             method: 'POST',
             body: new URLSearchParams(new FormData(this))
         })
