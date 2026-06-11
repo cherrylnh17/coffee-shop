@@ -161,5 +161,5 @@ $_SESSION['swal_msg'] = [
     'text'  => 'Pesanan berhasil disimpan. Mengirim ke printer...'
 ];
 
-header("Location: success");
+header("Location: index");
 exit;
