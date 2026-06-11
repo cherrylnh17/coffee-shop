@@ -103,9 +103,8 @@ function buildEscPos($order, $order_items, $order_fees) {
     $data .= $ALIGN_C;
     $data .= $LF . "Terima kasih atas kunjungannya!" . $LF;
     $data .= "Layanan Kritik & Saran:" . $LF;
-    $data .= "Telp: 0856-4195-4719" . $LF;
-    $data .= $LF . $LF . $LF;
-    $data .= $CUT;
+    $data .= "Telp: 0811-1111-1111" . $LF;
+    $data .= $LF . $LF . $LF. $CUT;
 
     return $data;
 }

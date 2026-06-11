@@ -46,9 +46,11 @@ function buildEscPos($order, $order_items, $order_fees = []) {
 
     $data .= $ALIGN_L;
     $data .= str_repeat('-', 32) . $LF;
-    $data .= justify("No :",      $order['code']) . $LF;
-    $data .= justify("Tgl :",     date('d-m-Y H:i', strtotime($order['created_at']))) . $LF;
-    $data .= justify("Kasir :",   $order['user_name'] ?? '-') . $LF;
+    $data .= justify("No :", $order['code']) . $LF;
+    $data .= justify("Tgl :", date('d-m-Y H:i', strtotime($order['created_at']))) . $LF;
+    $data .= justify("Kasir :", $order['user_name'] ?? '-') . $LF;
+    $data .= justify("Meja :", $order['table_name']) . $LF;
+    $data .= justify("Pembeli :", $order['customer_name']) . $LF;
     $data .= str_repeat('-', 32) . $LF;
 
     foreach ($order_items as $item) {
@@ -59,6 +61,10 @@ function buildEscPos($order, $order_items, $order_fees = []) {
 
         $data .= $nama . $LF;
         $data .= justify($left, $right) . $LF;
+
+        if(!empty($item['notes'])) {
+            $data .= " *" . mb_substr($item['notes'], 0, 28) . $LF;
+        }
     }
 
     $uang_bayar = $order['paid'] ?? $order['total'];
@@ -83,6 +89,8 @@ function buildEscPos($order, $order_items, $order_fees = []) {
     $data .= str_repeat('-', 32) . $LF;
     $data .= $ALIGN_C . $LF;
     $data .= "Terima kasih atas kunjungannya!" . $LF;
+    $data .= "Layanan Kritik & Saran:" . $LF;
+    $data .= "Telp: 0811-1111-1111" . $LF;
     $data .= $LF . $LF . $LF . $CUT;
 
     return $data;
