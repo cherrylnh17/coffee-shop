@@ -251,6 +251,23 @@ $defaultPage = BASE_URL . "kasir/dashboard";
 // ─────────────────────────────────────────────
 const mainFrame = document.getElementById('main-frame');
 
+/**
+ * Guard session: deteksi jika iframe diarahkan ke halaman login
+ * (terjadi saat session PHP habis di tengah sesi).
+ * Jika terdeteksi, redirect full page ke login agar tidak
+ * tampil di dalam iframe.
+ */
+mainFrame.addEventListener('load', () => {
+    try {
+        const iframeUrl = mainFrame.contentWindow.location.href;
+        if (iframeUrl.includes('/auth/login') || iframeUrl.includes('/login')) {
+            window.location.href = iframeUrl;
+        }
+    } catch (e) {
+        // Cross-origin error diabaikan (tidak relevan di sini)
+    }
+});
+
 function navigateTo(url) {
     mainFrame.src = url;
     setActiveNav(url);
