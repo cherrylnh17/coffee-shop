@@ -160,7 +160,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $pdo->commit();
-        header("Location: " . BASE_URL . "order/" . $table_code . "/payment/" . $order_code);
+
+        if ((int)$payment_type === 2) {
+            header("Location: " . BASE_URL . "order/" . $table_code . "/payment_online?code=" . $order_code);
+        } else {
+            header("Location: " . BASE_URL . "order/" . $table_code . "/payment/" . $order_code);
+        }
         exit();
     } catch (Exception $e) {
         $pdo->rollBack();

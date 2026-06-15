@@ -20,9 +20,6 @@ try {
 } catch (PDOException $e) {
     die("Error pada query: " . $e->getMessage());
 }
-
-
-
 ?>
 
 <?php
@@ -63,32 +60,23 @@ include __DIR__ . '/layout/header.php';
                 </div>
 
                 <!-- Metode Pembayaran -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mt-4">
                     <h2 class="font-bold text-gray-900 mb-1 flex items-center gap-2">
                         <span class="w-7 h-7 bg-blue-100 rounded-lg flex items-center justify-center text-sm">💳</span>
                         Metode Pembayaran
                     </h2>
                     <p class="text-sm text-gray-400 mb-4">Pilih salah satu metode pembayaran</p>
                     <div class="grid grid-cols-2 gap-3">
-                        <!-- Online — Coming Soon -->
-                        <label class="relative cursor-not-allowed opacity-50">
-                            <input type="radio" name="payment" value="online" class="peer hidden" disabled />
-                            <div class="w-full p-4 text-center border-2 border-gray-200 rounded-2xl bg-gray-100 transition-all duration-200">
-                                <i class="ph ph-device-mobile text-2xl text-gray-400 mb-1 block"></i>
-                                <span class="font-bold text-gray-400 text-sm">Online</span>
-                            </div>
-                            <div class="absolute -top-2 left-1/2 -translate-x-1/2 bg-gray-600 text-white text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider whitespace-nowrap">
-                                Coming Soon
-                            </div>
-                        </label>
-                        <!-- Bayar di Kasir -->
+
+                        <!-- Online (Tripay) -->
                         <label class="relative cursor-pointer">
-                            <input type="radio" name="payment" value="1" class="peer hidden" checked />
+                            <input type="radio" name="payment" value="2" class="peer hidden" />
                             <div class="w-full p-4 text-center border-2 border-gray-100 rounded-2xl bg-gray-50 transition-all duration-200
                                 peer-checked:border-blue-400 peer-checked:bg-blue-50 peer-checked:ring-4 peer-checked:ring-blue-100
                                 hover:border-blue-200">
-                                <i class="ph ph-cash-register text-2xl text-blue-500 mb-1 block"></i>
-                                <span class="font-bold text-gray-700 text-sm peer-checked:text-blue-700">Bayar di Kasir</span>
+                                <i class="ph ph-device-mobile text-2xl text-blue-500 mb-1 block"></i>
+                                <span class="font-bold text-gray-700 text-sm">Online</span>
+                                <p class="text-[10px] text-gray-400 mt-0.5">QRIS · OVO · DANA · ShopeePay</p>
                             </div>
                             <div class="absolute top-2 right-2 opacity-0 peer-checked:opacity-100 transition-opacity">
                                 <div class="bg-blue-400 rounded-full p-0.5">
@@ -98,6 +86,36 @@ include __DIR__ . '/layout/header.php';
                                 </div>
                             </div>
                         </label>
+
+                        <!-- Bayar di Kasir -->
+                        <label class="relative cursor-pointer">
+                            <input type="radio" name="payment" value="1" class="peer hidden" checked />
+                            <div class="w-full p-4 text-center border-2 border-gray-100 rounded-2xl bg-gray-50 transition-all duration-200
+                                peer-checked:border-blue-400 peer-checked:bg-blue-50 peer-checked:ring-4 peer-checked:ring-blue-100
+                                hover:border-blue-200">
+                                <i class="ph ph-cash-register text-2xl text-blue-500 mb-1 block"></i>
+                                <span class="font-bold text-gray-700 text-sm">Bayar di Kasir</span>
+                            </div>
+                            <div class="absolute top-2 right-2 opacity-0 peer-checked:opacity-100 transition-opacity">
+                                <div class="bg-blue-400 rounded-full p-0.5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Info kontekstual berdasarkan pilihan payment -->
+                    <div id="info-kasir" class="mt-3 bg-blue-50 border border-blue-100 rounded-xl p-3 flex items-center gap-2">
+                        <i class="ph ph-info text-blue-500 text-lg flex-shrink-0"></i>
+                        <p class="text-xs text-blue-700 font-medium">Tunjukkan QR Code kepada kasir untuk menyelesaikan pembayaran.</p>
+                    </div>
+                    <div id="info-online" class="mt-3 bg-green-50 border border-green-100 rounded-xl p-3 items-center gap-2 hidden">
+                        <div class="flex items-center gap-2">
+                            <i class="ph ph-shield-check text-green-500 text-lg flex-shrink-0"></i>
+                            <p class="text-xs text-green-700 font-medium">Bayar aman via Tripay. Pilih metode (QRIS, OVO, DANA, ShopeePay) di halaman berikutnya.</p>
+                        </div>
                     </div>
                 </div>
 
@@ -117,27 +135,23 @@ include __DIR__ . '/layout/header.php';
                     </div>
                 </div>
 
-                <!-- Info kasir -->
-                <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex items-center gap-3">
-                    <i class="ph ph-info text-blue-500 text-xl flex-shrink-0"></i>
-                    <p class="text-sm text-blue-700 font-medium">Lanjutkan ke Checkout dan tunjukkan QR Code kepada kasir untuk menyelesaikan pembayaran.</p>
-                </div>
-
             </div>
+        </div>
     </form>
 
     <div class="fixed bottom-0 w-full max-w-[480px] left-1/2 -translate-x-1/2 p-4 bg-white border-t border-gray-200 z-30">
         <button id="btnCheckout" onclick="submitPesanan()" disabled
             class="w-full bg-gray-300 text-gray-400 cursor-not-allowed rounded-xl py-3.5 font-bold text-base shadow-lg transition-all duration-200 flex items-center justify-center gap-2">
-            <span>Lanjut ke Checkout</span>
+            <span id="btnLabel">Lanjut ke Checkout</span>
             <i class="ph-bold ph-caret-right"></i>
         </button>
     </div>
 
 </main>
+
 <script>
-    const MENU_DATA = <?php echo json_encode($result); ?>;
-    const gratuitys = <?php echo json_encode($gratuitys); ?>;
+    const MENU_DATA  = <?php echo json_encode($result); ?>;
+    const gratuitys  = <?php echo json_encode($gratuitys); ?>;
 
     function calculateFees(subtotal) {
         let totalFee = 0;
@@ -152,13 +166,8 @@ include __DIR__ . '/layout/header.php';
         return { totalFee, feeLines };
     }
 
-    function getCart() {
-        return JSON.parse(localStorage.getItem('cart')) || [];
-    }
-
-    function saveCart(cart) {
-        localStorage.setItem('cart', JSON.stringify(cart));
-    }
+    function getCart()      { return JSON.parse(localStorage.getItem('cart')) || []; }
+    function saveCart(cart) { localStorage.setItem('cart', JSON.stringify(cart)); }
 
     function formatRupiah(angka) {
         return 'Rp ' + parseInt(angka).toLocaleString('id-ID');
@@ -168,7 +177,7 @@ include __DIR__ . '/layout/header.php';
         const cart = getCart();
 
         if (!cart.length) {
-            window.location.href = 'index?code<?= $table_code ?>';
+            window.location.href = 'index?code=<?= $table_code ?>';
             return;
         }
 
@@ -197,13 +206,12 @@ include __DIR__ . '/layout/header.php';
                         </div>` : ''}
                     </div>
                     <span class="font-bold text-sm text-gray-900 flex-shrink-0 pt-0.5">${formatRupiah(sub)}</span>
-                </div>
-            `;
+                </div>`;
             listEl.appendChild(row);
         });
+
         const { totalFee, feeLines } = calculateFees(total);
 
-        // Render baris fee satu per satu
         const feeLinesEl = document.getElementById('fee-lines');
         feeLinesEl.innerHTML = '';
         feeLines.forEach(f => {
@@ -221,43 +229,85 @@ include __DIR__ . '/layout/header.php';
         // Pre-fill dari localStorage jika ada
         const saved = JSON.parse(localStorage.getItem('buyer_data'));
         if (saved) {
-            document.getElementById('name').value = saved.name || '';
+            document.getElementById('name').value  = saved.name  || '';
             document.getElementById('email').value = saved.email || '';
             if (saved.payment) {
                 const radio = document.querySelector(`input[name="payment"][value="${saved.payment}"]`);
                 if (radio) radio.checked = true;
+                updatePaymentUI(saved.payment);
             }
         }
+
+        toggleCheckoutButton();
     });
 
-    // Contoh cara memasukkan data cart ke form sebelum submit
-    function submitPesanan() {
-        const form = document.getElementById('formPesanan');
-        // Buat input hidden secara dinamis untuk cart
-        if (!form.reportValidity()) {
-            return; // Berhenti di sini jika input tidak valid
+    // Toggle info kasir/online saat radio berubah
+    document.querySelectorAll('input[name="payment"]').forEach(radio => {
+        radio.addEventListener('change', () => updatePaymentUI(radio.value));
+    });
+
+    function updatePaymentUI(val) {
+        const infoKasir  = document.getElementById('info-kasir');
+        const infoOnline = document.getElementById('info-online');
+        const btnLabel   = document.getElementById('btnLabel');
+
+        if (val == '2') {
+            infoKasir.classList.add('hidden');
+            infoOnline.classList.remove('hidden');
+            infoOnline.classList.add('flex');
+            btnLabel.textContent = 'Pilih Metode Pembayaran';
+        } else {
+            infoOnline.classList.add('hidden');
+            infoOnline.classList.remove('flex');
+            infoKasir.classList.remove('hidden');
+            btnLabel.textContent = 'Lanjut ke Checkout';
         }
-        const cart = getCart();
-
-        const hiddenInput = document.createElement('input');
-        hiddenInput.type = 'hidden';
-        hiddenInput.name = 'cart_data';
-        hiddenInput.value = JSON.stringify(cart);
-
-        form.appendChild(hiddenInput);
-
-        const buyerData = {
-            name: document.getElementById('name').value,
-            email: document.getElementById('email').value,
-        };
-
-        localStorage.setItem('buyer_data', JSON.stringify(buyerData));
-
-        form.submit();
     }
 
-    // Toggle button checkout berdasarkan isian nama
-    const nameInput = document.getElementById('name');
+    function submitPesanan() {
+        const form = document.getElementById('formPesanan');
+        if (!form.reportValidity()) return;
+
+        const cart        = getCart();
+        const paymentVal  = document.querySelector('input[name="payment"]:checked').value;
+
+        const buyerData = {
+            name:    document.getElementById('name').value,
+            email:   document.getElementById('email').value,
+            payment: paymentVal,
+        };
+        localStorage.setItem('buyer_data', JSON.stringify(buyerData));
+
+        if (paymentVal == '2') {
+            // ── Pembayaran Online → kirim order dulu, lalu redirect ke pilih channel
+            const hiddenCart = document.createElement('input');
+            hiddenCart.type  = 'hidden';
+            hiddenCart.name  = 'cart_data';
+            hiddenCart.value = JSON.stringify(cart);
+            form.appendChild(hiddenCart);
+
+            // Override action supaya order_proses tahu ini online, nanti redirect ke payment_online
+            const hiddenRedirect = document.createElement('input');
+            hiddenRedirect.type  = 'hidden';
+            hiddenRedirect.name  = 'redirect_to';
+            hiddenRedirect.value = 'payment_online';
+            form.appendChild(hiddenRedirect);
+
+            form.submit();
+        } else {
+            // ── Bayar di Kasir → flow lama
+            const hiddenCart = document.createElement('input');
+            hiddenCart.type  = 'hidden';
+            hiddenCart.name  = 'cart_data';
+            hiddenCart.value = JSON.stringify(cart);
+            form.appendChild(hiddenCart);
+
+            form.submit();
+        }
+    }
+
+    // Toggle tombol checkout berdasarkan isian nama
+    const nameInput   = document.getElementById('name');
     const btnCheckout = document.getElementById('btnCheckout');
 
     function toggleCheckoutButton() {
@@ -273,22 +323,20 @@ include __DIR__ . '/layout/header.php';
     }
 
     nameInput.addEventListener('input', toggleCheckoutButton);
-    // Jalankan sekali saat load (jika ada pre-fill dari localStorage)
     toggleCheckoutButton();
 
-    const urlParams = new URLSearchParams(window.location.search);
+    // Error message dari URL
+    const urlParams    = new URLSearchParams(window.location.search);
     const errorMessage = urlParams.get('m');
-
     if (errorMessage) {
         Swal.fire({
             title: "Waduh!",
-            text: errorMessage,
-            icon: "error",
-            confirmButtonText: "Oke",
+            text:  errorMessage,
+            icon:  "error",
+            confirmButtonText:  "Oke",
             confirmButtonColor: "#3b82f6",
         });
-
-        window.history.replaceState({}, document.title, window.location.pathname + "?code=" + urlParams.get('code'));
+        window.history.replaceState({}, document.title, window.location.pathname + "?table=" + urlParams.get('table'));
     }
 </script>
 

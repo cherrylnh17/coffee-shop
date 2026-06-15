@@ -188,9 +188,6 @@ import   ||
 
 
 <!-- /////////////////////////////////////////////////////////////////////////////////// -->
-=======
->>>>>>> 9ec1b749e3c157fafcb1a8fb6e74bb7dcf79074e
-
 
 gratuity 
 tabel fee diganti gratuity
@@ -213,12 +210,8 @@ cron ada 2
 lewat 1 jam di hapus, lewat 1 menit update status
 
 
-<<<<<<< HEAD
-=======
 cron ada 2 
 lewat 1 jam di hapus, lewat 1 menit update status
->>>>>>> e3c7274ba29e3c72c7cb1a040108b6674dda32e9
-=======
 ----------------------
 Revisi Perbaikan
 -- order
@@ -246,4 +239,3 @@ Revisi Perbaikan
 - bisa menambahkan cashdrawer
 <!-- - penghapusan file .sh , karena cron nya langsung curl php -->
 
->>>>>>> 9ec1b749e3c157fafcb1a8fb6e74bb7dcf79074e

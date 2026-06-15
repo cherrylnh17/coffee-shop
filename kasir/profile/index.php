@@ -23,17 +23,18 @@ try {
         $new_password     = $_POST['new_password'];
         $confirm_password = $_POST['confirm_password'];
 
-        if ($old_password !== $user['password']) {
-            $error = "Kata sandi lama yang Anda masukkan salah!";
+        if (!password_verify($old_password, $user['password'])) {
+            $error = "Kata sandi lama yang Anda masukkan salah!"; 
         } elseif ($new_password !== $confirm_password) {
             $error = "Konfirmasi kata sandi baru tidak cocok!";
         } elseif (strlen($new_password) < 8) {
             $error = "Kata sandi baru harus memiliki minimal 8 karakter!";
         } else {
+            $hash_password = password_hash($new_password, PASSWORD_DEFAULT);
             $update_stmt = $pdo->prepare("UPDATE user SET password = ?, updated_at = NOW() WHERE id = ?");
-            if ($update_stmt->execute([$new_password, $user['id']])) {
+            if ($update_stmt->execute([$hash_password, $user['id']])) {
                 $success = "Kata sandi berhasil diubah!";
-                $user['password'] = $new_password;
+                $user['password'] = $hash_password;
             } else {
                 $error = "Gagal mengubah kata sandi di database.";
             }
