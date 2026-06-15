@@ -101,7 +101,7 @@ function buildEscPos($order, $order_items, $order_fees = []) {
 // ============================================================
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: " . BASE_URL . "kasir/history");
+    header("Location: " . BASE_URL . "kasir/history/index");
     exit;
 }
 
@@ -118,7 +118,7 @@ $orderData = $stmtOrder->fetch(PDO::FETCH_ASSOC);
 
 if (!$orderData) {
     $_SESSION['swal_msg'] = ['icon' => 'error', 'title' => 'Gagal', 'text' => 'Data tidak ditemukan.'];
-    header("Location: " . BASE_URL . "kasir/history");
+    header("Location: " . BASE_URL . "kasir/history/index");
     exit;
 }
 
@@ -155,11 +155,11 @@ $escpos = buildEscPos($orderData, $orderItems, $orderFees);
 $_SESSION['print_payload'] = base64_encode($escpos);
 
 // 3. Beri notifikasi sukses dan kembali ke halaman order
-$_SESSION['swal_msg'] = [
+$_SESSION['swal_msg'] = [ 
     'icon'  => 'success',
     'title' => 'Disimpan!',
     'text'  => 'Pesanan berhasil disimpan. Mengirim ke printer...'
 ];
-
-header("Location: " . BASE_URL . "kasir/history");
+ 
+header("Location: " . BASE_URL . "kasir/history/index");
 exit;

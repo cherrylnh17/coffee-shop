@@ -482,7 +482,7 @@ $query_string = "&status=$filter_status&start_date=$start_date&end_date=$end_dat
       <button type="button" onclick="closeDetailModal()" class="px-5 py-2.5 bg-white border border-gray-300 text-gray-600 rounded-xl hover:bg-gray-100 text-sm font-semibold transition-colors">
         Tutup
       </button>
-      <form action="<?= BASE_URL ?>kasir/items/struk" method="POST" id="print-form">
+      <form action="<?= BASE_URL ?>kasir/history/struk" method="POST" id="print-form">
         <input type="hidden" name="order_id" id="print-order-id" value="">
         <button type="submit" id="btn-print" class="px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors flex items-center gap-2">
           <i class="fa-solid fa-print"></i> Cetak Struk

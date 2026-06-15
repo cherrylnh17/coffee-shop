@@ -4,6 +4,8 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 1) {
     header("Location: " . BASE_URL . "auth/login");
     exit;
 }
+
+
 ?>
 <!doctype html>
 <html lang="id" dir="ltr">
