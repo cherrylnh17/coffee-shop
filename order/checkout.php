@@ -74,7 +74,6 @@ include __DIR__ . '/layout/header.php';
                             <div class="w-full p-4 text-center border-2 border-gray-200 rounded-2xl bg-gray-100 opacity-60 select-none">
                                 <i class="ph ph-device-mobile text-2xl text-gray-400 mb-1 block"></i>
                                 <span class="font-bold text-gray-400 text-sm">Online</span>
-                                <p class="text-[10px] text-gray-400 mt-0.5">QRIS · OVO · DANA · ShopeePay</p>
                             </div>
                             <!-- Badge Coming Soon -->
                             <div class="absolute top-2 right-2">
