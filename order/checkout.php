@@ -69,20 +69,23 @@ include __DIR__ . '/layout/header.php';
                     <div class="grid grid-cols-2 gap-3">
 
                         <!-- Online (Tripay) -->
-                        <label class="relative cursor-pointer">
-                            <input type="radio" name="payment" value="2" class="peer hidden" />
-                            <div class="w-full p-4 text-center border-2 border-gray-100 rounded-2xl bg-gray-50 transition-all duration-200
-                                peer-checked:border-blue-400 peer-checked:bg-blue-50 peer-checked:ring-4 peer-checked:ring-blue-100
-                                hover:border-blue-200">
-                                <i class="ph ph-device-mobile text-2xl text-blue-500 mb-1 block"></i>
-                                <span class="font-bold text-gray-700 text-sm">Online</span>
+                        <label class="relative cursor-not-allowed">
+                            <input type="radio" name="payment" value="2" class="peer hidden" disabled />
+                            <div class="w-full p-4 text-center border-2 border-gray-200 rounded-2xl bg-gray-100 opacity-60 select-none">
+                                <i class="ph ph-device-mobile text-2xl text-gray-400 mb-1 block"></i>
+                                <span class="font-bold text-gray-400 text-sm">Online</span>
                                 <p class="text-[10px] text-gray-400 mt-0.5">QRIS · OVO · DANA · ShopeePay</p>
                             </div>
-                            <div class="absolute top-2 right-2 opacity-0 peer-checked:opacity-100 transition-opacity">
-                                <div class="bg-blue-400 rounded-full p-0.5">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                    </svg>
+                            <!-- Badge Coming Soon -->
+                            <div class="absolute top-2 right-2">
+                                <span class="bg-amber-400 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wide leading-none">
+                                    Soon
+                                </span>
+                            </div>
+                            <!-- Lock icon -->
+                            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                                <div class="bg-white/80 backdrop-blur-sm rounded-full p-1.5 shadow">
+                                    <i class="ph-bold ph-lock text-gray-400 text-sm block"></i>
                                 </div>
                             </div>
                         </label>
