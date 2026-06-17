@@ -383,10 +383,10 @@ function btSetDisconnected() {
 
 // Kirim data ke printer dengan chunking 400-byte
 async function sendDataToPrinter(uint8) {
-    const CHUNK = 400;
+    const CHUNK = 50;
     for (let i = 0; i < uint8.length; i += CHUNK) {
         await writeCharacteristic.writeValue(uint8.slice(i, i + CHUNK));
-        await new Promise(r => setTimeout(r, 50));
+        await new Promise(r => setTimeout(r, 40));
     }
 }
 
