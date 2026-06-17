@@ -569,7 +569,7 @@ $query_string = "&status=$filter_status&start_date=$start_date&end_date=$end_dat
     document.body.classList.add("overflow-hidden");
 
     // Fetch items
-    fetch(BASE_URL_JS + "kasir/history/items?order_id=" + orderId)
+    fetch(BASE_URL_JS + "kasir/history/items?order_id=" + orderId) 
       .then(r => r.json())
       .then(items => {
         document.getElementById("det-items-loading").classList.add("hidden");

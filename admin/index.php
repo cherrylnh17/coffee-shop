@@ -224,6 +224,7 @@ include __DIR__ . '/layout/sidebar.php';
   const PER_PAGE = 5;
   const initialMenus = <?= json_encode($dashboard['menus'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
   const initialTransactions = <?= json_encode($dashboard['latest_transactions'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
+  const BASE_URL_JS = "<?php echo BASE_URL; ?>";
   let allMenuData = [];
   let currentPage = 1;
 
@@ -364,7 +365,7 @@ include __DIR__ . '/layout/sidebar.php';
 
   function fetchDashboard(query) {
     setLoading(true);
-    return fetch(`menu_filter.php?${query}`)
+    return fetch(BASE_URL_JS + `admin/menu_filter.php?${query}`)
       .then(r => {
         if (!r.ok) throw new Error('HTTP ' + r.status);
         return r.json();
