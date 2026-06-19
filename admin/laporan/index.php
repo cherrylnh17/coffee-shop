@@ -227,7 +227,6 @@ include __DIR__ . '/../layout/sidebar.php';
               <table class="w-full text-sm text-left whitespace-nowrap">
                 <thead class="bg-gray-50 text-gray-600 font-semibold border-b border-gray-200 uppercase text-[11px] tracking-wider">
                   <tr>
-                    <th class="px-5 py-4 w-12 text-center">No</th>
                     <th class="px-5 py-4">Nama Kasir</th>
                     <th class="px-5 py-4 max-w-[200px]">Menu Pesanan</th>
                     <th class="px-5 py-4">Pelanggan</th>
@@ -252,7 +251,6 @@ include __DIR__ . '/../layout/sidebar.php';
                         if ($o['payment'] == 2) $payment = "Online";
                     ?>
                     <tr class="hover:bg-blue-50/50 transition-colors group">
-                      <td class="px-5 py-4 text-center font-medium text-gray-500"><?php echo $no++; ?></td>
                       <td class="px-5 py-4">
                         <button type="button"
                                 onclick="openDetail(<?php echo $index; ?>, <?php echo (int)$o['id']; ?>)"

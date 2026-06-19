@@ -65,7 +65,6 @@ include __DIR__ . '/../layout/sidebar.php';
             <table class="w-full text-left text-sm text-gray-500">
                 <thead class="bg-gray-50 text-xs uppercase text-gray-700 border-b border-gray-200">
                     <tr>
-                        <th class="w-20 px-6 py-4 text-center">No</th>
                         <th class="px-6 py-4">Nama Biaya</th>
                         <th class="w-32 px-6 py-4 text-center">Tipe</th>
                         <th class="w-36 px-6 py-4 text-center">Nilai</th>
@@ -78,7 +77,6 @@ include __DIR__ . '/../layout/sidebar.php';
                     <?php else: ?>
                         <?php $no = 1; foreach ($fees as $fee): ?>
                         <tr class="border-b border-gray-100 bg-white hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4 text-center text-gray-500 font-medium"><?= $no++ ?></td>
                             <td class="px-6 py-4 font-bold text-gray-900"><?= htmlspecialchars($fee['name']) ?></td>
                             <td class="px-6 py-4 text-center">
                                 <?php if ($fee['type'] == 1): ?>

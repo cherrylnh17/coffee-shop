@@ -131,7 +131,6 @@ include __DIR__ . '/../layout/sidebar.php';
                 <table class="w-full text-left text-sm text-gray-500">
                   <thead class="bg-gray-50 text-xs uppercase text-gray-700 border-b border-gray-200">
                     <tr>
-                      <th scope="col" class="w-20 px-6 py-4 text-center">No</th>
                       <th scope="col" class="px-6 py-4">Nama Meja</th>
                       <th scope="col" class="px-6 py-4 text-center">QR Code</th>
                       <th scope="col" class="px-6 py-4 text-center">Aksi</th>
@@ -146,7 +145,6 @@ include __DIR__ . '/../layout/sidebar.php';
                         foreach ($mejas as $row): 
                         ?>
                         <tr class="border-b border-gray-100 bg-white transition-colors hover:bg-gray-50">
-                          <td class="px-6 py-4 text-center"><?php echo $no++; ?></td>
                           <td class="px-6 py-4 font-medium text-gray-900"><?php echo htmlspecialchars($row['name']); ?></td>
                           <td class="px-6 py-4 text-center">
                             <div class="flex justify-center items-center">
