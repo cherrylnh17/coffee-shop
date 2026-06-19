@@ -135,7 +135,6 @@ include __DIR__ . '/../layout/sidebar.php';
                       <th scope="col" class="w-16 px-6 py-4 text-center">No</th>
                       <th scope="col" class="px-6 py-4">Nama</th>
                       <th scope="col" class="px-6 py-4">Username</th>
-                      <th scope="col" class="px-6 py-4">Role</th>
                       <th scope="col" class="px-6 py-4 text-center">Aksi</th>
                     </tr>
                   </thead>
@@ -148,9 +147,6 @@ include __DIR__ . '/../layout/sidebar.php';
                           <td class="px-6 py-4 text-center"><?php echo $no++; ?></td>
                           <td class="px-6 py-4 font-medium text-gray-900"><?= htmlspecialchars($row['name'] ?? '-'); ?></td>
                           <td class="px-6 py-4 font-medium text-gray-900"><?= htmlspecialchars($row['username']); ?></td>
-                          <td class="px-6 py-4">
-                              <span class="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-medium text-blue-700">Kasir</span>
-                          </td>
                           <td class="px-6 py-4 text-center">
                             <div class="flex items-center justify-center gap-2">
                               <a href="hapus?id=<?php echo $row['id']; ?>" onclick="return confirm('Yakin ingin menghapus akun kasir ini?')" class="inline-flex h-8 w-8 items-center justify-center rounded bg-red-50 text-red-600 transition-colors hover:bg-red-100 hover:text-red-900">
