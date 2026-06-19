@@ -113,7 +113,7 @@ include __DIR__ . '/layout/sidebar.php';
           <i class="fa-solid fa-money-bill-wave"></i>
         </div>
         <div>
-          <p class="text-sm font-medium text-gray-500">Total Pendapatan</p>
+          <p class="text-sm font-medium text-gray-500">Total Pendapatan Kotor</p>
           <h4 id="val-pendapatan" class="text-2xl font-bold text-gray-800"><?php echo $initial_revenue; ?></h4>
         </div>
       </div>
@@ -174,10 +174,9 @@ include __DIR__ . '/layout/sidebar.php';
         <table class="w-full text-sm">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-400">#</th>
               <th class="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-gray-400">Nama Menu</th>
               <th class="px-5 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-gray-400">Total Terjual</th>
-              <th class="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-gray-400">Total Pendapatan</th>
+              <th class="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-gray-400">Total Kotor</th>
             </tr>
           </thead>
           <tbody id="menu-table-body" class="divide-y divide-gray-50"></tbody>
@@ -285,7 +284,6 @@ include __DIR__ . '/layout/sidebar.php';
       const terjual = parseInt(m.terjual || 0).toLocaleString('id-ID');
       const pendapatan = formatRupiah(m.pendapatan || 0);
       return `<tr class="transition-colors hover:bg-gray-50/50">
-        <td class="px-5 py-3.5 font-medium text-gray-400">${no}</td>
         <td class="px-5 py-3.5 font-semibold text-gray-800">${escapeHtml(m.menu_name || m.name)}</td>
         <td class="px-5 py-3.5 text-center">
           <span class="inline-flex items-center gap-1 rounded-lg border border-blue-100 bg-blue-50 px-2.5 py-1 text-sm font-bold text-blue-600">
@@ -418,5 +416,5 @@ include __DIR__ . '/layout/sidebar.php';
 </script>
 
 <?php 
-include __DIR__ . '/../layout/footer.php'; 
+include __DIR__ . '/layout/footer.php'; 
 ?>

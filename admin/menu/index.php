@@ -166,7 +166,6 @@ include __DIR__ . '/../layout/sidebar.php';
                 <table class="w-full text-left text-sm text-gray-500">
                     <thead class="bg-gray-50 text-xs uppercase text-gray-700 border-b border-gray-200">
                         <tr>
-                            <th scope="col" class="w-16 px-6 py-4 text-center">No</th>
                             <th scope="col" class="w-28 px-6 py-4 text-center">Gambar</th>
                             <th scope="col" class="px-6 py-4">Nama Menu</th>
                             <th scope="col" class="px-6 py-4">Kategori</th>
@@ -192,7 +191,6 @@ include __DIR__ . '/../layout/sidebar.php';
                         foreach ($menu as $row) : 
                         ?>
                         <tr class="border-b border-gray-100 bg-white hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4 text-center"><?php echo $no++; ?></td>
                             <td class="px-6 py-4 text-center">
                                 <?php 
                                 $img_src = htmlspecialchars($row['image']);
