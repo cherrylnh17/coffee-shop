@@ -150,14 +150,28 @@ function initQRScanner() {
       config,
       function (decodedText) {
         var tableNumber = decodedText.trim();
+        var isFullUrl = /^https?:\/\//i.test(tableNumber);
+        var redirectUrl;
+
+        // If QR contains a full URL, use it directly and extract table name
+        if (isFullUrl) {
+          redirectUrl = tableNumber;
+          // Extract table name from URL path: /order/{table}/menu
+          var urlMatch = tableNumber.match(/\/order\/([a-zA-Z0-9]+)/);
+          tableNumber = urlMatch ? urlMatch[1] : tableNumber;
+        }
 
         // 1. Hentikan scanner sementara saat melakukan validasi
         stopScanner();
         statusEl.innerHTML = '<span class="text-blue-600 font-bold">⏳ Mengecek validasi QR...</span>';
 
         var baseUrl = (window.BASE_URL || "").replace(/\/$/, "");
-        var redirectOrder = (window.APP_REDIRECT || "order").replace(/^\/|\/$/g, "");
-        var redirectUrl = baseUrl + "/" + redirectOrder + "/" + tableNumber + "/menu";
+
+        // For non-full-URL QR codes (backward compatibility), construct the URL
+        if (!isFullUrl) {
+          var redirectOrder = (window.APP_REDIRECT || "order").replace(/^\/|\/$/g, "");
+          redirectUrl = baseUrl + "/" + redirectOrder + "/" + tableNumber + "/menu";
+        }
 
         // 2. Request ke backend untuk cek tabel
         fetch(baseUrl + "/check_table.php?table_name=" + encodeURIComponent(tableNumber))

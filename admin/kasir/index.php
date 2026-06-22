@@ -18,7 +18,7 @@ $name = $_SESSION['name'];
   $initials = strtoupper(substr($initials, 0, 2));
 
 try {
-    $stmt = $pdo->prepare("SELECT * FROM user WHERE username != 'admin' ORDER BY id DESC");
+    $stmt = $pdo->prepare("SELECT u.*, COALESCE(o.cnt, 0) AS customer_count FROM user u LEFT JOIN (SELECT user_id, COUNT(*) AS cnt FROM `order` WHERE status = 1 GROUP BY user_id) o ON u.id = o.user_id WHERE u.username != 'admin' ORDER BY u.id DESC");
     $stmt->execute();
     $kasirs = $stmt->fetchAll();
 } catch (PDOException $e) {
@@ -135,18 +135,25 @@ include __DIR__ . '/../layout/sidebar.php';
                       <th scope="col" class="w-16 px-6 py-4 text-center">No</th>
                       <th scope="col" class="px-6 py-4">Nama</th>
                       <th scope="col" class="px-6 py-4">Username</th>
+                      <th scope="col" class="px-6 py-4 text-center">Pelanggan Dilayani</th>
                       <th scope="col" class="px-6 py-4 text-center">Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
                     <?php if (empty($kasirs)): ?>
-                        <tr><td colspan="4" class="py-6 text-center text-gray-500">Data kasir belum tersedia.</td></tr>
+                        <tr><td colspan="5" class="py-6 text-center text-gray-500">Data kasir belum tersedia.</td></tr>
                     <?php else: ?>
                         <?php $no = 1; foreach ($kasirs as $row): ?>
                         <tr class="border-b border-gray-100 bg-white transition-colors hover:bg-gray-50">
                           <td class="px-6 py-4 text-center"><?php echo $no++; ?></td>
                           <td class="px-6 py-4 font-medium text-gray-900"><?= htmlspecialchars($row['name'] ?? '-'); ?></td>
                           <td class="px-6 py-4 font-medium text-gray-900"><?= htmlspecialchars($row['username']); ?></td>
+                          <td class="px-6 py-4 text-center">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
+                              <i class="fa-solid fa-users text-[10px]"></i>
+                              <?= (int)$row['customer_count']; ?> pelanggan
+                            </span>
+                          </td>
                           <td class="px-6 py-4 text-center">
                             <div class="flex items-center justify-center gap-2">
                               <a href="hapus?id=<?php echo $row['id']; ?>" onclick="return confirm('Yakin ingin menghapus akun kasir ini?')" class="inline-flex h-8 w-8 items-center justify-center rounded bg-red-50 text-red-600 transition-colors hover:bg-red-100 hover:text-red-900">

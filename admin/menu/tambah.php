@@ -45,8 +45,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
-        $sql = "INSERT INTO menu (name, price, category, image, description) 
-                VALUES (?, ?, ?, ?, ?)";
+        // Get next sort_order
+        $maxSortStmt = $pdo->query("SELECT COALESCE(MAX(sort_order), 0) + 1 AS next_sort FROM menu");
+        $nextSort = (int)$maxSortStmt->fetchColumn();
+
+        $sql = "INSERT INTO menu (name, price, category, image, description, sort_order) 
+                VALUES (?, ?, ?, ?, ?, ?)";
         
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
@@ -54,7 +58,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $price, 
             $category, 
             $image_db_path, 
-            $description
+            $description,
+            $nextSort
         ]);
         
         header("Location: index?status=success");

@@ -32,7 +32,7 @@ if (count($where_conditions) > 0) {
 }
 
 // Sort logic
-$order_sql = " ORDER BY id DESC"; // default
+$order_sql = " ORDER BY sort_order ASC, id ASC"; // default
 if ($sort_filter === 'sold_desc') {
     $order_sql = " ORDER BY sold DESC, id DESC";
 } elseif ($sort_filter === 'sold_asc') {
@@ -125,6 +125,10 @@ include __DIR__ . '/../layout/sidebar.php';
             <div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <h3 class="text-xl font-bold text-gray-800">Manajemen Menu & Harga</h3>
                 <div class="flex items-center gap-3 flex-wrap">
+                    <!-- Save Order Button -->
+                    <button type="button" id="save-order-btn" onclick="saveMenuOrder()" class="inline-flex items-center rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-700 whitespace-nowrap hidden">
+                        <i class="fa-solid fa-floppy-disk mr-2"></i>Simpan Urutan
+                    </button>
                     <form method="GET" class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto" id="filter-form">
                         
                         <!-- Search Bar -->
@@ -166,6 +170,7 @@ include __DIR__ . '/../layout/sidebar.php';
                 <table class="w-full text-left text-sm text-gray-500">
                     <thead class="bg-gray-50 text-xs uppercase text-gray-700 border-b border-gray-200">
                         <tr>
+                            <th scope="col" class="w-16 px-3 py-4 text-center">Urutan</th>
                             <th scope="col" class="w-28 px-6 py-4 text-center">Gambar</th>
                             <th scope="col" class="px-6 py-4">Nama Menu</th>
                             <th scope="col" class="px-6 py-4">Kategori</th>
@@ -183,14 +188,36 @@ include __DIR__ . '/../layout/sidebar.php';
                     </thead>
                     <tbody>
                         <?php if(empty($menu)): ?>
-                            <tr><td colspan="7" class="py-6 text-center text-gray-500">Data menu belum tersedia.</td></tr>
+                            <tr><td colspan="8" class="py-6 text-center text-gray-500">Data menu belum tersedia.</td></tr>
                         <?php endif; ?>
 
                         <?php 
                         $no = $offset + 1;
                         foreach ($menu as $row) : 
                         ?>
-                        <tr class="border-b border-gray-100 bg-white hover:bg-gray-50 transition-colors">
+                        <tr class="border-b border-gray-100 bg-white hover:bg-gray-50 transition-colors menu-sort-row" 
+                            draggable="true" 
+                            data-id="<?php echo $row['id']; ?>"
+                            ondragstart="handleDragStart(event)" 
+                            ondragover="handleDragOver(event)" 
+                            ondrop="handleDrop(event)" 
+                            ondragend="handleDragEnd(event)">
+                            <td class="px-3 py-4 text-center">
+                                <div class="flex flex-col items-center gap-1">
+                                    <span class="text-[10px] text-gray-400 font-mono">#<?php echo (int)$row['sort_order']; ?></span>
+                                    <div class="flex gap-0.5">
+                                        <button type="button" onclick="moveRow(this, -1)" class="w-6 h-6 rounded bg-gray-100 text-gray-500 hover:bg-blue-100 hover:text-blue-600 flex items-center justify-center text-xs" title="Move up">
+                                            <i class="fa-solid fa-chevron-up text-[10px]"></i>
+                                        </button>
+                                        <button type="button" onclick="moveRow(this, 1)" class="w-6 h-6 rounded bg-gray-100 text-gray-500 hover:bg-blue-100 hover:text-blue-600 flex items-center justify-center text-xs" title="Move down">
+                                            <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                                        </button>
+                                    </div>
+                                    <div class="cursor-grab active:cursor-grabbing text-gray-300 hover:text-gray-500 mt-0.5" title="Drag to reorder">
+                                        <i class="fa-solid fa-grip-vertical text-xs"></i>
+                                    </div>
+                                </div>
+                            </td>
                             <td class="px-6 py-4 text-center">
                                 <?php 
                                 $img_src = htmlspecialchars($row['image']);
@@ -571,6 +598,125 @@ include __DIR__ . '/../layout/sidebar.php';
         document.getElementById('edit-old-image').value   = button.getAttribute('data-image');
         document.getElementById('edit-description').value = button.getAttribute('data-description');
         showModal('edit-crud-modal');
+    }
+
+    // ── Drag & Drop Sort ──
+    let draggedRow = null;
+
+    function handleDragStart(e) {
+        draggedRow = e.currentTarget;
+        draggedRow.classList.add('opacity-50');
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', draggedRow.dataset.id);
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const target = e.currentTarget;
+        if (target !== draggedRow) {
+            target.classList.add('border-t-2', 'border-blue-400');
+        }
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        const target = e.currentTarget;
+        target.classList.remove('border-t-2', 'border-blue-400');
+        if (target !== draggedRow && target.classList.contains('menu-sort-row')) {
+            const tbody = target.parentNode;
+            const rows = Array.from(tbody.querySelectorAll('.menu-sort-row'));
+            const dragIdx = rows.indexOf(draggedRow);
+            const dropIdx = rows.indexOf(target);
+            if (dragIdx < dropIdx) {
+                tbody.insertBefore(draggedRow, target.nextSibling);
+            } else {
+                tbody.insertBefore(draggedRow, target);
+            }
+            showSaveOrderBtn();
+            updateSortNumbers();
+        }
+    }
+
+    function handleDragEnd(e) {
+        e.currentTarget.classList.remove('opacity-50');
+        document.querySelectorAll('.menu-sort-row').forEach(r => {
+            r.classList.remove('border-t-2', 'border-blue-400');
+        });
+    }
+
+    // ── Arrow Move ──
+    function moveRow(btn, direction) {
+        const row = btn.closest('tr');
+        const tbody = row.parentNode;
+        const rows = Array.from(tbody.querySelectorAll('.menu-sort-row'));
+        const idx = rows.indexOf(row);
+
+        if (direction === -1 && idx > 0) {
+            tbody.insertBefore(row, rows[idx - 1]);
+            showSaveOrderBtn();
+            updateSortNumbers();
+        } else if (direction === 1 && idx < rows.length - 1) {
+            tbody.insertBefore(rows[idx + 1], row);
+            showSaveOrderBtn();
+            updateSortNumbers();
+        }
+    }
+
+    function showSaveOrderBtn() {
+        const btn = document.getElementById('save-order-btn');
+        if (btn) btn.classList.remove('hidden');
+    }
+
+    function updateSortNumbers() {
+        const rows = document.querySelectorAll('.menu-sort-row');
+        rows.forEach((row, i) => {
+            const label = row.querySelector('.text-\\[10px\\]');
+            if (label) label.textContent = '#' + (i + 1);
+        });
+    }
+
+    // ── Save Order via AJAX ──
+    async function saveMenuOrder() {
+        const rows = document.querySelectorAll('.menu-sort-row');
+        const order = [];
+        rows.forEach((row, i) => {
+            order.push({ id: parseInt(row.dataset.id), sort_order: i + 1 });
+        });
+
+        if (order.length === 0) return;
+
+        const btn = document.getElementById('save-order-btn');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Menyimpan...';
+
+        try {
+            const res = await fetch('<?= BASE_URL ?>admin/menu/save_order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ order })
+            });
+            const data = await res.json();
+            if (data.success) {
+                btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Tersimpan!';
+                btn.classList.replace('bg-emerald-600', 'bg-green-500');
+                setTimeout(() => {
+                    btn.classList.add('hidden');
+                    btn.classList.replace('bg-green-500', 'bg-emerald-600');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }, 2000);
+            } else {
+                alert('Gagal menyimpan urutan: ' + (data.message || 'Unknown error'));
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        } catch (err) {
+            alert('Terjadi kesalahan jaringan.');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
     }
     </script>
 

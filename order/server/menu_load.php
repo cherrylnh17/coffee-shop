@@ -46,14 +46,14 @@ try {
         $stmt = $pdo->prepare(
             "SELECT * FROM menu
              WHERE category = :category
-             ORDER BY created_at ASC
+             ORDER BY sort_order ASC, id ASC
              LIMIT :limit OFFSET :offset"
         );
         $stmt->bindValue(':category', (int)$category, PDO::PARAM_INT);
     } else {
         $stmt = $pdo->prepare(
             "SELECT * FROM menu
-             ORDER BY created_at ASC
+             ORDER BY sort_order ASC, id ASC
              LIMIT :limit OFFSET :offset"
         );
     }

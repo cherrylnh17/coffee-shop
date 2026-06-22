@@ -42,6 +42,12 @@ $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
 $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
 $mejas = $stmt->fetchAll();
+
+// All tables for batch QR export
+try {
+    $all_meja_stmt = $pdo->query("SELECT name FROM `table` ORDER BY id ASC");
+    $all_mejas = $all_meja_stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) { $all_mejas = []; }
 ?>
 
 <?php
@@ -84,7 +90,7 @@ include __DIR__ . '/../layout/sidebar.php';
           <div class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
               <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <h3 class="text-xl font-bold text-gray-800">Manajemen Meja</h3>
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-4 flex-wrap">
                     <form method="GET" class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto" id="filter-form">
                         <div class="relative w-full sm:w-auto">
                             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -98,6 +104,9 @@ include __DIR__ . '/../layout/sidebar.php';
                         <input type="hidden" name="page" id="page-input" value="1">
                         <button type="submit" class="hidden">Cari</button>
                     </form>
+                    <button type="button" onclick="downloadAllQr()" class="inline-flex items-center rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700">
+                        <i class="fa-solid fa-file-pdf mr-2"></i>Download Semua QR
+                    </button>
                     <button data-modal-target="tambah-meja-modal" data-modal-toggle="tambah-meja-modal" class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700" type="button">
                         <i class="fa-solid fa-plus mr-2"></i>Tambah Meja
                     </button>
@@ -234,7 +243,8 @@ include __DIR__ . '/../layout/sidebar.php';
                     <div class="rounded-xl border border-gray-100 bg-gray-50 p-4 shadow-inner">
                         <div id="qr-canvas-wrapper"></div>
                     </div>
-                    <p class="text-xs text-gray-400 text-center">Scan QR code ini untuk mengidentifikasi meja</p>
+                    <p class="text-xs text-gray-400 text-center">Scan QR code ini untuk membuka menu meja</p>
+                    <p id="qr-url-display" class="text-xs text-gray-500 text-center font-mono bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 break-all max-w-full"></p>
                     <button type="button" onclick="downloadQr()" class="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-purple-700 focus:outline-none focus:ring-4 focus:ring-purple-300">
                         <i class="fa-solid fa-download"></i> Download QR
                     </button>
@@ -278,22 +288,32 @@ include __DIR__ . '/../layout/sidebar.php';
 
     <!-- QR Code Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <script>
       // ── QR Code Modal ──
       let currentQrNama = '';
+      const APP_URL = '<?php echo rtrim(APP_URL, '/'); ?>/';
 
       function openQrModal(button) {
           currentQrNama = button.getAttribute('data-nama');
           document.getElementById('qr-meja-name').textContent = currentQrNama;
 
+          // Build full URL: APP_URL + order/{table_name}/menu
+          const qrUrl = APP_URL + 'order/' + currentQrNama + '/menu';
+
+          // Display URL below QR
+          const urlDisplay = document.getElementById('qr-url-display');
+          if (urlDisplay) urlDisplay.textContent = qrUrl;
+
           // Clear previous QR
           const wrapper = document.getElementById('qr-canvas-wrapper');
           wrapper.innerHTML = '';
 
-          // Generate QR dengan isi = nama meja
+          // Generate QR dengan isi = full URL
           new QRCode(wrapper, {
-              text: currentQrNama,
+              text: qrUrl,
               width: 200,
               height: 200,
               colorDark: '#1e1b4b',
@@ -314,11 +334,28 @@ include __DIR__ . '/../layout/sidebar.php';
           const img     = wrapper.querySelector('img');
           const safeName = currentQrNama.replace(/\s+/g, '-').toLowerCase();
 
+          const { jsPDF } = window.jspdf;
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pageW = pdf.internal.pageSize.getWidth();
+
+          // Title
+          pdf.setFontSize(20);
+          pdf.setFont(undefined, 'bold');
+          pdf.text('Meja: ' + currentQrNama, pageW / 2, 30, { align: 'center' });
+
+          // QR URL
+          const qrUrl = APP_URL + 'order/' + currentQrNama + '/menu';
+          pdf.setFontSize(10);
+          pdf.setFont(undefined, 'normal');
+          pdf.text(qrUrl, pageW / 2, 40, { align: 'center' });
+
+          const addImageToPdf = (dataUrl) => {
+              pdf.addImage(dataUrl, 'PNG', (pageW - 80) / 2, 55, 80, 80);
+              pdf.save('qr-' + safeName + '.pdf');
+          };
+
           if (canvas) {
-              const link = document.createElement('a');
-              link.download = 'qr-' + safeName + '.png';
-              link.href = canvas.toDataURL('image/png');
-              link.click();
+              addImageToPdf(canvas.toDataURL('image/png'));
           } else if (img) {
               const c = document.createElement('canvas');
               c.width = 200; c.height = 200;
@@ -327,13 +364,82 @@ include __DIR__ . '/../layout/sidebar.php';
               tempImg.crossOrigin = 'anonymous';
               tempImg.onload = function () {
                   ctx.drawImage(tempImg, 0, 0);
-                  const link = document.createElement('a');
-                  link.download = 'qr-' + safeName + '.png';
-                  link.href = c.toDataURL('image/png');
-                  link.click();
+                  addImageToPdf(c.toDataURL('image/png'));
               };
               tempImg.src = img.src;
           }
+      }
+
+      function downloadAllQr() {
+          const allTables = <?php echo json_encode($all_mejas); ?>;
+          if (!allTables || allTables.length === 0) {
+              alert('Tidak ada data meja.');
+              return;
+          }
+
+          const { jsPDF } = window.jspdf;
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pageW = pdf.internal.pageSize.getWidth();
+          const pageH = pdf.internal.pageSize.getHeight();
+
+          // Create a hidden container for generating QR codes
+          let tempDiv = document.getElementById('qr-batch-temp');
+          if (!tempDiv) {
+              tempDiv = document.createElement('div');
+              tempDiv.id = 'qr-batch-temp';
+              tempDiv.style.cssText = 'position:absolute;left:-9999px;top:0;';
+              document.body.appendChild(tempDiv);
+          }
+
+          let processed = 0;
+          const total = allTables.length;
+
+          allTables.forEach((table, idx) => {
+              tempDiv.innerHTML = '';
+              const qrContainer = document.createElement('div');
+              tempDiv.appendChild(qrContainer);
+
+              const tableName = table.name;
+              const qrUrl = APP_URL + 'order/' + tableName + '/menu';
+
+              new QRCode(qrContainer, {
+                  text: qrUrl,
+                  width: 300,
+                  height: 300,
+                  colorDark: '#1e1b4b',
+                  colorLight: '#ffffff',
+                  correctLevel: QRCode.CorrectLevel.H
+              });
+
+              // Wait for QR to render
+              setTimeout(() => {
+                  const canvas = qrContainer.querySelector('canvas');
+                  const img = qrContainer.querySelector('img');
+
+                  if (idx > 0) pdf.addPage();
+
+                  // Title
+                  pdf.setFontSize(24);
+                  pdf.setFont(undefined, 'bold');
+                  pdf.text('Meja: ' + tableName, pageW / 2, 35, { align: 'center' });
+
+                  // URL
+                  pdf.setFontSize(10);
+                  pdf.setFont(undefined, 'normal');
+                  pdf.text(qrUrl, pageW / 2, 45, { align: 'center' });
+
+                  const dataUrl = canvas ? canvas.toDataURL('image/png') : (img ? img.src : null);
+                  if (dataUrl) {
+                      pdf.addImage(dataUrl, 'PNG', (pageW - 90) / 2, 60, 90, 90);
+                  }
+
+                  processed++;
+                  if (processed === total) {
+                      pdf.save('semua-qr-meja.pdf');
+                      tempDiv.innerHTML = '';
+                  }
+              }, 200);
+          });
       }
 
       // Tutup modal QR saat klik backdrop

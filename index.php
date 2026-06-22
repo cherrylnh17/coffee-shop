@@ -6,7 +6,7 @@ require_once 'config.php';
 
 $menuItems = [];
 try {
-  $stmt = $pdo->query("SELECT name, image, description FROM menu LIMIT 20");
+  $stmt = $pdo->query("SELECT name, image, description FROM menu ORDER BY sort_order ASC, id ASC LIMIT 20");
   $menuItems = $stmt->fetchAll();
 } catch (PDOException $e) {
   $menuItems = [];
