@@ -95,6 +95,18 @@ try {
     $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) { $orders = []; }
 
+// ── Meja Paling Sering Dikunjungi ──────────────────────────────────────────
+try {
+    $top_meja_stmt = $pdo->query("SELECT table_name, COUNT(*) AS visit_count FROM `order` WHERE $where_sql AND table_name IS NOT NULL AND table_name != '' GROUP BY table_name ORDER BY visit_count DESC LIMIT 10");
+    $top_meja = $top_meja_stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) { $top_meja = []; }
+
+// ── Kasir Paling Sering Melayani ──────────────────────────────────────────
+try {
+    $top_kasir_stmt = $pdo->query("SELECT user_name, COUNT(*) AS serve_count FROM `order` WHERE $where_sql AND user_name IS NOT NULL GROUP BY user_name ORDER BY serve_count DESC LIMIT 10");
+    $top_kasir = $top_kasir_stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) { $top_kasir = []; }
+
 $params = [];
 $params['filter_date'] = $filter_date;
 
@@ -132,6 +144,75 @@ include __DIR__ . '/../layout/sidebar.php';
 
     <main class="relative min-h-screen pt-[74px] transition-all duration-300 lg:ml-[280px] pc-main">
       <div class="p-4 sm:p-6 lg:p-8">
+        <!-- Statistik Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <!-- Meja Paling Sering Dikunjungi -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center">
+                <i class="fa-solid fa-chair text-orange-500 text-sm"></i>
+              </div>
+              <h4 class="font-bold text-gray-800">Meja Paling Sering Dikunjungi</h4>
+            </div>
+            <?php if (empty($top_meja)): ?>
+              <p class="text-sm text-gray-400 text-center py-4">Belum ada data.</p>
+            <?php else: ?>
+              <div class="space-y-2">
+                <?php foreach ($top_meja as $idx => $tm): 
+                  $max_count = $top_meja[0]['visit_count'];
+                  $pct = ($max_count > 0) ? round(($tm['visit_count'] / $max_count) * 100) : 0;
+                ?>
+                <div class="flex items-center gap-3">
+                  <span class="w-6 h-6 flex items-center justify-center rounded-full bg-orange-100 text-orange-600 text-xs font-bold flex-shrink-0"><?= $idx + 1 ?></span>
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between mb-1">
+                      <span class="text-sm font-semibold text-gray-700"><?= htmlspecialchars($tm['table_name']) ?></span>
+                      <span class="text-xs font-bold text-orange-600"><?= $tm['visit_count'] ?>x</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-1.5">
+                      <div class="bg-orange-500 h-1.5 rounded-full" style="width: <?= $pct ?>%"></div>
+                    </div>
+                  </div>
+                </div>
+                <?php endforeach; ?>
+              </div>
+            <?php endif; ?>
+          </div>
+
+          <!-- Kasir Paling Sering Melayani -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+            <div class="flex items-center gap-2 mb-4">
+              <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                <i class="fa-solid fa-user-tie text-blue-500 text-sm"></i>
+              </div>
+              <h4 class="font-bold text-gray-800">Kasir Paling Sering Melayani</h4>
+            </div>
+            <?php if (empty($top_kasir)): ?>
+              <p class="text-sm text-gray-400 text-center py-4">Belum ada data.</p>
+            <?php else: ?>
+              <div class="space-y-2">
+                <?php foreach ($top_kasir as $idx => $tk): 
+                  $max_count = $top_kasir[0]['serve_count'];
+                  $pct = ($max_count > 0) ? round(($tk['serve_count'] / $max_count) * 100) : 0;
+                ?>
+                <div class="flex items-center gap-3">
+                  <span class="w-6 h-6 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 text-xs font-bold flex-shrink-0"><?= $idx + 1 ?></span>
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between mb-1">
+                      <span class="text-sm font-semibold text-gray-700"><?= htmlspecialchars($tk['user_name']) ?></span>
+                      <span class="text-xs font-bold text-blue-600"><?= $tk['serve_count'] ?>x</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-1.5">
+                      <div class="bg-blue-500 h-1.5 rounded-full" style="width: <?= $pct ?>%"></div>
+                    </div>
+                  </div>
+                </div>
+                <?php endforeach; ?>
+              </div>
+            <?php endif; ?>
+          </div>
+        </div>
+
         <div class="gap-x-6">
           <div class="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100">
 

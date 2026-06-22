@@ -1,12 +1,13 @@
 <?php
 session_start();
-if (!isset($_SESSION['username']) || $_SESSION['role'] != 2) {
-    header("Location: ../auth/login.php");
-    exit;
-}
 
 require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../path.php';
+
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 2) {
+    header("Location: " . BASE_URL . "auth/login");
+    exit;
+}
 
 // Buat tabel jika belum ada
 $pdo->exec("CREATE TABLE IF NOT EXISTS `fee_setting` (
@@ -103,7 +104,7 @@ include __DIR__ . '/../layout/sidebar.php';
                                         class="inline-flex h-8 w-8 items-center justify-center rounded bg-blue-50 text-blue-600 hover:bg-blue-100">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </button>
-                                    <a href="hapus.php?id=<?= $fee['id'] ?>"
+                                    <a href="<?= BASE_URL ?>admin/tax/hapus?id=<?= $fee['id'] ?>"
                                        onclick="return confirm('Yakin ingin menghapus \'<?= htmlspecialchars(addslashes($fee['name'])) ?>\'?')"
                                        class="inline-flex h-8 w-8 items-center justify-center rounded bg-red-50 text-red-600 hover:bg-red-100">
                                         <i class="fa-solid fa-trash"></i>
@@ -136,7 +137,7 @@ include __DIR__ . '/../layout/sidebar.php';
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            <form action="tambah.php" method="POST" class="p-4 md:p-5">
+            <form action="<?= BASE_URL ?>admin/tax/tambah" method="POST" class="p-4 md:p-5">
 
                 <div class="mb-4">
                     <label class="mb-2 block text-sm font-medium text-gray-900">Nama Biaya</label>
@@ -216,7 +217,7 @@ include __DIR__ . '/../layout/sidebar.php';
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            <form action="edit.php" method="POST" class="p-4 md:p-5">
+            <form action="<?= BASE_URL ?>admin/tax/edit" method="POST" class="p-4 md:p-5">
                 <input type="hidden" name="id" id="edit_id">
 
                 <div class="mb-4">

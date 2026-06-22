@@ -71,7 +71,11 @@ $imported   = 0;
 $skipped    = 0;
 $errors     = [];
 
-$stmt = $pdo->prepare("INSERT INTO menu (name, price, category, image, description) VALUES (?, ?, ?, ?, ?)");
+$stmt = $pdo->prepare("INSERT INTO menu (name, price, category, image, description, sort_order) VALUES (?, ?, ?, ?, ?, ?)");
+
+// Get current max sort_order
+$maxSortStmt = $pdo->query("SELECT COALESCE(MAX(sort_order), 0) FROM menu");
+$currentSort = (int)$maxSortStmt->fetchColumn();
 
 for ($r = 1; $r < count($rows); $r++) {
     $row = $rows[$r];
@@ -113,7 +117,8 @@ for ($r = 1; $r < count($rows); $r++) {
     $image       = 'https://placehold.co/400x300?text=' . urlencode($name);
 
     try {
-        $stmt->execute([$name, $price, $category, $image, $description]);
+        $currentSort++;
+        $stmt->execute([$name, $price, $category, $image, $description, $currentSort]);
         $imported++;
     } catch (PDOException $e) {
         $skipped++;

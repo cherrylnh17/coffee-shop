@@ -1,11 +1,15 @@
 <?php
 session_start();
+
+require_once __DIR__ . '/../../config.php';
+require_once __DIR__ . '/../../path.php';
+
 if (!isset($_SESSION['username']) || $_SESSION['role'] != 2) {
-    header("Location: ../../auth/login.php");
+    header("Location: " . BASE_URL . "auth/login");
     exit;
 }
 
-require_once __DIR__ . '/../../config.php';
+$redirectUrl = BASE_URL . 'admin/tax';
 
 if (isset($_GET['id'])) {
     try {
@@ -14,14 +18,14 @@ if (isset($_GET['id'])) {
         $stmt = $pdo->prepare("DELETE FROM fee_setting WHERE id = ?");
         $stmt->execute([$id]);
 
-        header("Location: index.php?status=success&msg=" . urlencode("Data berhasil dihapus."));
+        header("Location: " . $redirectUrl . "?status=success&msg=" . urlencode("Data berhasil dihapus."));
         exit;
 
     } catch (PDOException $e) {
-        header("Location: index.php?status=error&msg=" . urlencode("Gagal menghapus data: " . $e->getMessage()));
+        header("Location: " . $redirectUrl . "?status=error&msg=" . urlencode("Gagal menghapus data: " . $e->getMessage()));
         exit;
     }
 } else {
-    header("Location: index.php");
+    header("Location: " . $redirectUrl);
     exit;
 }

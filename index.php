@@ -6,7 +6,7 @@ require_once 'config.php';
 
 $menuItems = [];
 try {
-  $stmt = $pdo->query("SELECT name, image, description FROM menu LIMIT 6");
+  $stmt = $pdo->query("SELECT name, image, description FROM menu ORDER BY sort_order ASC, id ASC LIMIT 20");
   $menuItems = $stmt->fetchAll();
 } catch (PDOException $e) {
   $menuItems = [];
@@ -137,13 +137,28 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 
 
   <section id="hero" class="relative min-h-screen flex items-center overflow-hidden bg-slate-50 pt-20 pb-12 lg:py-0">
-    <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-100 rounded-full blur-[100px] opacity-60 pointer-events-none -translate-y-1/2 translate-x-1/3"></div>
     <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-50 rounded-full blur-[80px] pointer-events-none translate-y-1/3 -translate-x-1/4"></div>
     <div class="absolute inset-0 pointer-events-none opacity-50" style="background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 40px 40px;"></div>
 
-    <div class="relative max-w-7xl mx-auto px-5 lg:px-8 w-full">
-      <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center min-h-[85vh]">
-        <div class="order-2 lg:order-1 space-y-8 text-center lg:text-left relative z-10">
+    <!-- Desktop: right-half photo panel, absolutely positioned to truly fill 50vw -->
+    <div class="hidden lg:block absolute top-0 right-0 w-1/2 h-full z-0" id="hero-photo-panel">
+      <div id="product-grid-desktop" class="w-full h-full"></div>
+      <!-- Left fade overlay -->
+      <div class="absolute inset-0 pointer-events-none" style="background: linear-gradient(to right, #f8fafc 0%, rgba(248,250,252,0.5) 18%, transparent 40%);"></div>
+      <!-- Top fade -->
+      <div class="absolute inset-0 pointer-events-none" style="background: linear-gradient(to bottom, #f8fafc 0%, transparent 12%, transparent 88%, #f8fafc 100%);"></div>
+    </div>
+
+    <div class="relative w-full z-10">
+      <!-- Mobile: photo strip above text -->
+      <div class="lg:hidden w-full overflow-hidden mb-8 pt-4" style="height: 220px;">
+        <div id="product-grid-mobile" style="position:relative;width:100%;height:100%;"></div>
+        <div class="absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-slate-50 to-transparent pointer-events-none z-10"></div>
+        <div class="absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-slate-50 to-transparent pointer-events-none z-10"></div>
+      </div>
+
+      <div class="max-w-7xl mx-auto px-5 lg:px-8 w-full">
+        <div class="lg:w-1/2 space-y-8 text-center lg:text-left">
           <div class="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-600 text-xs font-bold px-4 py-2 rounded-full">
             <span class="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></span>
             Digital Coffee Experience
@@ -167,13 +182,14 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
             </a>
-            <button id="hero-order-btn"
+            <a href="https://maps.app.goo.gl/Dd7kpbXQp3T5j9Kx8" target="_blank" rel="noopener noreferrer"
               class="group w-full sm:w-auto flex items-center justify-center gap-2 bg-white border-2 border-slate-200 hover:border-blue-600 text-slate-800 hover:text-blue-600 font-semibold px-8 py-4 rounded-full transition-all duration-300 hover:shadow-lg active:scale-95">
               <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.243m-6.243 0H3.757" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              Order Sekarang
-            </button>
+              Temukan Kami
+            </a>
           </div>
 
           <div class="flex flex-wrap justify-center lg:justify-start gap-8 pt-8 border-t border-slate-200 mt-8">
@@ -190,47 +206,6 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
             <div>
               <div class="text-3xl font-display font-black text-slate-900">24/7</div>
               <div class="text-slate-600 font-medium text-sm mt-1">Digital Order</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="order-1 lg:order-2 flex items-center justify-center relative mt-10 lg:mt-0">
-          <div class="relative w-full max-w-sm mx-auto">
-            <div class="relative w-72 h-72 sm:w-96 sm:h-96 mx-auto">
-              <div class="absolute inset-0 rounded-full border border-blue-200 border-dashed animate-spin" style="animation-duration: 25s;"></div>
-              <div class="absolute inset-6 rounded-full border border-blue-100 animate-spin" style="animation-duration: 15s; animation-direction: reverse;"></div>
-              <div class="absolute inset-12 rounded-full bg-white border border-slate-100 flex items-center justify-center shadow-2xl shadow-blue-600/10">
-                <div class="absolute inset-0 rounded-full bg-gradient-to-tr from-blue-50 to-white"></div>
-                <svg class="w-28 h-28 text-blue-600 relative z-10" viewBox="0 0 100 100" fill="currentColor">
-                  <path d="M15 30 L85 30 L78 80 Q77 88 68 88 L32 88 Q23 88 22 80 Z" fill="rgba(37, 99, 235, 0.1)" stroke="currentColor" stroke-width="2.5" />
-                  <path d="M78 38 Q95 38 95 52 Q95 66 78 66" fill="none" stroke="currentColor" stroke-width="2.5" />
-                  <path d="M35 20 Q38 10 45 15 Q48 5 55 10 Q58 2 65 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-                </svg>
-              </div>
-              <div class="absolute top-10 right-10 w-4 h-4 bg-blue-500 rounded-full animate-bounce shadow-md shadow-blue-500/30" style="animation-delay: 0s;"></div>
-              <div class="absolute bottom-16 left-8 w-3 h-3 bg-indigo-400 rounded-full animate-bounce shadow-md shadow-indigo-400/30" style="animation-delay: 0.5s;"></div>
-            </div>
-            <div class="absolute -top-6 -left-6 sm:-left-12 bg-white rounded-2xl px-5 py-4 shadow-xl border border-slate-100 animate-bounce" style="animation-duration: 4s;">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-amber-50 rounded-full flex items-center justify-center text-xl">☕</div>
-                <div>
-                  <div class="text-slate-900 text-sm font-bold">Americano</div>
-                  <div class="text-slate-600 text-xs font-medium">Baru Diseduh</div>
-                </div>
-              </div>
-            </div>
-            <div class="absolute -bottom-4 -right-4 sm:-right-8 bg-white rounded-2xl px-5 py-4 shadow-xl border border-slate-100 animate-bounce" style="animation-duration: 3.5s; animation-delay: 0.5s;">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center">
-                  <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <div>
-                  <div class="text-slate-900 text-sm font-bold">Order Diterima</div>
-                  <div class="text-green-600 text-xs font-medium">Sedang disiapkan</div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -670,6 +645,129 @@ $menuJson = json_encode($menuItems, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED
 
         window.addEventListener('resize', toggleNavButton);
       }
+
+      // PRODUCT PHOTO AUTO-SCROLL — database images only, 2 columns (up / down)
+      function buildProductItems(menuData) {
+        if (!menuData || menuData.length === 0) return [];
+        return menuData.map(item => ({
+          src: BASE_URL + '/assets/img/menu/' + item.image,
+          name: item.name
+        }));
+      }
+
+      function initDesktopScroll(imgs) {
+        const panel = document.getElementById('product-grid-desktop');
+        if (!panel || imgs.length === 0) return;
+
+        const gap = 8;        // px between cards
+        const cardW = '100%'; // each card fills its column width
+        // Card height = square (will be set by CSS to match column width via aspect-ratio)
+
+        panel.style.cssText = 'position:relative;width:100%;height:100%;display:flex;gap:' + gap + 'px;padding:8px;overflow:hidden;';
+
+        // Split images: column 0 = even indices, column 1 = odd indices
+        const col0Imgs = imgs.filter((_, i) => i % 2 === 0);
+        const col1Imgs = imgs.filter((_, i) => i % 2 === 1);
+        // Make sure each column has enough items to loop; duplicate until >= 6
+        while (col0Imgs.length < 6) col0Imgs.push(...col0Imgs);
+        while (col1Imgs.length < 6) col1Imgs.push(...col1Imgs);
+
+        const columns = [
+          { imgs: col0Imgs, direction: 1,  speed: 0.5 },  // scroll up
+          { imgs: col1Imgs, direction: -1, speed: 0.5 },  // scroll down
+        ];
+
+        const tracks = columns.map(({ imgs: colImgs, direction, speed }) => {
+          const col = document.createElement('div');
+          col.style.cssText = 'flex:1;position:relative;overflow:hidden;';
+
+          const track = document.createElement('div');
+          track.style.cssText = 'position:absolute;left:0;right:0;top:0;display:flex;flex-direction:column;gap:' + gap + 'px;will-change:transform;';
+
+          // Triple the images for seamless infinite loop
+          const all = [...colImgs, ...colImgs, ...colImgs];
+          track.innerHTML = all.map(img => `
+            <div style="width:100%;aspect-ratio:1/1;border-radius:14px;overflow:hidden;flex-shrink:0;">
+              <img src="${img.src}" alt="${img.name}"
+                style="width:100%;height:100%;object-fit:cover;display:block;">
+            </div>
+          `).join('');
+
+          col.appendChild(track);
+          panel.appendChild(col);
+
+          // For the downward column, start halfway through so they appear offset
+          let pos = direction === -1 ? 0 : 0;
+
+          return { track, direction, speed, pos, colImgs };
+        });
+
+        // After DOM is painted, calculate real card height then start loop
+        requestAnimationFrame(() => {
+          tracks.forEach(t => {
+            const firstCard = t.track.firstElementChild;
+            if (!firstCard) return;
+            const cardH = firstCard.getBoundingClientRect().height;
+            const unit = cardH + gap;
+            const total = unit * t.colImgs.length;
+
+            // Downward column: start midway so they're visually offset from upward column
+            if (t.direction === -1) t.pos = total * 0.5;
+
+            t.total = total;
+            t.cardH = cardH;
+          });
+
+          function step() {
+            tracks.forEach(t => {
+              if (!t.total) return;
+              t.pos += t.speed * t.direction;
+              if (t.pos >= t.total) t.pos -= t.total;
+              if (t.pos < 0) t.pos += t.total;
+              t.track.style.transform = `translateY(-${t.pos}px)`;
+            });
+            requestAnimationFrame(step);
+          }
+          requestAnimationFrame(step);
+        });
+      }
+
+      function initMobileScroll(imgs) {
+        const wrapper = document.getElementById('product-grid-mobile');
+        if (!wrapper || imgs.length === 0) return;
+
+        wrapper.style.cssText = 'position:relative;width:100%;height:100%;overflow:hidden;';
+
+        const track = document.createElement('div');
+        track.style.cssText = 'display:flex;gap:10px;position:absolute;top:0;bottom:0;align-items:center;will-change:transform;';
+
+        // Triple for seamless loop
+        const all = [...imgs, ...imgs, ...imgs];
+        track.innerHTML = all.map(img => `
+          <div style="flex:0 0 auto;width:170px;height:170px;border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.10);">
+            <img src="${img.src}" alt="${img.name}"
+              style="width:100%;height:100%;object-fit:cover;display:block;">
+          </div>
+        `).join('');
+        wrapper.appendChild(track);
+
+        const cardW = 170 + 10;
+        const total = cardW * imgs.length;
+        let pos = 0;
+
+        function step() {
+          pos += 0.5;
+          if (pos >= total) pos -= total;
+          track.style.transform = `translateX(-${pos}px)`;
+          requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      }
+
+      const productImgs = buildProductItems(window.TRAFA_MENU_DATA);
+      initDesktopScroll(productImgs);
+      initMobileScroll(productImgs);
+
     });
 
     const sections = document.querySelectorAll('section[id]');
