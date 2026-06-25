@@ -15,7 +15,7 @@ if (isset($_GET['id'])) {
     try {
         $id = (int)$_GET['id'];
 
-        $stmt = $pdo->prepare("DELETE FROM fee_setting WHERE id = ?");
+        $stmt = $pdo->prepare("DELETE FROM gratuity WHERE id = ?");
         $stmt->execute([$id]);
 
         header("Location: " . $redirectUrl . "?status=success&msg=" . urlencode("Data berhasil dihapus."));
