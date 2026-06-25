@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        $stmt = $pdo->prepare("UPDATE fee_setting SET name = ?, type = ?, value = ? WHERE id = ?");
+        $stmt = $pdo->prepare("UPDATE gratuity SET name = ?, type = ?, value = ? WHERE id = ?");
         $stmt->execute([$name, $type, $value, $id]);
 
         header("Location: " . $redirectUrl . "?status=success&msg=" . urlencode("Data berhasil diperbarui."));
