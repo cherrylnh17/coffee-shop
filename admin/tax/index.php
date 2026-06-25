@@ -10,7 +10,7 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 2) {
 }
 
 // Buat tabel jika belum ada
-$pdo->exec("CREATE TABLE IF NOT EXISTS `fee_setting` (
+$pdo->exec("CREATE TABLE IF NOT EXISTS `gratuity` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `name` varchar(100) NOT NULL,
     `type` tinyint UNSIGNED NOT NULL COMMENT '1 Untuk Persen, 2 Untuk Fix',
@@ -18,7 +18,7 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS `fee_setting` (
     PRIMARY KEY (`id`)
 )");
 
-$stmt = $pdo->query("SELECT * FROM fee_setting ORDER BY id DESC");
+$stmt = $pdo->query("SELECT * FROM gratuity ORDER BY id DESC");
 $fees = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $pageTitle = "Manajemen Biaya & Pajak";

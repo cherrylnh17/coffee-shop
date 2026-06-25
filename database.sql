@@ -1,12 +1,4 @@
 SET foreign_key_checks = 0;
-DROP TABLE IF EXISTS `fee_setting`;
-CREATE TABLE `fee_setting` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `type` tinyint unsigned NOT NULL COMMENT '1 Untuk Persen, 2 Untuk Fix',
-  `value` decimal(10,2) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 DROP TABLE IF EXISTS `gratuity`;
 CREATE TABLE `gratuity` (

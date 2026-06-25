@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        $stmt = $pdo->prepare("INSERT INTO fee_setting (name, type, value) VALUES (?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO gratuity (name, type, value) VALUES (?, ?, ?)");
         $stmt->execute([$name, $type, $value]);
 
         header("Location: " . $redirectUrl . "?status=success&msg=" . urlencode("Biaya berhasil ditambahkan."));

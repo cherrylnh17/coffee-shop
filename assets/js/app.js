@@ -149,50 +149,73 @@ function initQRScanner() {
       { facingMode: "environment" },
       config,
       function (decodedText) {
-        var tableNumber = decodedText.trim();
-        var isFullUrl = /^https?:\/\//i.test(tableNumber);
+        var rawText = decodedText.trim();
+        var isFullUrl = /^https?:\/\//i.test(rawText);
         var redirectUrl;
+        var tableNumber;
+        var appBaseUrl = (window.BASE_URL || "").replace(/\/$/, "");
 
-        // If QR contains a full URL, use it directly and extract table name
         if (isFullUrl) {
-          redirectUrl = tableNumber;
-          // Extract table name from URL path: /order/{table}/menu
-          var urlMatch = tableNumber.match(/\/order\/([a-zA-Z0-9]+)/);
-          tableNumber = urlMatch ? urlMatch[1] : tableNumber;
+          // ── Validasi Full URL ──
+          try {
+            var scannedUrl = new URL(rawText);
+            var expectedUrl = new URL(appBaseUrl + "/");
+
+            // Validasi domain: protocol, hostname, dan port harus sama
+            if (scannedUrl.protocol !== expectedUrl.protocol ||
+                scannedUrl.hostname !== expectedUrl.hostname ||
+                scannedUrl.port !== expectedUrl.port) {
+              stopScanner();
+              showQRInvalidError("QR Code bukan dari domain ini. Silakan scan QR yang benar.");
+              return;
+            }
+
+            // Validasi format URL: harus /order/{table}/menu
+            var urlMatch = rawText.match(/\/order\/([^\/\?#]+)\/menu/);
+            if (!urlMatch) {
+              stopScanner();
+              showQRInvalidError("Format QR tidak valid. Pastikan QR code benar.");
+              return;
+            }
+
+            tableNumber = urlMatch[1];
+            redirectUrl = rawText;
+          } catch (e) {
+            stopScanner();
+            showQRInvalidError("Format QR tidak valid.");
+            return;
+          }
+        } else {
+          // ── Backward compatibility: QR berisi nomor meja saja ──
+          tableNumber = rawText;
+          var redirectOrder = (window.APP_REDIRECT || "order").replace(/^\/|\/$/g, "");
+          redirectUrl = appBaseUrl + "/" + redirectOrder + "/" + tableNumber + "/menu";
         }
 
         // 1. Hentikan scanner sementara saat melakukan validasi
         stopScanner();
-        statusEl.innerHTML = '<span class="text-blue-600 font-bold">⏳ Mengecek validasi QR...</span>';
+        statusEl.innerHTML = '<span class="text-blue-600 font-bold">⏳ Mengecek validasi meja...</span>';
 
-        var baseUrl = (window.BASE_URL || "").replace(/\/$/, "");
-
-        // For non-full-URL QR codes (backward compatibility), construct the URL
-        if (!isFullUrl) {
-          var redirectOrder = (window.APP_REDIRECT || "order").replace(/^\/|\/$/g, "");
-          redirectUrl = baseUrl + "/" + redirectOrder + "/" + tableNumber + "/menu";
-        }
-
-        // 2. Request ke backend untuk cek tabel
-        fetch(baseUrl + "/check_table.php?table_name=" + encodeURIComponent(tableNumber))
+        // 2. Request ke backend untuk cek nomor meja
+        fetch(appBaseUrl + "/check_table.php?table_name=" + encodeURIComponent(tableNumber))
           .then(function(response) {
             return response.json();
           })
           .then(function(data) {
             if (data.status === 'success') {
               // Jika Valid -> Alihkan
-              statusEl.innerHTML = '<span class="text-green-600 font-bold">✅ QR Valid! Mengalihkan ke Meja ' + tableNumber + '...</span>';
+              statusEl.innerHTML = '<span class="text-green-600 font-bold">✅ Meja ditemukan! Mengalihkan ke Meja ' + tableNumber + '...</span>';
               setTimeout(function () {
                 window.location.href = redirectUrl;
               }, 800);
             } else {
-              // Jika Tidak Valid -> Munculkan Error & Tombol Coba Lagi
-              showQRInvalidError();
+              // Jika Nomor Meja Tidak Ditemukan
+              showQRInvalidError("Nomor meja tidak ditemukan. Silakan cek nomor meja Anda.");
             }
           })
           .catch(function(error) {
             console.error("Error:", error);
-            showQRInvalidError("Terjadi kesalahan jaringan.");
+            showQRInvalidError("Terjadi kesalahan jaringan. Silakan coba lagi.");
           });
       }
     ).catch(function(err){
