@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: php_app
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - db
+
+  # Database MySQL
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Hakimlnh11
+      MYSQL_DATABASE: coffee-shop
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: Hakimlnh11
+    ports:
+      - "3307:3306"
+
+  # Dashboard PhpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: pma_dashboard
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: admin
+      PMA_PASSWORD: Hakimlnh11
+    depends_on:
+      - db
